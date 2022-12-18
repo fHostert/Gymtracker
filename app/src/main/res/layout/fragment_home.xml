@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".HomeFragment"
+    android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/home_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/start_empty_workout_button"
+                android:onClick="startEmptyWorkoutClick"
+                android:text="@string/startEmptyWorkout"
+                style="@style/largeButton"/>
+            <Button
+                android:id="@+id/add_new_exercise_button"
+                android:onClick="addToExerciseTableClick"
+                android:text="@string/addNewExercise"
+                style="@style/largeButton"/>
+            <Button
+                android:id="@+id/add_new_template_button"
+                android:onClick="addNewTemplateClick"
+                android:text="@string/addNewTemplate"
+                style="@style/largeButton"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@color/boarders"/>
+        </LinearLayout>
+
+</ScrollView>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".WorkoutFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:id="@+id/workout_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <Button
+                android:id="@+id/add_exercise_button"
+                android:onClick="addExerciseClick"
+                android:text="@string/addExercise"
+                style="@style/largeButton"/>
+            <Button
+                android:id="@+id/quit_workout_button"
+                android:onClick="quitWorkoutClick"
+                android:text="@string/quitWorkout"
+                style="@style/largeButton"/>
+            <Button
+                android:id="@+id/save_workout_button"
+                android:onClick="saveWorkoutClick"
+                android:text="@string/saveWorkout"
+                style="@style/largeButton"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@color/boarders"/>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

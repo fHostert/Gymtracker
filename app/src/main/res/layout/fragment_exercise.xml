@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayoutExercise"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ExerciseFragment">
+
+    <TableLayout
+        android:id="@+id/exercise_table_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="*">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="100">
+            <TextView
+                android:id="@+id/name_of_exercise_text_view"
+                android:text="Name der Übung"
+                android:textStyle="bold"
+                android:textSize="@dimen/headline_size"
+                android:layout_marginStart="20dp"
+                android:layout_weight="72"/>
+            <Button
+                android:id="@+id/delete_exercise_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_baseline_menu_24"
+                android:layout_weight="28"
+                android:layout_marginEnd="10dp">
+            </Button>
+        </TableRow>
+
+        <TableRow android:weightSum="100">
+            <TextView
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:text="@string/set"
+                android:layout_weight="15"/>
+            <TextView
+                android:gravity="center"
+                android:text="@string/last"
+                android:layout_width="0dp"
+                android:layout_weight="25"/>
+            <TextView
+                android:gravity="center"
+                android:text="@string/KG"
+                android:layout_width="0dp"
+                android:layout_weight="20"/>
+            <TextView
+                android:gravity="center"
+                android:text="@string/reps."
+                android:layout_width="0dp"
+                android:layout_weight="20"/>
+        </TableRow>
+    </TableLayout>
+
+    <Button
+        android:id="@+id/add_set_button"
+        android:onClick="addSetClick"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/addSet">
+    </Button>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/boarder_size"
+        android:background="@color/boarders"/>
+
+</LinearLayout>

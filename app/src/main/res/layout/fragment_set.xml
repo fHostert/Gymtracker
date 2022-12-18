@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SetFragment"
+    android:weightSum="100">
+
+    <TextView
+        android:id="@+id/set_index_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="1"
+        android:gravity="center"
+        android:layout_weight="15"/>
+
+    <TextView
+        android:id="@+id/last_set_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="200kg x 100"
+        android:gravity="center"
+        android:layout_weight="25"/>
+
+    <EditText
+        android:id="@+id/weight_edit_text"
+        android:layout_width="0dp"
+        android:gravity="center"
+        android:inputType="numberDecimal"
+        android:maxLength="6"
+        android:layout_weight="20"/>
+
+    <EditText
+        android:id="@+id/reps_edit_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:gravity="center"
+        android:layout_weight="20"
+        android:maxLength="3"/>
+
+    <Button
+        android:id="@+id/save_set_button"
+        android:onClick="saveSetClick"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/ok"
+        android:gravity="center"
+        android:layout_weight="20"/>
+
+</TableRow>

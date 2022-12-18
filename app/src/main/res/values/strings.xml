@@ -1,0 +1,115 @@
+<resources>
+    <string name="app_name">Gymtracker MS</string>
+    <string name="home">Home</string>
+    <string name="history">Verlauf</string>
+    <string name="stats">Statistik</string>
+    <string name="startEmptyWorkout">Leeres Workout starten</string>
+    <string name="addExercise">Übung hinzufügen</string>
+    <string name="addExerciseToTemplate">Weitere Übung der Vorlage hinzufügen</string>
+    <string name="saveTemplate">Vorlage speichern</string>
+    <string name="addNewExercise">Neue Übung erstellen</string>
+    <string name="addNewTemplate">Neue Vorlage erstellen</string>
+    <string name="repetitionsFull">Wiederholungen</string>
+    <string name="newExercise">Neue Übung</string>
+    <string name="newTemplate">Neue Vorlage</string>
+    <string name="templates">Vorlagen</string>
+    <string name="addNewExerciseText">Den Namen der neuen Übung eingeben:</string>
+    <string name="addNewTemplateText">Den Namen der neuen Vorlage eingeben:</string>
+    <string name="removeExercise">Übung entfernen</string>
+    <string name="removeExerciseText">Diese Übung aus dem aktuellen Workout entfernen?</string>
+    <string name="exercise">Übung</string>
+    <string name="exercises">Übungen:</string>
+    <string name="bestSet">Bestes Set</string>
+    <string name="remove">entfernen</string>
+    <string name="no">Nein</string>
+    <string name="yes">Ja</string>
+    <string name="addSet">Set hinzufügen</string>
+    <string name="search">🔎 Suchen</string>
+    <string name="min">min</string>
+    <string name="quitWorkout">Workout abbrechen</string>
+    <string name="quitWorkoutText">Soll das Workout wirklich ohne zu speichern beendet werden?</string>
+    <string name="saveWorkoutText">Workout beenden und speichern?</string>
+    <string name="saveWorkout">Workout speichern &amp; beenden</string>
+    <string name="set">Set</string>
+    <string name="sets">Sets</string>
+    <string name="last">Vorheriges</string>
+    <string name="KG">KG</string>
+    <string name="changeWorkoutName">Workoutnamen ändern</string>
+    <string name="reps.">Wiederh.</string>
+    <string name="ok">OK</string>
+    <string name="chooseExercise">Übung auswählen</string>#
+    <string name="restoreWorkout">Letztes Workout wiederherstellen</string>
+    <string name="emptyLastSet">-</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="prweight">Persönlicher Rekord (Gewicht):</string>
+    <string name="delete">löschen</string>
+    <string name="prvolume">Persönlicher Rekord (Volumen):</string>
+    <string name="totalWeight">Gesamtgewicht:</string>
+    <string name="workoutCount">Anzahl durchgeführter Workouts:</string>
+    <string name="workoutSumDuration">Gesamtdauer aller Workouts:</string>
+    <string name="totalWeightSum">Gesamtgewicht aller Workouts:</string>
+    <string name="defaultStatistik">Allgemeine Statistiken</string>
+    <string name="defaultWorkoutName">Standard Workout</string>
+    <string name="toastCannotSaveEmptyWorkout">Schließe ein Set ab, um das Workout zu speichern.</string>
+    <string name="toastDoubleExercise">Diese Übung existiert bereits.</string>
+    <string name="toastDoubleTemplate">Diese Vorlage exisitert bereits.</string>
+    <string name="toastNeverDoneExercise">Keine Details - diese Übung wurde noch nie durchgeführt.</string>
+    <string name="toastExerciseAlreadyInNewTemplate">Diese Übung ist in dieser Vorlage bereits vertreten.</string>
+    <string name="toastTemplateIsEmpty">Füge der Vorlage erst eine Übung hinzu.</string>
+    <string name="toastTemplateNameIsEmpty">Gib einen Namen für die Vorlage ein.</string>
+    <string name="statsForExercise">Statistiken für bestimmte Übung</string>
+    <string name="day">Tag</string>
+    <string name="days">Tage</string>
+    <string name="hour">Stunde</string>
+    <string name="hours">Stunden</string>
+    <string name="h">h</string>
+    <string name="d">d</string>
+    <string name="minute">Minute</string>
+    <string name="minutes">Minuten</string>
+    <string name="deleteWorkout">Workout löschen</string>
+    <string name="deleteTemplate">Template löschen</string>
+    <string name="deleteWorkoutText">Soll dieses Workout wirklich aus dem Verlauf gelöscht werden? Es wird in keiner Statistik mehr auftauchen.</string>
+    <string name="deleteTemplateText">Soll dieses Template wirklich gelöscht werden?</string>
+    <string name="notificationTitle">Laufendes Workout</string>
+    <string name="notificationText">Speichere oder lösche das Workout, um zu beenden.</string>
+
+
+    <string name="savedWorkoutKey">SAVED_WORKOUT_KEY</string>
+    <string name="savedStartTime">SAVED_START_TIME_KEY</string>
+    <string name="savedPauseTime">SAVED_PAUSE_TIME_KEY</string>
+
+
+    <string-array name="exercises">
+
+        <item>Bankdrücken</item>
+        <item>Schrägbankdrücken</item>
+        <item>Butterfly</item>
+        <item>Butterfly (Maschine)</item>
+        <item>Schulterdrücken (KH)</item>
+        <item>Schulterdrücken (LH)</item>
+        <item>Trizeps-Pulldown</item>
+        <item>Dips</item>
+        <item>Latzug</item>
+        <item>Rudern (eng)</item>
+        <item>Rudern (breit)</item>
+        <item>Butterfly Reverse</item>
+        <item>Hammercurls</item>
+        <item>Bizepscurls (LH)</item>
+        <item>Klimmzüge</item>
+        <item>Beinpresse</item>
+        <item>Leg Curls</item>
+        <item>Leg Extensions</item>
+        <item>Waden (KH)</item>
+        <item>Waden (LH)</item>
+        <item>Adduktoren</item>
+        <item>Abduktoren</item>
+        <item>Hip Thrust</item>
+        <item>Crunches</item>
+        <item>Plank</item>
+        <item>Rotator</item>
+        <item>Back Extensions</item>
+    </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>
