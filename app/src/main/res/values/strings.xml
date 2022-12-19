@@ -38,6 +38,8 @@
     <string name="moveExerciseUp">Übung nach oben verschieben</string>
     <string name="moveExerciseDown">Übung nach unten verschieben</string>
     <string name="replaceExercise">Übung ersetzen</string>
+    <string name="workoutChangeName">Namen des Workouts ändern</string>
+    <string name="workoutChangeNameEnterName">Den neuen Namen eingeben:</string>
     <string name="reps.">Wiederh.</string>
     <string name="ok">OK</string>
     <string name="chooseExercise">Übung auswählen</string>#

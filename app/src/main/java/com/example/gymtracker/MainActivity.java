@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -107,11 +108,32 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.change_workout_name) {
-
+            changeWorkoutName();
         }
         return true;
     }
 
+    private void changeWorkoutName() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setMessage(getResources().getString(R.string.workoutChangeNameEnterName));
+        alert.setTitle(getResources().getString(R.string.workoutChangeName));
+        final View customLayout = getLayoutInflater().inflate(R.layout.alert, null);
+        alert.setView(customLayout);
+
+        alert.setPositiveButton(getResources().getString(R.string.ok), (dialogInterface, i) -> {
+            EditText et = customLayout.findViewById(R.id.alert_input_edit_text);
+            String newWorkoutName = et.getText().toString();
+            this.setTitle(newWorkoutName);
+            DatabaseManager.changeCurrentWorkoutName(newWorkoutName);
+        });
+
+        //If cancel, do nothing
+        alert.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
+            //Do nothing and cancel
+        });
+
+        alert.show();
+    }
 
     public void reload() {
         Fragment newHome = new HomeFragment();
@@ -128,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
                     .replace(R.id.home_container, workoutFragment).commit();
             getSupportFragmentManager().executePendingTransactions();
             globalWorkoutFragment = workoutFragment;
+            this.setTitle(DatabaseManager.getCurrentWorkoutName());
         }
     }
 
@@ -222,6 +245,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else if (id == R.id.move_exercise_down) {
                     globalWorkoutFragment.moveExerciseDown(exerciseFragment);
+                }
+                else if (id == R.id.remove_exercise) {
+                    globalWorkoutFragment.removeExercise(exerciseFragment);
                 }
                 return false;
             }

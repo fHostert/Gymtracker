@@ -155,6 +155,18 @@ public class WorkoutFragment extends Fragment {
         Collections.swap(exerciseFragments, indexInArray, indexInArray + 1);
     }
 
+    public void removeExercise(ExerciseFragment exerciseFragment) {
+        LinearLayout workoutLinearLayout = getView().findViewById(R.id.workout_linear_layout);
+        DatabaseManager.deleteExerciseFromCurrentWorkout(exerciseFragment.getDatabaseIndex());
+        for (int i = 0; i < exerciseFragments.size(); i++) {
+            if (exerciseFragments.get(i) == exerciseFragment) {
+                exerciseFragments.remove(i);
+                workoutLinearLayout.removeViewAt(i);
+                break;
+            }
+        }
+    }
+
     public ArrayList<ExerciseFragment> getExerciseFragments() {
         return exerciseFragments;
     }

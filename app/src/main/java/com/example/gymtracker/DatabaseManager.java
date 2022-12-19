@@ -62,6 +62,22 @@ public final class DatabaseManager {
         db.execSQL(query);
     }
 
+    public static void deleteExerciseFromCurrentWorkout(int exerciseID) {
+        String query = String.format(l,
+                "SELECT position FROM CurrentWorkout WHERE exerciseID = %d;", exerciseID);
+        Cursor rs = db.rawQuery(query, null);
+        rs.moveToFirst();
+        int oldPosition = rs.getInt(0);
+        rs.close();
+        query = String.format(l, "DELETE FROM CurrentWorkout WHERE exerciseID = %d;",
+                exerciseID);
+        db.execSQL(query);
+        query = String.format(l, "UPDATE CurrentWorkout SET position = position - 1 " +
+                        "WHERE position > %d;",
+                        oldPosition);
+        db.execSQL(query);
+    }
+
     public static void moveExerciseUp(int exerciseID, int oldPosition) {
         String query = String.format(l, "UPDATE CurrentWorkout SET position = position + 1 " +
                 "WHERE position = %d;", oldPosition - 1);
