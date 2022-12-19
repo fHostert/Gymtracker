@@ -15,11 +15,14 @@ import android.widget.TextView;
 import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.Set;
 
+import java.util.ArrayList;
+
 public class ExerciseFragment extends Fragment {
 
     private static final String ARG_EXERCISE = "param1";
 
     private Exercise exercise;
+    private final ArrayList<SetFragment> setFragments = new ArrayList<>();
 
     public ExerciseFragment() {
         // Required empty public constructor
@@ -53,7 +56,8 @@ public class ExerciseFragment extends Fragment {
         //add Sets
         for (Set set : exercise.getSets()) {
             LinearLayout exerciseLinearLayout = view.findViewById(R.id.exercise_table_layout);
-            SetFragment setFragment = SetFragment.newInstance(set);
+            SetFragment setFragment = SetFragment.newInstance(set, exercise.getDatabaseIndex());
+            setFragments.add(setFragment);
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
             newContainer.setId(View.generateViewId());
             getParentFragmentManager().beginTransaction()
@@ -67,7 +71,8 @@ public class ExerciseFragment extends Fragment {
     public void addSet() {
         LinearLayout exerciseLinearLayout = getView().findViewById(R.id.exercise_table_layout);
         Set set = new Set(exerciseLinearLayout.getChildCount() - 1, 0, 0);
-        SetFragment setFragment = SetFragment.newInstance(set);
+        SetFragment setFragment = SetFragment.newInstance(set, exercise.getDatabaseIndex());
+        setFragments.add(setFragment);
         FragmentContainerView newContainer = new FragmentContainerView(getContext());
         newContainer.setId(View.generateViewId());
         getParentFragmentManager().beginTransaction()
@@ -76,6 +81,19 @@ public class ExerciseFragment extends Fragment {
 
         DatabaseManager.insertSetIntoCurrentWorkout(exercise.getDatabaseIndex(), set);
     }
+
+    public int getDatabaseIndex() {
+        return exercise.getDatabaseIndex();
+    }
+
+    public String getName() {
+        return exercise.getName();
+    }
+
+    public SetFragment getSetFragment(int setIndex) {
+        return setFragments.get(setIndex - 1);
+    }
+
 
 
 }

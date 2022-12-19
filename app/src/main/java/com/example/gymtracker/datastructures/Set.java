@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 public class Set implements Serializable {
     private final int index;
-    private final int reps;
-    private final float weight;
+    private int reps;
+    private float weight;
 
     public Set(int index, int reps, float weight) {
         this.index = index;
@@ -23,5 +23,13 @@ public class Set implements Serializable {
 
     public float getWeight() {
         return weight;
+    }
+
+    public void setReps(int reps) {
+        this.reps = reps;
+    }
+
+    public void setWeight(float weight) {
+        this.weight = weight;
     }
 }

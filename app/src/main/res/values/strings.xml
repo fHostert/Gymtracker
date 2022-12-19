@@ -35,6 +35,9 @@
     <string name="last">Vorheriges</string>
     <string name="KG">KG</string>
     <string name="changeWorkoutName">Workoutnamen ändern</string>
+    <string name="moveExerciseUp">Übung nach oben verschieben</string>
+    <string name="moveExerciseDown">Übung nach unten verschieben</string>
+    <string name="replaceExercise">Übung ersetzen</string>
     <string name="reps.">Wiederh.</string>
     <string name="ok">OK</string>
     <string name="chooseExercise">Übung auswählen</string>#
@@ -57,6 +60,9 @@
     <string name="toastExerciseAlreadyInNewTemplate">Diese Übung ist in dieser Vorlage bereits vertreten.</string>
     <string name="toastTemplateIsEmpty">Füge der Vorlage erst eine Übung hinzu.</string>
     <string name="toastTemplateNameIsEmpty">Gib einen Namen für die Vorlage ein.</string>
+    <string name="toastNoRepsDone">Erst Wiederholungen eintragen.</string>
+    <string name="toastExerciseAlreadyUp">Übung ist bereits an erster Stelle.</string>
+    <string name="toastExerciseAlreadyDown">Übung ist bereits an letzter Stelle.</string>
     <string name="statsForExercise">Statistiken für bestimmte Übung</string>
     <string name="day">Tag</string>
     <string name="days">Tage</string>

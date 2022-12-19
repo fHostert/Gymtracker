@@ -13,7 +13,10 @@ public class Formatter {
         }
         else {
             erg = (new DecimalFormat("0.00")).format(f);
+            if (erg.substring(erg.length() - 1).equals("0")) {
+                erg = erg.substring(0, erg.length() - 1);
+            }
         }
-        return erg;
+        return erg.replaceAll(",", ".");
     }
 }

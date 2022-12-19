@@ -16,10 +16,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.Set;
 import com.example.gymtracker.datastructures.Workout;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,6 +35,7 @@ public class WorkoutFragment extends Fragment {
     private static final String ARG_WORKOUT = "param1";
 
     private Workout workout = null;
+    private final ArrayList<ExerciseFragment> exerciseFragments = new ArrayList<>();
 
     public WorkoutFragment() {
         // Required empty public constructor
@@ -64,16 +69,12 @@ public class WorkoutFragment extends Fragment {
         LinearLayout workoutLinearLayout = view.findViewById(R.id.workout_linear_layout);
         for (Exercise exercise : workout.getExercises()) {
             ExerciseFragment exerciseFragment = ExerciseFragment.newInstance(exercise);
+            exerciseFragments.add(exerciseFragment);
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
             newContainer.setId(View.generateViewId());
             getParentFragmentManager().beginTransaction()
                     .add(newContainer.getId(), exerciseFragment).commit();
             workoutLinearLayout.addView(newContainer);
-
-            /*for (Set set : exercise.getSets()) {
-                DatabaseManager.insertSetIntoCurrentWorkout(
-                        exercise.getDatabaseIndex(), workoutLinearLayout.getChildCount(), set);
-            }*/
         }
         return view;
     }
@@ -83,25 +84,11 @@ public class WorkoutFragment extends Fragment {
         startActivityForResult(intent, 0);
     }
 
-    private void addExercise(Exercise exercise) {
-        LinearLayout workoutLinearLayout = getView().findViewById(R.id.workout_linear_layout);
-        ExerciseFragment exerciseFragment = ExerciseFragment.newInstance(exercise);
-        FragmentContainerView newContainer = new FragmentContainerView(getContext());
-        newContainer.setId(View.generateViewId());
-        getParentFragmentManager().beginTransaction()
-                .add(newContainer.getId(), exerciseFragment).commit();
-        workoutLinearLayout.addView(newContainer);
-
-       for (Set set : exercise.getSets()) {
-           DatabaseManager.insertSetIntoCurrentWorkout(
-                   exercise.getDatabaseIndex(), workoutLinearLayout.getChildCount(), set);
-       }
-    }
-
     private void addEmptyExercise(String exerciseName) {
         LinearLayout workoutLinearLayout = getView().findViewById(R.id.workout_linear_layout);
         Exercise exercise = new Exercise(DatabaseManager.getExerciseID(exerciseName));
         ExerciseFragment exerciseFragment = ExerciseFragment.newInstance(exercise);
+        exerciseFragments.add(exerciseFragment);
         FragmentContainerView newContainer = new FragmentContainerView(getContext());
         newContainer.setId(View.generateViewId());
         getParentFragmentManager().beginTransaction()
@@ -110,9 +97,8 @@ public class WorkoutFragment extends Fragment {
 
         for (Set set : exercise.getSets()) {
             DatabaseManager.insertSetIntoCurrentWorkout(
-                    exercise.getDatabaseIndex(), workoutLinearLayout.getChildCount() - 4, set);
+                    exercise.getDatabaseIndex(), workoutLinearLayout.getChildCount(), set);
         }
-        DatabaseManager.printTable("CurrentWorkout");
     }
 
     @Override
@@ -123,6 +109,54 @@ public class WorkoutFragment extends Fragment {
           addEmptyExercise(data.getExtras().getString("EXERCISE_NAME_KEY"));
         }
 
+    }
+
+    public void moveExerciseUp(ExerciseFragment exerciseFragment) {
+        LinearLayout workoutLinearLayout = getView().findViewById(R.id.workout_linear_layout);
+        int indexInArray = 0;
+        for (int i = 0; i < exerciseFragments.size(); i++) {
+            if (exerciseFragments.get(i) == exerciseFragment) {
+                indexInArray = i;
+                break;
+            }
+        }
+        if (indexInArray == 0) {
+            Toast.makeText(getContext(),
+                    getResources().getString(R.string.toastExerciseAlreadyUp),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        DatabaseManager.moveExerciseUp(exerciseFragment.getDatabaseIndex(), indexInArray + 1);
+        View thisExercise = workoutLinearLayout.getChildAt(indexInArray);
+        workoutLinearLayout.removeViewAt(indexInArray);
+        workoutLinearLayout.addView(thisExercise, indexInArray - 1);
+        Collections.swap(exerciseFragments, indexInArray, indexInArray - 1);
+    }
+
+    public void moveExerciseDown(ExerciseFragment exerciseFragment) {
+        LinearLayout workoutLinearLayout = getView().findViewById(R.id.workout_linear_layout);
+        int indexInArray = 0;
+        for (int i = 0; i < exerciseFragments.size(); i++) {
+            if (exerciseFragments.get(i) == exerciseFragment) {
+                indexInArray = i;
+                break;
+            }
+        }
+        if (indexInArray == exerciseFragments.size() - 1) {
+            Toast.makeText(getContext(),
+                    getResources().getString(R.string.toastExerciseAlreadyDown),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        DatabaseManager.moveExerciseDown(exerciseFragment.getDatabaseIndex(), indexInArray + 1);
+        View thisExercise = workoutLinearLayout.getChildAt(indexInArray);
+        workoutLinearLayout.removeViewAt(indexInArray);
+        workoutLinearLayout.addView(thisExercise, indexInArray + 1);
+        Collections.swap(exerciseFragments, indexInArray, indexInArray + 1);
+    }
+
+    public ArrayList<ExerciseFragment> getExerciseFragments() {
+        return exerciseFragments;
     }
 
 

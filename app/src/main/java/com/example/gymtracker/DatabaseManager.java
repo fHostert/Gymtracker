@@ -4,6 +4,7 @@ package com.example.gymtracker;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Paint;
 import android.util.Log;
 
 import com.example.gymtracker.datastructures.Exercise;
@@ -38,8 +39,8 @@ public final class DatabaseManager {
 
     public static void insertSetIntoCurrentWorkout(int exerciseID, int position, Set set) {
         String query = String.format(l, "INSERT INTO CurrentWorkout VALUES " +
-                        "(%d, %d, %d, %d, '%f')",
-                        exerciseID, position, set.getIndex(), set.getReps(), set.getWeight());
+                        "(%d, %d, %d, %d, '%s')",
+                        exerciseID, position, set.getIndex(), set.getReps(), Formatter.formatFloat(set.getWeight()));
         db.execSQL(query);
     }
 
@@ -55,15 +56,29 @@ public final class DatabaseManager {
     }
 
     public static void updateSet(int exerciseID, Set set) {
-        String query = String.format(l, "UPDATE CurrentWorkout SET reps = %d, weight = %f " +
+        String query = String.format(l, "UPDATE CurrentWorkout SET reps = %d, weight = '%s' " +
                         "WHERE exerciseID = %d AND setIndex = %d;",
-                        set.getReps(), set.getWeight(), exerciseID, set.getIndex());
+                        set.getReps(), Formatter.formatFloat(set.getWeight()), exerciseID, set.getIndex());
         db.execSQL(query);
     }
 
-    public static void updateExercisePosition(int exerciseID, int newPosition) {
-        String query = String.format(l, "UPDATE CurrentWorkout SET position = %d, " +
-                        "WHERE exerciseID = %d;", newPosition, exerciseID);
+    public static void moveExerciseUp(int exerciseID, int oldPosition) {
+        String query = String.format(l, "UPDATE CurrentWorkout SET position = position + 1 " +
+                "WHERE position = %d;", oldPosition - 1);
+        db.execSQL(query);
+
+        query = String.format(l, "UPDATE CurrentWorkout SET position = position - 1 " +
+                "WHERE exerciseID = %d;", exerciseID);
+        db.execSQL(query);
+    }
+
+    public static void moveExerciseDown(int exerciseID, int oldIndex) {
+        String query = String.format(l, "UPDATE CurrentWorkout SET position = position - 1 " +
+                "WHERE position = %d;", oldIndex + 1);
+        db.execSQL(query);
+
+        query = String.format(l, "UPDATE CurrentWorkout SET position = position + 1 " +
+                "WHERE exerciseID = %d;", exerciseID);
         db.execSQL(query);
     }
 
@@ -71,6 +86,8 @@ public final class DatabaseManager {
         if (isCurrentWorkoutEmpty()) {
             return false;
         }
+        createWorkoutsTable();
+        printTable("CurrentWorkout");
         int workoutID = getNextWorkoutID();
         String workoutName = getCurrentWorkoutName();
         int duration = (int) (System.currentTimeMillis() - getCurrentWorkoutStartTime());
@@ -84,8 +101,8 @@ public final class DatabaseManager {
                         workoutID);
         db.execSQL(query);
 
-        query = String.format(l, "INSERT INTO Workouts VALUES (%d, %s, %d, %s, %f)",
-                        workoutID, workoutName, duration, currentDate, totalWeight);
+        query = String.format(l, "INSERT INTO Workouts VALUES (%d, '%s', %d, '%s', '%s')",
+                        workoutID, workoutName, duration, currentDate, Formatter.formatFloat(totalWeight));
         db.execSQL(query);
 
         dropTable("CurrentWorkout");
@@ -111,7 +128,6 @@ public final class DatabaseManager {
         if (!doesTableExist("CurrentWorkout")) {
             return null;
         }
-        printTable("CurrentWorkout");
 
         //Get exercise IDs
         String query = "SELECT DISTINCT exerciseID FROM CurrentWorkout ORDER BY position ASC;";
@@ -137,8 +153,6 @@ public final class DatabaseManager {
             do {
                 sets.add(new Set(rs.getInt(0), rs.getInt(1), rs.getFloat(2)));
             } while (rs.moveToNext());
-            Log.d("GetCurrentWorkout INDEX", String.valueOf(exercisesIDs[i]));
-            Log.d("GetCurrentWorkout NAME", getExerciseName(exercisesIDs[i]));
             exercises.add(new Exercise(exercisesIDs[i], sets));
         }
         rs.close();
@@ -147,7 +161,7 @@ public final class DatabaseManager {
     }
 
     public static float getTotalWeightOfCurrentWorkout() {
-        String query = "SELECT (weight * repetitions) FROM CurrentWorkout;";
+        String query = "SELECT (weight * reps) FROM CurrentWorkout;";
         Cursor resultSet = db.rawQuery(query, null);
         resultSet.moveToFirst();
         if (resultSet.getCount() == 0) {
@@ -206,7 +220,7 @@ public final class DatabaseManager {
     }
 
     public static String getCurrentWorkoutDate() {
-        String query = "SELECT workoutName FROM CurrentWorkoutMetadata;";
+        String query = "SELECT date FROM CurrentWorkoutMetadata;";
         Cursor rs = db.rawQuery(query, null);
         rs.moveToFirst();
         String workoutDate = rs.getString(0);
@@ -342,6 +356,20 @@ public final class DatabaseManager {
                 Log.d(String.valueOf(i), String.format(
                         "exerciseID: %d, " +
                         "position: %d, " +
+                        "setIndex: %d, " +
+                        "reps: %d, " +
+                        "weight: %f",
+                        resultSet.getInt(0), resultSet.getInt(1), resultSet.getInt(2),
+                        resultSet.getInt(3), resultSet.getFloat(4)));
+                i++;
+            }
+            while (resultSet.moveToNext());
+        }
+        else if (Objects.equals(tableName, "History")) {
+            do {
+                Log.d(String.valueOf(i), String.format(
+                        "workoutID: %d, " +
+                        "exerciseID: %d, " +
                         "setIndex: %d, " +
                         "reps: %d, " +
                         "weight: %f",

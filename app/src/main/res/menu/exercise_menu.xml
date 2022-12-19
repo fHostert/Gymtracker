@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/move_exercise_up"
+        android:title="@string/moveExerciseUp" />
+
+    <item
+        android:id="@+id/move_exercise_down"
+        android:title="@string/moveExerciseDown" />
+
+    <item
+        android:id="@+id/remove_exercise"
+        android:title="@string/removeExercise" />
+
+    <item
+        android:id="@+id/replace_exercise"
+        android:title="@string/replaceExercise" />
+
+</menu>

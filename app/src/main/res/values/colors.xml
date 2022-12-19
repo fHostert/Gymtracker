@@ -13,4 +13,6 @@
     <color name="boarders">#FF000000</color>
     <color name="background">#FFFFFFFF</color>
     <color name="buttonText">#FF000000</color>
+    <color name="setCompleted">#FF00FF00</color>
+
 </resources>

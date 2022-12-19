@@ -19,14 +19,19 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.gymtracker.datastructures.Workout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -101,12 +106,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.change_workout_name) {
 
         }
         return true;
     }
+
 
     public void reload() {
         Fragment newHome = new HomeFragment();
@@ -118,7 +123,6 @@ public class MainActivity extends AppCompatActivity {
         Workout workout = DatabaseManager.getCurrentWorkout();
         //build new workout
         if (workout != null) {
-            Log.d("RESTORING WORKOUT", "------------------------");
             WorkoutFragment workoutFragment = WorkoutFragment.newInstance(workout);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.home_container, workoutFragment).commit();
@@ -143,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
         this.setTitle(DatabaseManager.getCurrentWorkoutName());
         startOngoingNotification();
     }
-
 
 
     /*##############################################################################################
@@ -181,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
         alert.setPositiveButton(getResources().getString(R.string.yes), (dialogInterface, i) -> {
             DatabaseManager.createHistoryTable();
             if (DatabaseManager.saveCurrentWorkout()) {
+                DatabaseManager.printTable("History");
                 reload();
                 stopOngoingNotification();
             }
@@ -199,28 +203,43 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addSetClick(View view) {
-        View parentView = ((View) view.getParent());
-        TableLayout tableLayout = parentView.findViewById(R.id.exercise_table_layout);
-
-        //add new Set
-       /* int indexOfNextSet = tableLayout.getChildCount() - 1;
-        String exerciseName = String
-                .valueOf(((TextView)parentView.findViewById(R.id.name_of_exercise)).getText());
-        Fragment
-        Fragment row = SetRowFragment.newInstance(exerciseName,
-                indexOfNextSet, 0, 0);
-        FragmentContainerView newContainer = new FragmentContainerView(this);
-        newContainer.setId(View.generateViewId());
-        getSupportFragmentManager().beginTransaction().add(newContainer.getId(), row).commit();
-        tableLayout.addView(newContainer);
-
-        //update current workout table
-        dbManager.insertNewSetToCurrentWorkout(exerciseName, indexOfNextSet);*/
-
+        ExerciseFragment exerciseFragment = getExerciseFragment(view);
+        exerciseFragment.addSet();
     }
 
     /*##############################################################################################
-    ##########################################NOTIFICATION##########################################
+    #########################################EXERCISE BUTTONS#######################################
+    ##############################################################################################*/
+    public void exerciseMenuClick(View view) {
+        PopupMenu popup = new PopupMenu(this, view);
+        ExerciseFragment exerciseFragment = getExerciseFragment(view);
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                int id = menuItem.getItemId();
+                if (id == R.id.move_exercise_up) {
+                    globalWorkoutFragment.moveExerciseUp(exerciseFragment);
+                }
+                else if (id == R.id.move_exercise_down) {
+                    globalWorkoutFragment.moveExerciseDown(exerciseFragment);
+                }
+                return false;
+            }
+        });
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.exercise_menu, popup.getMenu());
+        popup.show();
+    }
+
+    /*##############################################################################################
+    ###########################################SET BUTTONS##########################################
+    ##############################################################################################*/
+    public void saveSetClick(View view) {
+        getSetFragment(view).saveSet();
+    }
+
+    /*##############################################################################################
+    #########################################NOTIFICATIONS##########################################
     ##############################################################################################*/
     public void startOngoingNotification(){
         CharSequence name = "General";
@@ -254,4 +273,31 @@ public class MainActivity extends AppCompatActivity {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.cancel(notificationId);
     }
+
+    /*##############################################################################################
+    ############################################HELPER##############################################
+    ##############################################################################################*/
+    private ExerciseFragment getExerciseFragment(View view) {
+        View parentView = ((View) view.getParent());
+        Log.d("CLASSNAMEEXERCSIE", parentView.getClass().getSimpleName());
+        String exerciseName = String.valueOf((
+                (TextView)parentView.findViewById(R.id.name_of_exercise_text_view)).getText());
+        ArrayList<ExerciseFragment> exercises = globalWorkoutFragment.getExerciseFragments();
+        for (ExerciseFragment exerciseFragment : exercises) {
+            if (Objects.equals(exerciseFragment.getName(), exerciseName)) {
+                return exerciseFragment;
+            }
+        }
+        return null;
+    }
+
+    private SetFragment getSetFragment(View view) {
+        View parentView = ((View) view.getParent().getParent().getParent());
+        TextView setIndexTV = ((View) view.getParent()).findViewById(R.id.set_index_text_view);
+        int setIndex = Integer.parseInt(String.valueOf(setIndexTV.getText()));
+        ExerciseFragment exerciseFragment = getExerciseFragment(parentView);
+        return exerciseFragment.getSetFragment(setIndex);
+    }
+
+
 }
