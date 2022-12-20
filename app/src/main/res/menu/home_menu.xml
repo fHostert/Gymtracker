@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/edit_exercises"
+        android:title="@string/editExercises" />
+
+    <item
+        android:id="@+id/edit_templates"
+        android:title="@string/editTemplates" />
+
+</menu>

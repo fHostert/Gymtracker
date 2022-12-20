@@ -100,7 +100,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.workout_menu, menu);
+        if (DatabaseManager.doesTableExist("CurrentTable")){
+            getMenuInflater().inflate(R.menu.workout_menu, menu);
+        }
+        else {
+            getMenuInflater().inflate(R.menu.home_menu, menu);
+        }
         return true;
     }
 
@@ -188,8 +193,7 @@ public class MainActivity extends AppCompatActivity {
         alert.setPositiveButton(getResources().getString(R.string.yes), (dialogInterface, i) -> {
             DatabaseManager.dropTable("CurrentWorkout");
             DatabaseManager.dropTable("CurrentWorkoutMetadata");
-            reload();
-            stopOngoingNotification();
+            stopWorkout();
         });
         //If cancel, return
         alert.setNegativeButton(getResources().getString(R.string.no), (dialog, whichButton) -> {
@@ -207,9 +211,7 @@ public class MainActivity extends AppCompatActivity {
         alert.setPositiveButton(getResources().getString(R.string.yes), (dialogInterface, i) -> {
             DatabaseManager.createHistoryTable();
             if (DatabaseManager.saveCurrentWorkout()) {
-                DatabaseManager.printTable("History");
-                reload();
-                stopOngoingNotification();
+                stopWorkout();
             }
             else {
                 Toast.makeText(this,
@@ -225,6 +227,12 @@ public class MainActivity extends AppCompatActivity {
         alert.show();
     }
 
+    private void stopWorkout() {
+        reload();
+        stopOngoingNotification();
+        invalidateOptionsMenu();
+    }
+
     public void addSetClick(View view) {
         ExerciseFragment exerciseFragment = getExerciseFragment(view);
         exerciseFragment.addSet();
@@ -236,21 +244,24 @@ public class MainActivity extends AppCompatActivity {
     public void exerciseMenuClick(View view) {
         PopupMenu popup = new PopupMenu(this, view);
         ExerciseFragment exerciseFragment = getExerciseFragment(view);
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                int id = menuItem.getItemId();
-                if (id == R.id.move_exercise_up) {
-                    globalWorkoutFragment.moveExerciseUp(exerciseFragment);
-                }
-                else if (id == R.id.move_exercise_down) {
-                    globalWorkoutFragment.moveExerciseDown(exerciseFragment);
-                }
-                else if (id == R.id.remove_exercise) {
-                    globalWorkoutFragment.removeExercise(exerciseFragment);
-                }
-                return false;
+        popup.setOnMenuItemClickListener(menuItem -> {
+            int id = menuItem.getItemId();
+            if (id == R.id.move_exercise_up) {
+                globalWorkoutFragment.moveExerciseUp(exerciseFragment);
             }
+            else if (id == R.id.move_exercise_down) {
+                globalWorkoutFragment.moveExerciseDown(exerciseFragment);
+            }
+            else if (id == R.id.remove_exercise) {
+                globalWorkoutFragment.removeExercise(exerciseFragment);
+            }
+            else if (id == R.id.replace_exercise) {
+                globalWorkoutFragment.replaceExercise(exerciseFragment);
+            }
+            else if (id == R.id.delete_last_set) {
+                globalWorkoutFragment.deleteLastSet(exerciseFragment);
+            }
+            return false;
         });
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.exercise_menu, popup.getMenu());

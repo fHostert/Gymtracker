@@ -167,6 +167,14 @@ public class WorkoutFragment extends Fragment {
         }
     }
 
+    public void replaceExercise(ExerciseFragment exerciseFragment) {
+
+    }
+
+    public void deleteLastSet(ExerciseFragment exerciseFragment) {
+
+    }
+
     public ArrayList<ExerciseFragment> getExerciseFragments() {
         return exerciseFragments;
     }

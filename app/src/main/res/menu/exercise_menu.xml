@@ -17,4 +17,8 @@
         android:id="@+id/replace_exercise"
         android:title="@string/replaceExercise" />
 
+    <item
+        android:id="@+id/delete_last_set"
+        android:title="@string/deleteLastSet" />
+
 </menu>
