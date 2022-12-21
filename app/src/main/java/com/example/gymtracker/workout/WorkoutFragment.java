@@ -1,4 +1,4 @@
-package com.example.gymtracker;
+package com.example.gymtracker.workout;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -8,22 +8,22 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
-import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.example.gymtracker.ChooseActivity;
+import com.example.gymtracker.helper.DatabaseManager;
+import com.example.gymtracker.R;
 import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.Set;
 import com.example.gymtracker.datastructures.Workout;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,6 +36,7 @@ public class WorkoutFragment extends Fragment {
 
     private Workout workout = null;
     private final ArrayList<ExerciseFragment> exerciseFragments = new ArrayList<>();
+    private ExerciseFragment exerciseFragmentToBeReplaced = null;
 
     public WorkoutFragment() {
         // Required empty public constructor
@@ -80,11 +81,21 @@ public class WorkoutFragment extends Fragment {
     }
 
     public void addExerciseClick() {
-        final Intent intent = new Intent(getContext(), ChooseExerciseActivity.class);
+        final Intent intent = new Intent(getContext(), ChooseActivity.class);
+        intent.putExtra("LIST", DatabaseManager.getExercises());
+        intent.putExtra("TITLE", getResources().getString(R.string.addExercise));
         startActivityForResult(intent, 0);
     }
 
     private void addEmptyExercise(String exerciseName) {
+        for (ExerciseFragment e : exerciseFragments) {
+            if (Objects.equals(e.getName(), exerciseName)) {
+                Toast.makeText(getContext(),
+                        getResources().getString(R.string.exerciseAlreadyInWorkout),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
         LinearLayout workoutLinearLayout = getView().findViewById(R.id.workout_linear_layout);
         Exercise exercise = new Exercise(DatabaseManager.getExerciseID(exerciseName));
         ExerciseFragment exerciseFragment = ExerciseFragment.newInstance(exercise);
@@ -106,7 +117,11 @@ public class WorkoutFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         //add Exercise
         if (resultCode == RESULT_OK && requestCode == 0) {
-          addEmptyExercise(data.getExtras().getString("EXERCISE_NAME_KEY"));
+          addEmptyExercise(data.getExtras().getString("ITEM"));
+        }
+        //replace Exercise
+        else if (resultCode == RESULT_OK && requestCode == 1) {
+            replaceExercise(data.getExtras().getString("ITEM"));
         }
 
     }
@@ -167,12 +182,41 @@ public class WorkoutFragment extends Fragment {
         }
     }
 
+    /**
+     * Called from button click.
+     * @param exerciseFragment The exercise that gets replaced.
+     */
     public void replaceExercise(ExerciseFragment exerciseFragment) {
+        exerciseFragmentToBeReplaced = exerciseFragment;
+        final Intent intent = new Intent(getContext(), ChooseActivity.class);
+        intent.putExtra("LIST", DatabaseManager.getExercises());
+        intent.putExtra("TITLE", getResources().getString(R.string.replaceExerciseThrough));
+        startActivityForResult(intent, 1);
+    }
 
+    /**
+     * Called from OnActivityResult
+     * @param exerciseName The name of the new exercise.
+     */
+    private void replaceExercise(String exerciseName) {
+        DatabaseManager.replaceExercise(DatabaseManager.getExerciseID(exerciseName),
+                exerciseFragmentToBeReplaced.getDatabaseIndex());
+        for (int i = 0; i < exerciseFragments.size(); i++) {
+            if (exerciseFragments.get(i) == exerciseFragmentToBeReplaced) {
+                exerciseFragments.get(i).replace(exerciseName);
+                break;
+            }
+        }
     }
 
     public void deleteLastSet(ExerciseFragment exerciseFragment) {
-
+        if (exerciseFragment.getSetCount() < 2) {
+            Toast.makeText(getContext(),
+                    getResources().getString(R.string.cantRemoveLastSet),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        exerciseFragment.deleteLastSet();
     }
 
     public ArrayList<ExerciseFragment> getExerciseFragments() {

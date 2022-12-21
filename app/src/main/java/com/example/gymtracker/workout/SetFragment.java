@@ -1,19 +1,19 @@
-package com.example.gymtracker;
+package com.example.gymtracker.workout;
 
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.gymtracker.helper.DatabaseManager;
+import com.example.gymtracker.helper.Formatter;
+import com.example.gymtracker.R;
 import com.example.gymtracker.datastructures.Set;
 
 /**

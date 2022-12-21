@@ -1,4 +1,4 @@
-package com.example.gymtracker;
+package com.example.gymtracker.helper;
 
 import java.text.DecimalFormat;
 

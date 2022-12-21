@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Gymtracker MS</string>
+    <string name="app_name">Gymtracker</string>
     <string name="home">Home</string>
     <string name="history">Verlauf</string>
     <string name="stats">Statistik</string>
@@ -34,10 +34,13 @@
     <string name="sets">Sets</string>
     <string name="last">Vorheriges</string>
     <string name="KG">KG</string>
+    <string name="exerciseAlreadyInWorkout">Diese Übung befindet sich bereits im Workout.</string>
     <string name="changeWorkoutName">Workoutnamen ändern</string>
     <string name="moveExerciseUp">Übung nach oben verschieben</string>
     <string name="moveExerciseDown">Übung nach unten verschieben</string>
     <string name="replaceExercise">Übung ersetzen</string>
+    <string name="replaceExerciseThrough">Übung ersetzen durch</string>
+    <string name="cantRemoveLastSet">Das letzte Set kann nicht entfernt werden.</string>
     <string name="editTemplates">Vorlagen bearbeiten</string>
     <string name="deleteLastSet">Letztes Set löschen</string>
     <string name="editExercises">Übungen bearbeiten</string>
@@ -50,6 +53,7 @@
     <string name="emptyLastSet">-</string>
     <string name="cancel">Abbrechen</string>
     <string name="prweight">Persönlicher Rekord (Gewicht):</string>
+    <string name="doublePressToExit">Drücke die Zurücktaste erneut, um die App zu schließen.</string>
     <string name="delete">löschen</string>
     <string name="prvolume">Persönlicher Rekord (Volumen):</string>
     <string name="totalWeight">Gesamtgewicht:</string>

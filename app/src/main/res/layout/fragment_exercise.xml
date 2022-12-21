@@ -5,10 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ExerciseFragment">
+    tools:context=".workout.ExerciseFragment">
 
     <TableLayout
-        android:id="@+id/exercise_table_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:stretchColumns="*">
@@ -16,15 +15,16 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:weightSum="100">
+            android:weightSum="100"
+            android:layout_marginStart="@dimen/horizontal_margin_from_boxes_to_inside">
             <TextView
                 android:id="@+id/name_of_exercise_text_view"
                 android:layout_width="0dp"
                 android:text="Name der Übung"
                 android:textStyle="bold"
                 android:textSize="@dimen/headline_size"
-                android:layout_marginStart="20dp"
-                android:layout_weight="85"/>
+                android:layout_weight="85"
+                android:layout_gravity="center"/>
             <Button
                 android:id="@+id/exercise_menu_button"
                 android:onClick="exerciseMenuClick"
@@ -32,7 +32,8 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/ic_baseline_menu_24"
                 android:layout_weight="15"
-                android:layout_marginEnd="10dp">
+                android:layout_marginEnd="10dp"
+                android:gravity="center">
             </Button>
         </TableRow>
 
@@ -41,23 +42,35 @@
                 android:gravity="center"
                 android:layout_width="0dp"
                 android:text="@string/set"
-                android:layout_weight="15"/>
+                android:layout_weight="15"
+                android:textSize="@dimen/medium_text"/>
             <TextView
                 android:gravity="center"
                 android:text="@string/last"
                 android:layout_width="0dp"
-                android:layout_weight="25"/>
+                android:layout_weight="25"
+                android:textSize="@dimen/medium_text"/>
             <TextView
                 android:gravity="center"
                 android:text="@string/KG"
                 android:layout_width="0dp"
-                android:layout_weight="20"/>
+                android:layout_weight="20"
+                android:textSize="@dimen/medium_text"/>
             <TextView
                 android:gravity="center"
                 android:text="@string/reps."
                 android:layout_width="0dp"
-                android:layout_weight="20"/>
+                android:layout_weight="20"
+                android:textSize="@dimen/medium_text"/>
         </TableRow>
+    </TableLayout>
+
+    <TableLayout
+        android:id="@+id/exercise_table_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="*">
+
     </TableLayout>
 
     <Button
@@ -65,7 +78,8 @@
         android:onClick="addSetClick"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/addSet">
+        android:text="@string/addSet"
+        android:textSize="@dimen/medium_text">
     </Button>
 
     <View

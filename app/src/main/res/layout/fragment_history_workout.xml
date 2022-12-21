@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".history.HistoryWorkoutFragment"
+    android:background="@drawable/border"
+    android:orientation="vertical"
+    android:layout_marginHorizontal="@dimen/horizontal_margin_between_boxes"
+    android:layout_marginVertical="@dimen/vertical_margin_between_boxes">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:layout_marginHorizontal="@dimen/horizontal_margin_from_boxes_to_inside"
+        android:layout_marginTop="@dimen/vertical_margin_from_boxes_to_inside">
+
+        <TextView
+            android:id="@+id/workout_name_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Name des Workouts"
+            android:textSize="@dimen/headline_size"
+            android:textStyle="bold"
+            android:layout_weight="75"
+            android:layout_gravity="center"/>
+
+        <Button
+            android:id="@+id/delete_workout_button"
+            android:text="@string/delete"
+            android:layout_weight="25"
+            android:textSize="@dimen/small_text"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+
+
+    <TextView
+        android:id="@+id/workout_date_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="22.01.2022"
+        android:textSize="@dimen/medium_text"
+        android:layout_marginStart="@dimen/horizontal_margin_from_boxes_to_inside" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:layout_marginHorizontal="@dimen/horizontal_margin_from_boxes_to_inside"
+        android:layout_marginTop="@dimen/vertical_margin_from_boxes_to_inside">
+
+        <TextView
+            android:id="@+id/duration_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="🕐  1h 30min"
+            android:layout_weight="50"
+            android:gravity="center"
+            android:textSize="@dimen/medium_text"/>
+
+        <TextView
+            android:id="@+id/sum_weight_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="💪  10.100 kg"
+            android:layout_weight="50"
+            android:gravity="center"
+            android:textSize="@dimen/medium_text"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="100"
+        android:layout_marginHorizontal="@dimen/horizontal_margin_from_boxes_to_inside"
+        android:layout_marginTop="@dimen/vertical_margin_from_boxes_to_inside">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/exercise"
+                android:layout_weight="65"
+                android:textStyle="bold"
+                />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/bestSet"
+                android:layout_weight="35"
+                android:textStyle="bold"
+                android:gravity="end"
+                />
+    </LinearLayout>
+
+    <TableLayout
+        android:id="@+id/workout_history_table_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/horizontal_margin_from_boxes_to_inside"
+        android:layout_marginTop="@dimen/vertical_margin_from_boxes_to_inside">
+    </TableLayout>
+
+
+</LinearLayout>

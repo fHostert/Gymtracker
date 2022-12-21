@@ -12,7 +12,7 @@
         android:theme="@style/Theme.Gymtracker"
         tools:targetApi="31">
         <activity
-            android:name=".ChooseExerciseActivity"
+            android:name=".ChooseActivity"
             android:exported="false"
             android:screenOrientation="portrait">
             <meta-data

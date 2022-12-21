@@ -10,19 +10,28 @@ import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class ChooseExerciseActivity extends AppCompatActivity {
+public class ChooseActivity extends AppCompatActivity {
+
+    String title = "";
+    String[] list = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_exercise);
-        this.setTitle(R.string.chooseExercise);
 
-        //Fill ListView with exercises
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            title = extras.getString("TITLE");
+            list = extras.getStringArray("LIST");
+        }
+        this.setTitle(title);
+
+        //Fill ListView with list extra
         ListView listView = findViewById(R.id.exercises_list_view);
-        String[] exercises = DatabaseManager.getExercises();
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, exercises);
+                android.R.layout.simple_list_item_1, list);
         listView.setAdapter(arrayAdapter);
         listView.setOnItemClickListener((adapterView, view, i, l) -> {
 
@@ -33,11 +42,9 @@ public class ChooseExerciseActivity extends AppCompatActivity {
             }
 
             setResult(RESULT_OK,
-                    (new Intent()).putExtra("EXERCISE_NAME_KEY", filteredList[i]));
+                    (new Intent()).putExtra("ITEM", filteredList[i]));
             finish();
         });
-
-
 
         //Search Logic
         EditText searchET = findViewById(R.id.search_edit_text);

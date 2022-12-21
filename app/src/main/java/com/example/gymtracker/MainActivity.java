@@ -3,6 +3,7 @@ package com.example.gymtracker;
 import static android.database.sqlite.SQLiteDatabase.openOrCreateDatabase;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
@@ -17,18 +18,24 @@ import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.PopupMenu;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.gymtracker.datastructures.Workout;
+import com.example.gymtracker.helper.DatabaseManager;
+import com.example.gymtracker.history.HistoryFragment;
+import com.example.gymtracker.stats.StatsFragment;
+import com.example.gymtracker.workout.ExerciseFragment;
+import com.example.gymtracker.workout.SetFragment;
+import com.example.gymtracker.workout.WorkoutFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -38,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     WorkoutFragment globalWorkoutFragment;
     private final int notificationId = 69;
+    boolean doubleBackToExitPressedOnce = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         //DatabaseManager.dropTable("CurrentWorkout");
         //DatabaseManager.dropTable("CurrentWorkoutMetadata");
 
-        //Setup Bottom Navigation View and Fragments containing each tab
+        //Bottom Navigation View Setup
         BottomNavigationView navView = findViewById(R.id.nav_view);
         ColorStateList iconColorStates = new ColorStateList(
                 new int[][]{
@@ -65,28 +73,47 @@ public class MainActivity extends AppCompatActivity {
 
         navView.setItemIconTintList(iconColorStates);
         navView.setItemTextColor(iconColorStates);
+
+        //home container
         FragmentContainerView homeContainer = findViewById(R.id.home_container);
-        FragmentContainerView historyContainer = findViewById(R.id.history_container);
-        FragmentContainerView statistikContainer = findViewById(R.id.stats_container);
 
+        //Declare historyFragment programmatically so it can be called later on
+        ConstraintLayout mainLayout = findViewById(R.id.main_constraint_layout);
+        HistoryFragment historyFragment = new HistoryFragment();
+        FragmentContainerView historyContainer = new FragmentContainerView(this);
+        historyContainer.setId(View.generateViewId());
+        getSupportFragmentManager().beginTransaction()
+                .add(historyContainer.getId(), historyFragment).commit();
+        mainLayout.addView(historyContainer);
 
+        //Declare statsFragment programmatically so it can be called later on
+        StatsFragment statsFragment = new StatsFragment();
+        FragmentContainerView statsContainer = new FragmentContainerView(this);
+        statsContainer.setId(View.generateViewId());
+        getSupportFragmentManager().beginTransaction()
+                .add(statsContainer.getId(), statsFragment).commit();
+        mainLayout.addView(statsContainer);
+
+        //Click Logic
         historyContainer.setVisibility(View.INVISIBLE);
-        statistikContainer.setVisibility(View.INVISIBLE);
+        statsContainer.setVisibility(View.INVISIBLE);
         navView.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.navigation_home) {
                 homeContainer.setVisibility(View.VISIBLE);
                 historyContainer.setVisibility(View.INVISIBLE);
-                statistikContainer.setVisibility(View.INVISIBLE);
+                historyContainer.setVisibility(View.INVISIBLE);
                 this.setTitle(R.string.app_name);
             }
-            else if (item.getItemId() == R.id.navigation_verlauf) {
+            else if (item.getItemId() == R.id.navigation_history) {
                 historyContainer.setVisibility(View.VISIBLE);
                 homeContainer.setVisibility(View.INVISIBLE);
-                statistikContainer.setVisibility(View.INVISIBLE);
+                historyContainer.setVisibility(View.INVISIBLE);
                 this.setTitle(R.string.history);
+
+                historyFragment.initialize();
             }
-            else if (item.getItemId() == R.id.navigation_statistik) {
-                statistikContainer.setVisibility(View.VISIBLE);
+            else if (item.getItemId() == R.id.navigation_stats) {
+                historyContainer.setVisibility(View.VISIBLE);
                 homeContainer.setVisibility(View.INVISIBLE);
                 historyContainer.setVisibility(View.INVISIBLE);
                 this.setTitle(R.string.stats);
@@ -100,13 +127,29 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (DatabaseManager.doesTableExist("CurrentTable")){
+        if (DatabaseManager.doesTableExist("CurrentWorkout")){
             getMenuInflater().inflate(R.menu.workout_menu, menu);
         }
         else {
             getMenuInflater().inflate(R.menu.home_menu, menu);
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this,
+                getResources().getString(R.string.doublePressToExit),
+                Toast.LENGTH_SHORT).show();
+
+        new Handler(Looper.getMainLooper()).postDelayed(()
+                -> doubleBackToExitPressedOnce=false, 2000);
     }
 
     @Override
@@ -166,14 +209,18 @@ public class MainActivity extends AppCompatActivity {
         globalWorkoutFragment = new WorkoutFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.home_container, globalWorkoutFragment).commit();
-
         DatabaseManager.createCurrentWorkoutTable();
         DatabaseManager.createCurrentWorkoutMetadataTable();
         DatabaseManager.setCurrentWorkoutMetadata(
                 getResources().getString(R.string.defaultWorkoutName));
 
+        startWorkout();
+    }
+
+    public void startWorkout() {
         this.setTitle(DatabaseManager.getCurrentWorkoutName());
         startOngoingNotification();
+        invalidateOptionsMenu();
     }
 
 
@@ -231,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
         reload();
         stopOngoingNotification();
         invalidateOptionsMenu();
+        this.setTitle(getResources().getString(R.string.app_name));
     }
 
     public void addSetClick(View view) {
@@ -316,7 +364,6 @@ public class MainActivity extends AppCompatActivity {
     ##############################################################################################*/
     private ExerciseFragment getExerciseFragment(View view) {
         View parentView = ((View) view.getParent());
-        Log.d("CLASSNAMEEXERCSIE", parentView.getClass().getSimpleName());
         String exerciseName = String.valueOf((
                 (TextView)parentView.findViewById(R.id.name_of_exercise_text_view)).getText());
         ArrayList<ExerciseFragment> exercises = globalWorkoutFragment.getExerciseFragments();

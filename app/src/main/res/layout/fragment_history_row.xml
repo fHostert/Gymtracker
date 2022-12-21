@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".history.HistoryRowFragment"
+    android:weightSum="100">
+
+    <TextView
+        android:id="@+id/history_exercise_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="65"
+        android:textSize="@dimen/medium_text"/>
+
+    <TextView
+        android:id="@+id/history_best_set_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="35"
+        android:gravity="end"
+        android:textSize="@dimen/medium_text"/>
+</TableRow>

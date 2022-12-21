@@ -1,13 +1,13 @@
-package com.example.gymtracker;
+package com.example.gymtracker.helper;
 
 
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Paint;
 import android.util.Log;
 
 import com.example.gymtracker.datastructures.Exercise;
+import com.example.gymtracker.datastructures.History;
 import com.example.gymtracker.datastructures.Set;
 import com.example.gymtracker.datastructures.Workout;
 
@@ -75,6 +75,20 @@ public final class DatabaseManager {
         query = String.format(l, "UPDATE CurrentWorkout SET position = position - 1 " +
                         "WHERE position > %d;",
                         oldPosition);
+        db.execSQL(query);
+    }
+
+    public static void replaceExercise(int indexOfNewExercise, int indexOfOldExercise) {
+        String query = String.format(l, "UPDATE CurrentWorkout " +
+                "SET exerciseID = %d, reps = 0, weight = 0 WHERE exerciseID = %d;",
+                indexOfNewExercise, indexOfOldExercise);
+        db.execSQL(query);
+    }
+
+    public static void removeLastSet(int exerciseID, int lastIndex) {
+        String query = String.format(l, "DELETE FROM CurrentWorkout " +
+                        "WHERE exerciseID = %d and setIndex = %d;",
+                exerciseID, lastIndex);
         db.execSQL(query);
     }
 
@@ -269,6 +283,72 @@ public final class DatabaseManager {
         String query = "CREATE TABLE IF NOT EXISTS History(" +
                 "workoutID INT, exerciseID INT, setIndex INT, reps INT, weight REAL);";
         db.execSQL(query);
+    }
+
+    public static History getHistory(int top) {
+        //Get IDs of workouts to be returned
+        String query = String.format(l,
+                "SELECT DISTINCT ID FROM Workouts ORDER BY date DESC TOP %d;", top);
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        int[] workoutIDs = new int[resultSet.getCount()];
+        for (int i = 0; i < resultSet.getCount(); i++) {
+            workoutIDs[i] = resultSet.getInt(0);
+            resultSet.moveToNext();
+        }
+
+        //Fill workout objects
+        ArrayList<Workout> workouts = new ArrayList<>();
+        for (int currentWorkoutID : workoutIDs) {
+            //Get exercises in current workout
+            query = String.format(l,
+                    "SELECT DISTINCT exerciseID FROM History ORDER BY setIndex ASC " +
+                            "WHERE workoutID = %d;",
+                            currentWorkoutID);
+            resultSet = db.rawQuery(query, null);
+            resultSet.moveToFirst();
+            int[] exerciseIDs = new int[resultSet.getCount()];
+            for (int i = 0; i < resultSet.getCount(); i++) {
+                exerciseIDs[i] = resultSet.getInt(0);
+                resultSet.moveToNext();
+            }
+
+            //Fill exercise objects for current workout
+            ArrayList<Exercise> exercises = new ArrayList<>();
+            for (int currentExerciseID : exerciseIDs) {
+                query = String.format(l,
+                        "SELECT reps, weight FROM History ORDER BY setIndex ASC " +
+                                "WHERE workoutID = %d AND exerciseID = %d;",
+                                currentWorkoutID, currentExerciseID);
+                resultSet = db.rawQuery(query, null);
+                resultSet.moveToFirst();
+
+                //Fill sets objects for current exercise
+                ArrayList<Set> sets = new ArrayList<>();
+                for (int i = 0; i < resultSet.getCount(); i++) {
+                    sets.add(new Set(i, resultSet.getInt(0), resultSet.getFloat(1)));
+                    resultSet.moveToNext();
+                }
+                exercises.add(new Exercise(currentExerciseID, sets));
+                sets.clear();
+            }
+
+            //Get meta data
+            query = String.format(l,
+                    "SELECT name, duration, date, totalWeight FROM Workouts " +
+                            "WHERE workoutID = %d TOP 1",
+                            currentWorkoutID);
+            resultSet = db.rawQuery(query, null);
+            resultSet.moveToFirst();
+
+            //create new workout object
+            workouts.add(new Workout(resultSet.getString(0), resultSet.getInt(1),
+                    resultSet.getString(2), exercises));
+            exercises.clear();
+
+        }
+        resultSet.close();
+        return new History(workouts);
     }
 
 
