@@ -538,6 +538,40 @@ public final class DatabaseManager {
         db.execSQL(query);
     }
 
+    public static ArrayList<Workout> getTemplates() {
+        String query = "SELECT DISTINCT name FROM Templates";
+        Cursor resultSet = db.rawQuery(query, null);
+        String[] names = new String[resultSet.getCount()];
+        resultSet.moveToFirst();
+        for (int i = 0; i < resultSet.getCount(); i++) {
+            names[i] = resultSet.getString(0);
+            resultSet.moveToNext();
+        }
+        ArrayList<Workout> workouts = new ArrayList<>();
+        for (String name : names) {
+            query = String.format("SELECT exerciseID, numberOfSets FROM Templates " +
+                    "WHERE name = '%s';", name);
+            resultSet = db.rawQuery(query, null);
+            resultSet.moveToFirst();
+
+            ArrayList<Exercise> exercises = new ArrayList<>();
+            for (int i = 0; i < resultSet.getCount(); i++) {
+                int exerciseID = resultSet.getInt(0);
+
+                ArrayList<Set> sets = new ArrayList<>();
+                for (int j = 0; i < resultSet.getInt(1); j++) {
+                    sets.add(new Set(j + 1, 0, 0));
+                }
+                exercises.add(new Exercise(exerciseID, sets));
+                resultSet.moveToNext();
+            }
+            workouts.add(new Workout(name, exercises));
+        }
+
+        resultSet.close();
+        return workouts;
+    }
+
     /*##############################################################################################
     ############################################EXERCISES###########################################
     ##############################################################################################*/

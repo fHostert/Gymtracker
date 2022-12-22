@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
             renameExercise();
         }
         else if (id == R.id.create_new_template_menu) {
-            addTemplate();
+            createNewTemplate();
         }
         return true;
     }
@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
         }
         //rename Exercise
         else if (resultCode == RESULT_OK && requestCode == 3) {
-            deleteExercise(data.getExtras().getString("ITEM"));
+            renameExercise(data.getExtras().getString("ITEM"));
         }
     }
 
@@ -303,12 +303,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void addTemplate() {
+    public void createNewTemplate() {
 
     }
 
-
-
+    public void templateMenuClick(View view) {
+    }
 
     /*##############################################################################################
     #########################################WORKOUT BUTTONS########################################
@@ -433,19 +433,19 @@ public class MainActivity extends AppCompatActivity {
         ExerciseFragment exerciseFragment = getExerciseFragment(view);
         popup.setOnMenuItemClickListener(menuItem -> {
             int id = menuItem.getItemId();
-            if (id == R.id.move_exercise_up) {
+            if (id == R.id.move_exercise_up_menu) {
                 globalWorkoutFragment.moveExerciseUp(exerciseFragment);
             }
-            else if (id == R.id.move_exercise_down) {
+            else if (id == R.id.move_exercise_down_menu) {
                 globalWorkoutFragment.moveExerciseDown(exerciseFragment);
             }
-            else if (id == R.id.remove_exercise) {
+            else if (id == R.id.remove_exercise_menu) {
                 globalWorkoutFragment.removeExercise(exerciseFragment);
             }
-            else if (id == R.id.replace_exercise) {
+            else if (id == R.id.replace_exercise_menu) {
                 globalWorkoutFragment.replaceExercise(exerciseFragment);
             }
-            else if (id == R.id.delete_last_set) {
+            else if (id == R.id.delete_last_set_menu) {
                 globalWorkoutFragment.deleteLastSet(exerciseFragment);
             }
             return false;

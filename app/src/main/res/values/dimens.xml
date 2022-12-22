@@ -2,6 +2,7 @@
 <resources>
     <dimen name="small_text">10sp</dimen>
     <dimen name="medium_text">15sp</dimen>
+    <dimen name="large_text">18sp</dimen>
     <dimen name="headline_size">25sp</dimen>
     <dimen name="boarder_size">3dp</dimen>
     <dimen name="vertical_margin_between_boxes">5dp</dimen>

@@ -52,15 +52,19 @@ public class Exercise implements Serializable {
     public String getBestSetString(){
         float benchmark = -1;
         Set bestSet = null;
+        int mostReps = 0;
         for (Set set : sets) {
             if (set.getReps() * set.getWeight() > benchmark) {
                 benchmark = set.getReps() * set.getWeight();
                 bestSet = set;
             }
+            if (set.getReps() > mostReps) {
+                mostReps = set.getReps();
+            }
         }
         if (bestSet.getWeight() == 0)
         {
-            return String.format(l, "%d Wdhl.", bestSet.getReps());
+            return String.format(l, "%d Wdhl.", mostReps);
         }
         return String.format(l, "%d × %skg",
                 bestSet.getReps(), Formatter.formatFloat(bestSet.getWeight()));

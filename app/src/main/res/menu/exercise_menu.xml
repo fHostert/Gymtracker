@@ -2,23 +2,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/move_exercise_up"
+        android:id="@+id/move_exercise_up_menu"
         android:title="@string/moveExerciseUp" />
 
     <item
-        android:id="@+id/move_exercise_down"
+        android:id="@+id/move_exercise_down_menu"
         android:title="@string/moveExerciseDown" />
 
     <item
-        android:id="@+id/remove_exercise"
+        android:id="@+id/remove_exercise_menu"
         android:title="@string/removeExercise" />
 
     <item
-        android:id="@+id/replace_exercise"
+        android:id="@+id/replace_exercise_menu"
         android:title="@string/replaceExercise" />
 
     <item
-        android:id="@+id/delete_last_set"
+        android:id="@+id/delete_last_set_menu"
         android:title="@string/deleteLastSet" />
 
 </menu>
