@@ -2,13 +2,17 @@ package com.example.gymtracker.workout;
 
 import android.os.Bundle;
 
+
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.example.gymtracker.helper.DatabaseManager;
@@ -51,8 +55,13 @@ public class ExerciseFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_exercise, container, false);
 
+        //Exercise name
         ((TextView) view.findViewById(R.id.name_of_exercise_text_view)).
                 setText(exercise.getName());
+        //view.findViewById(R.id.name_of_exercise_text_view).
+        //        setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT), 85.0);
+        Log.d("ExerciseName", exercise.getName());
+        Log.d("LengthOFString", String.valueOf(exercise.getName().length()));
 
         //add Sets
         for (Set set : exercise.getSets()) {
@@ -65,13 +74,12 @@ public class ExerciseFragment extends Fragment {
                     .add(newContainer.getId(), setFragment).commit();
             exerciseLinearLayout.addView(newContainer);
         }
-
         return view;
     }
 
     public void addSet() {
         LinearLayout exerciseLinearLayout = getView().findViewById(R.id.exercise_table_layout);
-        Set set = new Set(exerciseLinearLayout.getChildCount() - 1, 0, 0);
+        Set set = new Set(exerciseLinearLayout.getChildCount() + 1, 0, 0);
         SetFragment setFragment = SetFragment.newInstance(set, exercise.getDatabaseIndex());
         exercise.addSet(set);
         setFragments.add(setFragment);

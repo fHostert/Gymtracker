@@ -534,7 +534,7 @@ public final class DatabaseManager {
     ##############################################################################################*/
     public static void createTemplatesTable() {
         String query = "CREATE TABLE IF NOT EXISTS Templates(" +
-                "name VARCHAR, exerciseID INT, numbrerOfSets INT);";
+                "name VARCHAR, exerciseID INT, numberOfSets INT);";
         db.execSQL(query);
     }
 
@@ -583,6 +583,23 @@ public final class DatabaseManager {
 
         query = String.format(l, "DELETE FROM History WHERE exerciseID = %d;", exerciseID);
         db.execSQL(query);
+    }
+
+    public static void renameExercise(String exerciseName, String newExerciseName) {
+        int exerciseID = getExerciseID(exerciseName);
+        String query = String.format(l, "UPDATE Exercises SET name = '%s' " +
+                "WHERE ID = %d;", newExerciseName, exerciseID);
+        db.execSQL(query);
+    }
+
+    public static void mergeExercises(String nameOfMainExercise, String nameOfOldExercise) {
+        int newID = getExerciseID(nameOfMainExercise);
+        int oldID = getExerciseID(nameOfOldExercise);
+        String query = String.format(l, "UPDATE History SET exerciseID = %d " +
+                "WHERE ID = %d;", newID, oldID);
+        db.execSQL(query);
+
+        deleteExercise(nameOfOldExercise);
     }
 
     public static String[] getExercises() {

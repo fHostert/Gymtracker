@@ -172,8 +172,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //deleteExercise
+        //delete Exercise
         if (resultCode == RESULT_OK && requestCode == 2) {
+            deleteExercise(data.getExtras().getString("ITEM"));
+        }
+        //rename Exercise
+        else if (resultCode == RESULT_OK && requestCode == 3) {
             deleteExercise(data.getExtras().getString("ITEM"));
         }
     }
@@ -221,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
     public void deleteExercise() {
         final Intent intent = new Intent(this, ChooseActivity.class);
         intent.putExtra("LIST", DatabaseManager.getExercises());
-        intent.putExtra("TITLE", getResources().getString(R.string.addExercise));
+        intent.putExtra("TITLE", getResources().getString(R.string.deleteExercise));
         startActivityForResult(intent, 2);
     }
 
@@ -244,7 +248,59 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void renameExercise() {
+        final Intent intent = new Intent(this, ChooseActivity.class);
+        intent.putExtra("LIST", DatabaseManager.getExercises());
+        intent.putExtra("TITLE", getResources().getString(R.string.renameExercise));
+        startActivityForResult(intent, 3);
+    }
 
+    public void renameExercise(String exerciseName) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setMessage(getResources().getString(R.string.changeExerciseName));
+        alert.setTitle(getResources().getString(R.string.changeExerciseNameText));
+        final View customLayout = getLayoutInflater().inflate(R.layout.alert, null);
+        alert.setView(customLayout);
+
+        alert.setPositiveButton(getResources().getString(R.string.ok), (dialogInterface, i) -> {
+            EditText et = customLayout.findViewById(R.id.alert_input_edit_text);
+            String newExerciseName = et.getText().toString();
+
+            //Exercise already exists. Ask again and Merge both exercises
+            if (newExerciseName.equals(exerciseName)) {
+                AlertDialog.Builder newAlert = new AlertDialog.Builder(this);
+                newAlert.setTitle(getResources().getString(R.string.mergeExercises));
+                newAlert.setMessage(getResources().getString(R.string.mergeExercisesText));
+
+                //If ok, continue
+                newAlert.setPositiveButton(getResources().getString(R.string.yes), (dialogInterface1, i1) -> {
+                    DatabaseManager.mergeExercises(newExerciseName, exerciseName);
+                });
+                //If cancel, return
+                newAlert.setNegativeButton(getResources().getString(R.string.no), (dialog, whichButton) -> {
+                });
+
+                newAlert.show();
+            }
+            //Just rename the exercise
+            else {
+                DatabaseManager.renameExercise(exerciseName, newExerciseName);
+            }
+
+        });
+
+        //If cancel, do nothing
+        alert.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
+            //Do nothing and cancel
+        });
+
+        alert.show();
+
+        for (String exercise : DatabaseManager.getExercises()) {
+            if (Objects.equals(exercise, exerciseName)) {
+
+                return;
+            }
+        }
     }
 
     public void addTemplate() {

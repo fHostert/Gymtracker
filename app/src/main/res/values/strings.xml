@@ -68,6 +68,8 @@
     <string name="workoutSumDuration">Gesamtdauer aller Workouts:</string>
     <string name="totalWeightSum">Gesamtgewicht aller Workouts:</string>
     <string name="defaultStatistik">Allgemeine Statistiken</string>
+    <string name="mergeExercises">Übungen zusmamenführen</string>
+    <string name="mergeExercisesText">Die neu eingegebene Übung exisitiert bereits. Sollen beide Übungen unter dem neuen Namen zusammengefasst werden? Diese Aktion kann NICHT rückgängig gemacht werden.</string>
     <string name="defaultWorkoutName">Standard Workout</string>
     <string name="toastCannotSaveEmptyWorkout">Schließe ein Set ab, um das Workout zu speichern.</string>
     <string name="toastDoubleExercise">Diese Übung existiert bereits.</string>
@@ -80,6 +82,8 @@
     <string name="toastExerciseAlreadyUp">Übung ist bereits an erster Stelle.</string>
     <string name="toastExerciseAlreadyDown">Übung ist bereits an letzter Stelle.</string>
     <string name="toastFinishPreviousSetFirst">Zuerst das vorherige Set abschließen.</string>
+    <string name="changeExerciseName">Übungsnamen ändern</string>
+    <string name="changeExerciseNameText">Falls eine Übung eingegeben wird, die bereits existiert, werden die Statistiken der beiden Übungen unter dem neuen Namen zusammengefasst werden. Diese Aktion kann NICHT rückgängig gemacht werden. Ansonsten wird nur die Übung umbennant.</string>
     <string name="statsForExercise">Statistiken für bestimmte Übung</string>
     <string name="day">Tag</string>
     <string name="days">Tage</string>
