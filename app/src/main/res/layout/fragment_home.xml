@@ -19,7 +19,7 @@
             <Button
                 android:id="@+id/add_new_exercise_button"
                 android:onClick="addToExerciseTableClick"
-                android:text="@string/addNewExercise"
+                android:text="@string/createNewExercise"
                 style="@style/largeButton"/>
             <Button
                 android:id="@+id/add_new_template_button"

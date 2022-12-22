@@ -6,7 +6,15 @@
         android:title="@string/changeWorkoutName" />
 
     <item
-        android:id="@+id/create_new_exercise"
-        android:title="@string/addNewExercise" />
+        android:id="@+id/create_new_exercise_menu_workout"
+        android:title="@string/createNewExercise" />
+
+    <item
+        android:id="@+id/save_workout_menu"
+        android:title="@string/saveWorkout" />
+
+    <item
+        android:id="@+id/quit_workout_menu"
+        android:title="@string/quitWorkout" />
 
 </menu>

@@ -2,11 +2,32 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/edit_exercises"
-        android:title="@string/editExercises" />
+        android:id="@+id/edit_exercises_menu"
+        android:title="@string/editExercises">
+        <menu>
+            <item
+                android:id="@+id/create_new_exercise_menu_home"
+                android:title="@string/createNewExercise" />
+            <item
+                android:id="@+id/delete_exercise_menu"
+                android:title="@string/deleteExercise" />
+            <item
+                android:id="@+id/rename_exercise_menu"
+                android:title="@string/renameExercise" />
+        </menu>
+    </item>
+
 
     <item
-        android:id="@+id/edit_templates"
-        android:title="@string/editTemplates" />
+        android:id="@+id/create_new_template_menu"
+        android:title="@string/addNewTemplate" />
+
+    <item
+        android:id="@+id/import_data_menu"
+        android:title="@string/importData" />
+
+    <item
+        android:id="@+id/export_data_menu"
+        android:title="@string/exportData" />
 
 </menu>

@@ -70,6 +70,11 @@ public class HistoryFragment extends Fragment {
         isInitialized = true;
     }
 
+    public void reload() {
+        isInitialized = false;
+        initialize();
+    }
+
     public void update(){
         History history = DatabaseManager.getHistory(1);
         LinearLayout historyLinearLayout = getView().findViewById(R.id.history_linear_layout);

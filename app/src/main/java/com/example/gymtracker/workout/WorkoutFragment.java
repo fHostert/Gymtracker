@@ -123,7 +123,6 @@ public class WorkoutFragment extends Fragment {
         else if (resultCode == RESULT_OK && requestCode == 1) {
             replaceExercise(data.getExtras().getString("ITEM"));
         }
-
     }
 
     public void moveExerciseUp(ExerciseFragment exerciseFragment) {

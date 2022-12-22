@@ -7,10 +7,12 @@
     <string name="addExercise">Übung hinzufügen</string>
     <string name="addExerciseToTemplate">Weitere Übung der Vorlage hinzufügen</string>
     <string name="saveTemplate">Vorlage speichern</string>
-    <string name="addNewExercise">Neue Übung erstellen</string>
+    <string name="createNewExercise">Neue Übung erstellen</string>
+    <string name="createNewExerciseText">Den Namen der neuen Übung eingeben:</string>
     <string name="addNewTemplate">Neue Vorlage erstellen</string>
     <string name="repetitionsFull">Wiederholungen</string>
     <string name="newExercise">Neue Übung</string>
+    <string name="exerciseAlreadyExists">Diese Übung gibt es bereits. Sie wurde nicht hinzugefügt.</string>
     <string name="newTemplate">Neue Vorlage</string>
     <string name="templates">Vorlagen</string>
     <string name="addNewExerciseText">Den Namen der neuen Übung eingeben:</string>
@@ -47,6 +49,11 @@
     <string name="workoutChangeName">Namen des Workouts ändern</string>
     <string name="workoutChangeNameEnterName">Den neuen Namen eingeben:</string>
     <string name="reps.">Wiederh.</string>
+    <string name="deleteExercise">Übung löschen</string>
+    <string name="deleteExerciseText">Soll diese Übung wirklich gelöscht werden? Sie wird ebenfalls aus dem Verlauf und allen Statistiken gelöscht. Diese Aktion kann NICHT rückgängig gemacht werden.</string>
+    <string name="renameExercise">Übung umbenennen</string>
+    <string name="exportData">Verlaufsdaten exportieren</string>
+    <string name="importData">Verlaufsdaten importieren</string>
     <string name="ok">OK</string>
     <string name="chooseExercise">Übung auswählen</string>#
     <string name="restoreWorkout">Letztes Workout wiederherstellen</string>
@@ -84,7 +91,7 @@
     <string name="minutes">Minuten</string>
     <string name="deleteWorkout">Workout löschen</string>
     <string name="deleteTemplate">Template löschen</string>
-    <string name="deleteWorkoutText">Soll dieses Workout wirklich aus dem Verlauf gelöscht werden? Es wird in keiner Statistik mehr auftauchen.</string>
+    <string name="deleteWorkoutText">Soll dieses Workout wirklich aus dem Verlauf gelöscht werden? Es wird in keiner Statistik mehr auftauchen. Diese Aktion kann NICHT rückgängig gemacht werden.</string>
     <string name="deleteTemplateText">Soll dieses Template wirklich gelöscht werden?</string>
     <string name="notificationTitle">Laufendes Workout</string>
     <string name="notificationText">Speichere oder lösche das Workout, um zu beenden.</string>

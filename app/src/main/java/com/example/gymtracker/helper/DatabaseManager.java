@@ -501,18 +501,32 @@ public final class DatabaseManager {
     public static boolean isSetPersonalRecord(int exerciseID, int reps, float weight) {
         float benchmark = reps * weight;
         String query = String.format(l, "SELECT (reps * weight) FROM History " +
-                "WHERE exerciseID = %d ORDER BY (reps * weight) DESC LIMIT 1;", exerciseID);
+                        "WHERE exerciseID = %d ORDER BY (reps * weight) DESC LIMIT 1;", exerciseID);
         Cursor resultSet = db.rawQuery(query, null);
         resultSet.moveToFirst();
         boolean isVolumeRecord = benchmark > resultSet.getFloat(0);
 
         query = String.format(l, "SELECT weight FROM History " +
-                "WHERE exerciseID = %d ORDER BY weight DESC LIMIT 1;", exerciseID);
+                        "WHERE exerciseID = %d ORDER BY weight DESC LIMIT 1;", exerciseID);
         resultSet = db.rawQuery(query, null);
         resultSet.moveToFirst();
         boolean isWeightRecord = weight > resultSet.getFloat(0);
         resultSet.close();
         return isVolumeRecord || isWeightRecord;
+    }
+
+    public static int[] getExerciseIDsFromWorkout(int workoutID) {
+        String query = String.format(l, "SELECT DISTINCT exerciseID FROM History " +
+                        "WHERE workoutID = %d;", workoutID);
+        Cursor resultSet = db.rawQuery(query, null);
+        int[] erg = new int[resultSet.getCount()];
+        resultSet.moveToFirst();
+        for (int i = 0; i < resultSet.getCount(); i++) {
+            erg[i] = resultSet.getInt(0);
+            resultSet.moveToNext();
+        }
+        resultSet.close();
+        return erg;
     }
 
     /*##############################################################################################
@@ -540,6 +554,35 @@ public final class DatabaseManager {
             query = String.format("INSERT INTO Exercises (name) VALUES (\"%s\");", s);
             db.execSQL(query);
         }
+    }
+
+    public static void createNewExercise(String newName) {
+        String query = String.format("INSERT INTO Exercises (name) VALUES ('%s');", newName);
+        db.execSQL(query);
+    }
+
+    public static void deleteExercise(String exercise) {
+        int exerciseID = getExerciseID(exercise);
+
+        String query = String.format(l, "DELETE FROM Exercises WHERE ID = %d;", exerciseID);
+        db.execSQL(query);
+
+        //find workouts that only had this exercise in them and delete them
+        query = String.format(l, "SELECT workoutID FROM (" +
+                "SELECT workoutID, COUNT(exerciseID) AS distinctExercises " +
+                "FROM History WHERE exerciseID = %d GROUP BY workoutID) " +
+                "WHERE distinctExercises = 1;",
+                exerciseID);
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        for (int i = 0; i < resultSet.getCount(); i++) {
+            query = String.format(l, "DELETE FROM Workouts WHERE ID = %d;",
+                    resultSet.getInt(0));
+            db.execSQL(query);
+        }
+
+        query = String.format(l, "DELETE FROM History WHERE exerciseID = %d;", exerciseID);
+        db.execSQL(query);
     }
 
     public static String[] getExercises() {

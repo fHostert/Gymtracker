@@ -3,7 +3,6 @@ package com.example.gymtracker;
 import static android.database.sqlite.SQLiteDatabase.openOrCreateDatabase;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
@@ -25,16 +24,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.gymtracker.datastructures.Set;
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.history.HistoryFragment;
-import com.example.gymtracker.stats.StatsFragment;
 import com.example.gymtracker.workout.ExerciseFragment;
 import com.example.gymtracker.workout.SetFragment;
 import com.example.gymtracker.workout.WorkoutFragment;
@@ -146,32 +142,40 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        //workout buttons
         if (id == R.id.change_workout_name) {
             changeWorkoutName();
+        }
+        else if (id == R.id.create_new_exercise_menu_workout ||
+                id == R.id.create_new_exercise_menu_home) {
+            createNewExercise();
+        }
+        else if (id == R.id.save_workout_menu) {
+            saveWorkout();
+        }
+        else if (id == R.id.quit_workout_menu) {
+            quitWorkout();
+        }
+        //home buttons
+        else if (id == R.id.delete_exercise_menu) {
+            deleteExercise();
+        }
+        else if (id == R.id.rename_exercise_menu) {
+            renameExercise();
+        }
+        else if (id == R.id.create_new_template_menu) {
+            addTemplate();
         }
         return true;
     }
 
-    private void changeWorkoutName() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setMessage(getResources().getString(R.string.workoutChangeNameEnterName));
-        alert.setTitle(getResources().getString(R.string.workoutChangeName));
-        final View customLayout = getLayoutInflater().inflate(R.layout.alert, null);
-        alert.setView(customLayout);
-
-        alert.setPositiveButton(getResources().getString(R.string.ok), (dialogInterface, i) -> {
-            EditText et = customLayout.findViewById(R.id.alert_input_edit_text);
-            String newWorkoutName = et.getText().toString();
-            this.setTitle(newWorkoutName);
-            DatabaseManager.changeCurrentWorkoutName(newWorkoutName);
-        });
-
-        //If cancel, do nothing
-        alert.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
-            //Do nothing and cancel
-        });
-
-        alert.show();
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //deleteExercise
+        if (resultCode == RESULT_OK && requestCode == 2) {
+            deleteExercise(data.getExtras().getString("ITEM"));
+        }
     }
 
     public void reload() {
@@ -214,6 +218,41 @@ public class MainActivity extends AppCompatActivity {
         invalidateOptionsMenu();
     }
 
+    public void deleteExercise() {
+        final Intent intent = new Intent(this, ChooseActivity.class);
+        intent.putExtra("LIST", DatabaseManager.getExercises());
+        intent.putExtra("TITLE", getResources().getString(R.string.addExercise));
+        startActivityForResult(intent, 2);
+    }
+
+    public void deleteExercise(String exerciseName) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle(getResources().getString(R.string.deleteExercise));
+        alert.setMessage(getResources().getString(R.string.deleteExerciseText));
+
+        //If ok, continue
+        alert.setPositiveButton(getResources().getString(R.string.yes), (dialogInterface, i) -> {
+            DatabaseManager.deleteExercise(exerciseName);
+            ((HistoryFragment) getSupportFragmentManager().
+                    findFragmentByTag("history_fragment")).reload();
+        });
+        //If cancel, return
+        alert.setNegativeButton(getResources().getString(R.string.no), (dialog, whichButton) -> {
+        });
+
+        alert.show();
+    }
+
+    public void renameExercise() {
+
+    }
+
+    public void addTemplate() {
+
+    }
+
+
+
 
     /*##############################################################################################
     #########################################WORKOUT BUTTONS########################################
@@ -222,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
         globalWorkoutFragment.addExerciseClick();
     }
 
-    public void quitWorkoutClick(View view) {
+    public void quitWorkout() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setMessage(getResources().getString(R.string.quitWorkoutText));
         alert.setTitle(getResources().getString(R.string.quitWorkout));
@@ -240,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
         alert.show();
     }
 
-    public void saveWorkoutClick(View view) {
+    public void saveWorkout() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setMessage(getResources().getString(R.string.saveWorkoutText));
         alert.setTitle(getResources().getString(R.string.saveWorkout));
@@ -277,6 +316,57 @@ public class MainActivity extends AppCompatActivity {
     public void addSetClick(View view) {
         ExerciseFragment exerciseFragment = getExerciseFragment(view);
         exerciseFragment.addSet();
+    }
+
+    private void changeWorkoutName() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setMessage(getResources().getString(R.string.workoutChangeNameEnterName));
+        alert.setTitle(getResources().getString(R.string.workoutChangeName));
+        final View customLayout = getLayoutInflater().inflate(R.layout.alert, null);
+        alert.setView(customLayout);
+
+        alert.setPositiveButton(getResources().getString(R.string.ok), (dialogInterface, i) -> {
+            EditText et = customLayout.findViewById(R.id.alert_input_edit_text);
+            String newWorkoutName = et.getText().toString();
+            this.setTitle(newWorkoutName);
+            DatabaseManager.changeCurrentWorkoutName(newWorkoutName);
+        });
+
+        //If cancel, do nothing
+        alert.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
+            //Do nothing and cancel
+        });
+
+        alert.show();
+    }
+
+    public void createNewExercise() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setMessage(getResources().getString(R.string.createNewExerciseText));
+        alert.setTitle(getResources().getString(R.string.createNewExercise));
+        final View customLayout = getLayoutInflater().inflate(R.layout.alert, null);
+        alert.setView(customLayout);
+
+        alert.setPositiveButton(getResources().getString(R.string.ok), (dialogInterface, i) -> {
+            EditText et = customLayout.findViewById(R.id.alert_input_edit_text);
+            String newExerciseName = et.getText().toString();
+            for (String exercise : DatabaseManager.getExercises()) {
+                if (Objects.equals(exercise, newExerciseName)) {
+                    Toast.makeText(this,
+                            getResources().getString(R.string.exerciseAlreadyExists),
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+            DatabaseManager.createNewExercise(newExerciseName);
+        });
+
+        //If cancel, do nothing
+        alert.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
+            //Do nothing and cancel
+        });
+
+        alert.show();
     }
 
     /*##############################################################################################
