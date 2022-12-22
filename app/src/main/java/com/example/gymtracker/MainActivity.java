@@ -25,10 +25,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.gymtracker.datastructures.Set;
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.history.HistoryFragment;
@@ -56,8 +58,12 @@ public class MainActivity extends AppCompatActivity {
         SQLiteDatabase db = openOrCreateDatabase("GymtrackerNew", MODE_PRIVATE,null);
         DatabaseManager.initialize(db);
         DatabaseManager.createExercisesTable(getResources().getStringArray(R.array.exercises));
+        DatabaseManager.createHistoryTable();
+        DatabaseManager.createWorkoutsTable();
         //DatabaseManager.dropTable("CurrentWorkout");
         //DatabaseManager.dropTable("CurrentWorkoutMetadata");
+        //DatabaseManager.dropTable("History");
+        //DatabaseManager.dropTable("Workouts");
 
         //Bottom Navigation View Setup
         BottomNavigationView navView = findViewById(R.id.nav_view);
@@ -74,25 +80,9 @@ public class MainActivity extends AppCompatActivity {
         navView.setItemIconTintList(iconColorStates);
         navView.setItemTextColor(iconColorStates);
 
-        //home container
         FragmentContainerView homeContainer = findViewById(R.id.home_container);
-
-        //Declare historyFragment programmatically so it can be called later on
-        ConstraintLayout mainLayout = findViewById(R.id.main_constraint_layout);
-        HistoryFragment historyFragment = new HistoryFragment();
-        FragmentContainerView historyContainer = new FragmentContainerView(this);
-        historyContainer.setId(View.generateViewId());
-        getSupportFragmentManager().beginTransaction()
-                .add(historyContainer.getId(), historyFragment).commit();
-        mainLayout.addView(historyContainer);
-
-        //Declare statsFragment programmatically so it can be called later on
-        StatsFragment statsFragment = new StatsFragment();
-        FragmentContainerView statsContainer = new FragmentContainerView(this);
-        statsContainer.setId(View.generateViewId());
-        getSupportFragmentManager().beginTransaction()
-                .add(statsContainer.getId(), statsFragment).commit();
-        mainLayout.addView(statsContainer);
+        FragmentContainerView historyContainer = findViewById(R.id.history_container);
+        FragmentContainerView statsContainer = findViewById(R.id.stats_container);
 
         //Click Logic
         historyContainer.setVisibility(View.INVISIBLE);
@@ -101,19 +91,20 @@ public class MainActivity extends AppCompatActivity {
             if (item.getItemId() == R.id.navigation_home) {
                 homeContainer.setVisibility(View.VISIBLE);
                 historyContainer.setVisibility(View.INVISIBLE);
-                historyContainer.setVisibility(View.INVISIBLE);
+                statsContainer.setVisibility(View.INVISIBLE);
                 this.setTitle(R.string.app_name);
             }
             else if (item.getItemId() == R.id.navigation_history) {
                 historyContainer.setVisibility(View.VISIBLE);
                 homeContainer.setVisibility(View.INVISIBLE);
-                historyContainer.setVisibility(View.INVISIBLE);
+                statsContainer.setVisibility(View.INVISIBLE);
                 this.setTitle(R.string.history);
 
-                historyFragment.initialize();
+                ((HistoryFragment) getSupportFragmentManager().
+                        findFragmentByTag("history_fragment")).initialize();
             }
             else if (item.getItemId() == R.id.navigation_stats) {
-                historyContainer.setVisibility(View.VISIBLE);
+                statsContainer.setVisibility(View.VISIBLE);
                 homeContainer.setVisibility(View.INVISIBLE);
                 historyContainer.setVisibility(View.INVISIBLE);
                 this.setTitle(R.string.stats);
@@ -258,6 +249,8 @@ public class MainActivity extends AppCompatActivity {
         alert.setPositiveButton(getResources().getString(R.string.yes), (dialogInterface, i) -> {
             DatabaseManager.createHistoryTable();
             if (DatabaseManager.saveCurrentWorkout()) {
+                ((HistoryFragment) getSupportFragmentManager().
+                        findFragmentByTag("history_fragment")).update();
                 stopWorkout();
             }
             else {

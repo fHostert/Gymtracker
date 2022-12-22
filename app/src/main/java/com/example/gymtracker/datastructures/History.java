@@ -4,13 +4,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class History implements Serializable {
-    private ArrayList<Workout> workouts = new ArrayList<>();
+    private final ArrayList<Workout> workouts;
 
     public History(ArrayList<Workout> workouts) {
         this.workouts = workouts;
     }
 
-    private ArrayList<Workout> getWorkouts() {
+    public ArrayList<Workout> getWorkouts() {
         return workouts;
     }
 }

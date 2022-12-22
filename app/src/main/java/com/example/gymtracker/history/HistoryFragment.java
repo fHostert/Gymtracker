@@ -3,14 +3,19 @@ package com.example.gymtracker.history;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.gymtracker.R;
 import com.example.gymtracker.datastructures.History;
+import com.example.gymtracker.datastructures.Workout;
+import com.example.gymtracker.helper.DatabaseManager;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,34 +24,16 @@ import com.example.gymtracker.datastructures.History;
  */
 public class HistoryFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
     private boolean isInitialized = false;
-//TEstcommit
+    private final int howManyWorkoutsToLoad = 10;
+
     public HistoryFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HistoryFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static HistoryFragment newInstance(String param1, String param2) {
         HistoryFragment fragment = new HistoryFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,8 +42,6 @@ public class HistoryFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -71,6 +56,29 @@ public class HistoryFragment extends Fragment {
         if (isInitialized) {
             return;
         }
+        History history = DatabaseManager.getHistory(howManyWorkoutsToLoad);
+        LinearLayout historyLinearLayout = getView().findViewById(R.id.history_linear_layout);
+        for (Workout workout : history.getWorkouts()) {
+            HistoryWorkoutFragment historyWorkoutFragment = HistoryWorkoutFragment.newInstance(workout);
+            FragmentContainerView newContainer = new FragmentContainerView(getContext());
+            newContainer.setId(View.generateViewId());
+            getParentFragmentManager().beginTransaction()
+                    .add(newContainer.getId(), historyWorkoutFragment).commit();
+            historyLinearLayout.addView(newContainer);
+        }
         isInitialized = true;
+    }
+
+    public void update(){
+        History history = DatabaseManager.getHistory(1);
+        LinearLayout historyLinearLayout = getView().findViewById(R.id.history_linear_layout);
+        for (Workout workout : history.getWorkouts()) {
+            HistoryWorkoutFragment historyWorkoutFragment = HistoryWorkoutFragment.newInstance(workout);
+            FragmentContainerView newContainer = new FragmentContainerView(getContext());
+            newContainer.setId(View.generateViewId());
+            getParentFragmentManager().beginTransaction()
+                    .add(newContainer.getId(), historyWorkoutFragment).commit();
+            historyLinearLayout.addView(newContainer, 0);
+        }
     }
 }

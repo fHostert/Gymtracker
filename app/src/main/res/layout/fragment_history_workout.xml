@@ -24,13 +24,13 @@
             android:text="Name des Workouts"
             android:textSize="@dimen/headline_size"
             android:textStyle="bold"
-            android:layout_weight="75"
+            android:layout_weight="70"
             android:layout_gravity="center"/>
 
         <Button
             android:id="@+id/delete_workout_button"
             android:text="@string/delete"
-            android:layout_weight="25"
+            android:layout_weight="30"
             android:textSize="@dimen/small_text"
             android:layout_height="wrap_content"
             android:layout_width="0dp"
@@ -52,7 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="100"
+        android:weightSum="99"
         android:layout_marginHorizontal="@dimen/horizontal_margin_from_boxes_to_inside"
         android:layout_marginTop="@dimen/vertical_margin_from_boxes_to_inside">
 
@@ -61,7 +61,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="🕐  1h 30min"
-            android:layout_weight="50"
+            android:layout_weight="33"
             android:gravity="center"
             android:textSize="@dimen/medium_text"/>
 
@@ -70,7 +70,16 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="💪  10.100 kg"
-            android:layout_weight="50"
+            android:layout_weight="33"
+            android:gravity="center"
+            android:textSize="@dimen/medium_text"/>
+
+        <TextView
+            android:id="@+id/number_of_prs_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="🏆  3 PRs"
+            android:layout_weight="33"
             android:gravity="center"
             android:textSize="@dimen/medium_text"/>
 
@@ -105,7 +114,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/horizontal_margin_from_boxes_to_inside"
-        android:layout_marginTop="@dimen/vertical_margin_from_boxes_to_inside">
+        android:layout_marginBottom="@dimen/vertical_margin_from_boxes_to_inside">
     </TableLayout>
 
 

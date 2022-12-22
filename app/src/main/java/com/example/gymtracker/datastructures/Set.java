@@ -6,11 +6,21 @@ public class Set implements Serializable {
     private final int index;
     private int reps;
     private float weight;
+    private final boolean isPersonalRecord;
+    private boolean isDone;
 
     public Set(int index, int reps, float weight) {
         this.index = index;
         this.reps = reps;
         this.weight = weight;
+        this.isPersonalRecord = false;
+    }
+
+    public Set(int index, int reps, float weight, boolean isPersonalRecord) {
+        this.index = index;
+        this.reps = reps;
+        this.weight = weight;
+        this.isPersonalRecord = isPersonalRecord;
     }
 
     public int getIndex() {
@@ -31,5 +41,21 @@ public class Set implements Serializable {
 
     public void setWeight(float weight) {
         this.weight = weight;
+    }
+
+    public float getVolume() {
+        return reps * weight;
+    }
+
+    public boolean isPersonalRecord() {
+        return isPersonalRecord;
+    }
+
+    public void setIsDone(boolean isDone) {
+        this.isDone = isDone;
+    }
+
+    public boolean getIsDone() {
+        return isDone;
     }
 }

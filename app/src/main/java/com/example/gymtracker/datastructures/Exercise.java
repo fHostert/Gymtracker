@@ -1,11 +1,16 @@
 package com.example.gymtracker.datastructures;
 
 import com.example.gymtracker.helper.DatabaseManager;
+import com.example.gymtracker.helper.Formatter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class Exercise implements Serializable {
+
+    private static final Locale l = Locale.GERMAN;
+
     private final int databaseIndex;
     private final String name;
     private ArrayList<Set> sets = new ArrayList<>();
@@ -42,5 +47,22 @@ public class Exercise implements Serializable {
 
     public ArrayList<Set> getSets() {
         return sets;
+    }
+
+    public String getBestSetString(){
+        float benchmark = -1;
+        Set bestSet = null;
+        for (Set set : sets) {
+            if (set.getReps() * set.getWeight() > benchmark) {
+                benchmark = set.getReps() * set.getWeight();
+                bestSet = set;
+            }
+        }
+        if (bestSet.getWeight() == 0)
+        {
+            return String.format(l, "%d Wdhl.", bestSet.getReps());
+        }
+        return String.format(l, "%d × %skg",
+                bestSet.getReps(), Formatter.formatFloat(bestSet.getWeight()));
     }
 }

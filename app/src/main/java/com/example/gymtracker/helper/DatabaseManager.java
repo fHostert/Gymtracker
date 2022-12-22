@@ -13,6 +13,7 @@ import com.example.gymtracker.datastructures.Workout;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
@@ -80,35 +81,46 @@ public final class DatabaseManager {
 
     public static void replaceExercise(int indexOfNewExercise, int indexOfOldExercise) {
         String query = String.format(l, "UPDATE CurrentWorkout " +
-                "SET exerciseID = %d, reps = 0, weight = 0 WHERE exerciseID = %d;",
-                indexOfNewExercise, indexOfOldExercise);
+                        "SET exerciseID = %d, reps = 0, weight = 0 WHERE exerciseID = %d;",
+                        indexOfNewExercise, indexOfOldExercise);
         db.execSQL(query);
     }
 
     public static void removeLastSet(int exerciseID, int lastIndex) {
         String query = String.format(l, "DELETE FROM CurrentWorkout " +
                         "WHERE exerciseID = %d and setIndex = %d;",
-                exerciseID, lastIndex);
+                        exerciseID, lastIndex);
         db.execSQL(query);
+    }
+
+    public static boolean arePreviousSetsDone(int exerciseID, int setIndex) {
+        String query = String.format(l, "SELECT reps FROM CurrentWorkout " +
+                        "WHERE exerciseID = %d AND setIndex < %d ORDER BY reps ASC;",
+                        exerciseID, setIndex);
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        boolean erg = resultSet.getCount() == 0 || resultSet.getInt(0) != 0;
+        resultSet.close();
+        return erg;
     }
 
     public static void moveExerciseUp(int exerciseID, int oldPosition) {
         String query = String.format(l, "UPDATE CurrentWorkout SET position = position + 1 " +
-                "WHERE position = %d;", oldPosition - 1);
+                        "WHERE position = %d;", oldPosition - 1);
         db.execSQL(query);
 
         query = String.format(l, "UPDATE CurrentWorkout SET position = position - 1 " +
-                "WHERE exerciseID = %d;", exerciseID);
+                        "WHERE exerciseID = %d;", exerciseID);
         db.execSQL(query);
     }
 
     public static void moveExerciseDown(int exerciseID, int oldIndex) {
         String query = String.format(l, "UPDATE CurrentWorkout SET position = position - 1 " +
-                "WHERE position = %d;", oldIndex + 1);
+                        "WHERE position = %d;", oldIndex + 1);
         db.execSQL(query);
 
         query = String.format(l, "UPDATE CurrentWorkout SET position = position + 1 " +
-                "WHERE exerciseID = %d;", exerciseID);
+                        "WHERE exerciseID = %d;", exerciseID);
         db.execSQL(query);
     }
 
@@ -117,22 +129,71 @@ public final class DatabaseManager {
             return false;
         }
         createWorkoutsTable();
-        printTable("CurrentWorkout");
         int workoutID = getNextWorkoutID();
         String workoutName = getCurrentWorkoutName();
-        int duration = (int) (System.currentTimeMillis() - getCurrentWorkoutStartTime());
+
+        long duration = (System.currentTimeMillis() - getCurrentWorkoutStartTime()) / 1000;
         String currentDate = getCurrentWorkoutDate();
         float totalWeight = getTotalWeightOfCurrentWorkout();
 
-        String query = String.format(l, "INSERT INTO History " +
-                        "(workoutID, exerciseID, setIndex, reps, weight) " +
-                        "SELECT %d, exerciseID, setIndex, reps, weight " +
-                        "FROM CurrentWorkout WHERE reps <> 0;",
-                        workoutID);
-        db.execSQL(query);
+        //Get exercise IDs
+        String query = "SELECT DISTINCT exerciseID FROM CurrentWorkout WHERE reps <> 0 " +
+                        "ORDER BY position ASC;";
+        Cursor rs = db.rawQuery(query, null);
+        int numberOfExercises = rs.getCount();
+        int[] exercisesIDs = new int[numberOfExercises];
+        rs.moveToFirst();
+        for (int i = 0; i < numberOfExercises; i++) {
+            exercisesIDs[i] = rs.getInt(0);
+            rs.moveToNext();
+        }
 
-        query = String.format(l, "INSERT INTO Workouts VALUES (%d, '%s', %d, '%s', '%s')",
-                        workoutID, workoutName, duration, currentDate, Formatter.formatFloat(totalWeight));
+        int numberOfPRs = 0;
+        for (int currentExerciseID : exercisesIDs) {
+            query = String.format(l, "SELECT reps, weight FROM CurrentWorkout " +
+                            "WHERE exerciseID = %d AND reps <> 0 ORDER BY setIndex ASC;",
+                            currentExerciseID);
+            Cursor resultSet = db.rawQuery(query, null);
+            resultSet.moveToFirst();
+            Set volumeSet = getVolumePR(currentExerciseID);
+            Set weightSet = getWeightPR(currentExerciseID);
+            //loop through sets and insert
+            for (int i = 0; i < resultSet.getCount(); i++) {
+                int reps = resultSet.getInt(0);
+                String weight = Formatter.formatFloat(resultSet.getFloat(1));
+                //tendency
+                int tendency = - 1;
+                Set lastSet = getLastSet(currentExerciseID, i + 1);
+                float volume = resultSet.getInt(0) * resultSet.getFloat(1);
+                if (lastSet == null || lastSet.getVolume() < volume) {
+                    tendency = 1;
+                }
+                else if (lastSet.getVolume() == volume) {
+                    tendency = 0;
+                }
+
+                //isPR
+                String isPR = "FALSE";
+                if (volumeSet == null || weightSet == null || volume > volumeSet.getVolume()
+                        || resultSet.getFloat(1) > weightSet.getWeight()) {
+                    isPR = "TRUE";
+                    numberOfPRs++;
+                }
+
+                //insert into history
+                query = String.format(l, "INSERT INTO History " +
+                                "(workoutID, exerciseID, setIndex, reps, weight, tendency, isPR) " +
+                                "VALUES (%d, %d, %d, %d, '%s', %d, '%s');",
+                                workoutID, currentExerciseID, i, reps, weight, tendency, isPR);
+                db.execSQL(query);
+
+                resultSet.moveToNext();
+            }
+        }
+
+        query = String.format(l, "INSERT INTO Workouts VALUES (%d, '%s', %d, '%s', '%s', %d)",
+                        workoutID, workoutName, duration, currentDate,
+                        Formatter.formatFloat(totalWeight), numberOfPRs);
         db.execSQL(query);
 
         dropTable("CurrentWorkout");
@@ -217,10 +278,11 @@ public final class DatabaseManager {
 
     public static void setCurrentWorkoutMetadata(String workoutName) {
         long startTime = System.currentTimeMillis();
-        String date = new SimpleDateFormat("yyyy-MM-dd",
+        String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
                 Locale.getDefault()).format(new Date());
+        Log.d("DATE", date);
         String query = String.format(l,
-                "INSERT INTO CurrentWorkoutMetadata VALUES ('%s', %d, %s);",
+                "INSERT INTO CurrentWorkoutMetadata VALUES ('%s', %d, '%s');",
                 workoutName, startTime, date);
         db.execSQL(query);
     }
@@ -240,11 +302,11 @@ public final class DatabaseManager {
         return name;
     }
 
-    public static int getCurrentWorkoutStartTime() {
+    public static long getCurrentWorkoutStartTime() {
         String query = "SELECT startTime FROM CurrentWorkoutMetadata;";
         Cursor rs = db.rawQuery(query, null);
         rs.moveToFirst();
-        int startTime = rs.getInt(0);
+        long startTime = rs.getLong(0);
         rs.close();
         return startTime;
     }
@@ -263,7 +325,7 @@ public final class DatabaseManager {
     ##############################################################################################*/
     public static void createWorkoutsTable() {
         String query = "CREATE TABLE IF NOT EXISTS Workouts(" +
-                "ID INT, name VARCHAR, duration INT, date VARCHAR, totalWeight REAL);";
+                "ID INT, name VARCHAR, duration INT, date VARCHAR, totalWeight REAL, numberOfPRs INT);";
         db.execSQL(query);
     }
 
@@ -276,19 +338,67 @@ public final class DatabaseManager {
         return nextID;
     }
 
+    public static String getTotalWeight(int workoutID) {
+        String query = String.format(l,
+                "SELECT totalWeight FROM Workouts WHERE ID = %d;", workoutID);
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        String erg = Formatter.formatFloat(resultSet.getFloat(0));
+        resultSet.close();
+        return erg;
+    }
+
     /*##############################################################################################
     #############################################HISTORY############################################
     ##############################################################################################*/
     public static void createHistoryTable() {
         String query = "CREATE TABLE IF NOT EXISTS History(" +
-                "workoutID INT, exerciseID INT, setIndex INT, reps INT, weight REAL);";
+                "workoutID INT, exerciseID INT, setIndex INT, reps INT, weight REAL, " +
+                "tendency INT, isPR BOOLEAN);";
         db.execSQL(query);
+    }
+
+    public static Set getLastSet(int exerciseID, int setIndex) {
+        //this prevents sets from different workouts to load
+        String query = String.format(l,
+                "SELECT ID FROM History, Workouts " +
+                        "WHERE History.workoutID = Workouts.ID " +
+                        "AND exerciseID = %d " +
+                        "AND setIndex = 1 " +
+                        "ORDER BY date DESC LIMIT 1;",
+                        exerciseID);
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        if (resultSet.getCount() == 0){
+            resultSet.close();
+            return null;
+        }
+        int workoutIdOfLastWorkout = resultSet.getInt(0);
+
+
+        query = String.format(l,
+                "SELECT reps, weight, ID FROM History, Workouts " +
+                        "WHERE History.workoutID = Workouts.ID " +
+                        "AND ID = %d " +
+                        "AND exerciseID = %d " +
+                        "AND setIndex = %d " +
+                        "ORDER BY date DESC LIMIT 1;",
+                        workoutIdOfLastWorkout, exerciseID, setIndex);
+        resultSet = db.rawQuery(query, null);
+        if (resultSet.getCount() == 0){
+            resultSet.close();
+            return null;
+        }
+        resultSet.moveToFirst();
+        Set erg = new Set(setIndex, resultSet.getInt(0), resultSet.getFloat(1));
+        resultSet.close();
+        return erg;
     }
 
     public static History getHistory(int top) {
         //Get IDs of workouts to be returned
         String query = String.format(l,
-                "SELECT DISTINCT ID FROM Workouts ORDER BY date DESC TOP %d;", top);
+                "SELECT DISTINCT ID FROM Workouts ORDER BY date DESC LIMIT %d;", top);
         Cursor resultSet = db.rawQuery(query, null);
         resultSet.moveToFirst();
         int[] workoutIDs = new int[resultSet.getCount()];
@@ -302,8 +412,8 @@ public final class DatabaseManager {
         for (int currentWorkoutID : workoutIDs) {
             //Get exercises in current workout
             query = String.format(l,
-                    "SELECT DISTINCT exerciseID FROM History ORDER BY setIndex ASC " +
-                            "WHERE workoutID = %d;",
+                    "SELECT DISTINCT exerciseID FROM History " +
+                            "WHERE workoutID = %d ORDER BY setIndex ASC;",
                             currentWorkoutID);
             resultSet = db.rawQuery(query, null);
             resultSet.moveToFirst();
@@ -317,8 +427,9 @@ public final class DatabaseManager {
             ArrayList<Exercise> exercises = new ArrayList<>();
             for (int currentExerciseID : exerciseIDs) {
                 query = String.format(l,
-                        "SELECT reps, weight FROM History ORDER BY setIndex ASC " +
-                                "WHERE workoutID = %d AND exerciseID = %d;",
+                        "SELECT reps, weight FROM History " +
+                                "WHERE workoutID = %d AND exerciseID = %d " +
+                                "ORDER BY setIndex ASC;",
                                 currentWorkoutID, currentExerciseID);
                 resultSet = db.rawQuery(query, null);
                 resultSet.moveToFirst();
@@ -326,31 +437,75 @@ public final class DatabaseManager {
                 //Fill sets objects for current exercise
                 ArrayList<Set> sets = new ArrayList<>();
                 for (int i = 0; i < resultSet.getCount(); i++) {
-                    sets.add(new Set(i, resultSet.getInt(0), resultSet.getFloat(1)));
+                    sets.add(new Set(i + 1, resultSet.getInt(0), resultSet.getFloat(1),
+                            isSetPersonalRecord(currentExerciseID,  resultSet.getInt(0),
+                            resultSet.getFloat(1))));
                     resultSet.moveToNext();
                 }
                 exercises.add(new Exercise(currentExerciseID, sets));
-                sets.clear();
             }
 
             //Get meta data
             query = String.format(l,
-                    "SELECT name, duration, date, totalWeight FROM Workouts " +
-                            "WHERE workoutID = %d TOP 1",
+                    "SELECT name, duration, date, totalWeight, numberOfPRs FROM Workouts " +
+                            "WHERE ID = %d LIMIT 1",
                             currentWorkoutID);
             resultSet = db.rawQuery(query, null);
             resultSet.moveToFirst();
 
             //create new workout object
             workouts.add(new Workout(resultSet.getString(0), resultSet.getInt(1),
-                    resultSet.getString(2), exercises));
-            exercises.clear();
-
+                    resultSet.getString(2), exercises, resultSet.getFloat(3),
+                    resultSet.getInt(4)));
         }
         resultSet.close();
         return new History(workouts);
     }
 
+    public static Set getVolumePR(int exerciseID) {
+        String query = String.format(l, "SELECT setIndex, reps, weight FROM History " +
+                "WHERE exerciseID = %d ORDER BY (reps * weight) DESC LIMIT 1;", exerciseID);
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        if (resultSet.getCount() == 0) {
+            resultSet.close();
+            return null;
+        }
+        Set erg = new Set(resultSet.getInt(0), resultSet.getInt(1), resultSet.getFloat(2));
+        resultSet.close();
+        return erg;
+    }
+
+    public static Set getWeightPR(int exerciseID) {
+        String query = String.format(l, "SELECT setIndex, reps, weight FROM History " +
+                "WHERE exerciseID = %d ORDER BY weight DESC LIMIT 1;", exerciseID);
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        if (resultSet.getCount() == 0) {
+            resultSet.close();
+            return null;
+        }
+        Set erg = new Set(resultSet.getInt(0), resultSet.getInt(1), resultSet.getFloat(2));
+        resultSet.close();
+        return erg;
+    }
+
+    public static boolean isSetPersonalRecord(int exerciseID, int reps, float weight) {
+        float benchmark = reps * weight;
+        String query = String.format(l, "SELECT (reps * weight) FROM History " +
+                "WHERE exerciseID = %d ORDER BY (reps * weight) DESC LIMIT 1;", exerciseID);
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        boolean isVolumeRecord = benchmark > resultSet.getFloat(0);
+
+        query = String.format(l, "SELECT weight FROM History " +
+                "WHERE exerciseID = %d ORDER BY weight DESC LIMIT 1;", exerciseID);
+        resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        boolean isWeightRecord = weight > resultSet.getFloat(0);
+        resultSet.close();
+        return isVolumeRecord || isWeightRecord;
+    }
 
     /*##############################################################################################
     ############################################TEMPLATES###########################################

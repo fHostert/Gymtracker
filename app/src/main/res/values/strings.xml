@@ -72,6 +72,7 @@
     <string name="toastNoRepsDone">Erst Wiederholungen eintragen.</string>
     <string name="toastExerciseAlreadyUp">Übung ist bereits an erster Stelle.</string>
     <string name="toastExerciseAlreadyDown">Übung ist bereits an letzter Stelle.</string>
+    <string name="toastFinishPreviousSetFirst">Zuerst das vorherige Set abschließen.</string>
     <string name="statsForExercise">Statistiken für bestimmte Übung</string>
     <string name="day">Tag</string>
     <string name="days">Tage</string>

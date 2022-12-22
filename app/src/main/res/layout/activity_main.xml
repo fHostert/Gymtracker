@@ -32,5 +32,33 @@
         android:layout_marginBottom="?attr/actionBarSize"
         />
 
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/history_container"
+        android:tag="history_fragment"
+        android:name="com.example.gymtracker.history.HistoryFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_history"
+        app:layout_constraintBottom_toTopOf="@id/nav_view"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginBottom="?attr/actionBarSize"
+        />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/stats_container"
+        android:name="com.example.gymtracker.stats.StatsFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_stats"
+        app:layout_constraintBottom_toTopOf="@id/nav_view"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginBottom="?attr/actionBarSize"
+        />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
