@@ -63,7 +63,8 @@ public class HistoryFragment extends Fragment {
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
             newContainer.setId(View.generateViewId());
             getParentFragmentManager().beginTransaction()
-                    .add(newContainer.getId(), historyWorkoutFragment).commit();
+                    .add(newContainer.getId(), historyWorkoutFragment,
+                    String.valueOf(workout.getID())).commit();
             historyLinearLayout.addView(newContainer);
         }
         isInitialized = true;
@@ -77,7 +78,8 @@ public class HistoryFragment extends Fragment {
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
             newContainer.setId(View.generateViewId());
             getParentFragmentManager().beginTransaction()
-                    .add(newContainer.getId(), historyWorkoutFragment).commit();
+                    .add(newContainer.getId(), historyWorkoutFragment,
+                    String.valueOf(workout.getID())).commit();
             historyLinearLayout.addView(newContainer, 0);
         }
     }

@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Workout implements Serializable {
+    private final int ID;
     private final String name;
     private final int duration;
     private final String date;
@@ -21,16 +22,22 @@ public class Workout implements Serializable {
         this.totalWeight = -1;
         this.exercises = exercises;
         this.numberOfPRs = 0;
+        this.ID = -1;
     }
 
     public Workout(String name, int duration, String date, ArrayList<Exercise> exercises,
-                   float totalWeight, int numberOfPrs) {
+                   float totalWeight, int numberOfPrs, int ID) {
         this.name = name;
         this.duration = duration;
         this.date = date;
         this.exercises = exercises;
         this.totalWeight = totalWeight;
         this.numberOfPRs = numberOfPrs;
+        this.ID = ID;
+    }
+
+    public int getID() {
+        return ID;
     }
 
     public String getName() {

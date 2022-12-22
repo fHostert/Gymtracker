@@ -395,6 +395,14 @@ public final class DatabaseManager {
         return erg;
     }
 
+    public static void deleteFromHistory(int ID) {
+        String query = String.format(l, "DELETE FROM History WHERE workoutID = %d", ID);
+        db.execSQL(query);
+
+        query = String.format(l, "DELETE FROM Workouts WHERE ID = %d", ID);
+        db.execSQL(query);
+    }
+
     public static History getHistory(int top) {
         //Get IDs of workouts to be returned
         String query = String.format(l,
@@ -447,7 +455,7 @@ public final class DatabaseManager {
 
             //Get meta data
             query = String.format(l,
-                    "SELECT name, duration, date, totalWeight, numberOfPRs FROM Workouts " +
+                    "SELECT name, duration, date, totalWeight, numberOfPRs, ID FROM Workouts " +
                             "WHERE ID = %d LIMIT 1",
                             currentWorkoutID);
             resultSet = db.rawQuery(query, null);
@@ -456,7 +464,7 @@ public final class DatabaseManager {
             //create new workout object
             workouts.add(new Workout(resultSet.getString(0), resultSet.getInt(1),
                     resultSet.getString(2), exercises, resultSet.getFloat(3),
-                    resultSet.getInt(4)));
+                    resultSet.getInt(4), resultSet.getInt(5)));
         }
         resultSet.close();
         return new History(workouts);

@@ -1,5 +1,6 @@
 package com.example.gymtracker.history;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -8,10 +9,12 @@ import androidx.fragment.app.FragmentContainerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.example.gymtracker.MainActivity;
 import com.example.gymtracker.R;
 import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.Set;
@@ -77,6 +80,30 @@ public class HistoryWorkoutFragment extends Fragment {
                 setText(String.format("💪 %s kg", Formatter.formatFloat(workout.getTotalWeight())));
         ((TextView) view.findViewById(R.id.number_of_prs_text_view)).
                 setText(String.format(l, "\uD83C\uDFC6 %d PRs", workout.getNumberOfPRs()));
+
+        //set logic for the delete button
+        Button deleteButton = view.findViewById(R.id.delete_workout_button);
+        deleteButton.setOnClickListener(view1 -> {
+
+            AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+            alert.setMessage(getResources().getString(R.string.deleteWorkoutText));
+            alert.setTitle(getResources().getString(R.string.deleteWorkout));
+
+            //If ok, delete workout and hide this fragment
+            alert.setPositiveButton("ok", (dialogInterface, i) -> {
+                DatabaseManager.deleteFromHistory(workout.getID());
+                Fragment thisFragment = getParentFragmentManager().
+                        findFragmentByTag(String.valueOf(workout.getID()));
+                getParentFragmentManager().beginTransaction().remove(thisFragment).commit();
+
+            });
+            //If cancel, do nothing
+            alert.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
+                //Do nothing and cancel
+            });
+
+            alert.show();
+        });
 
         return view;
     }
