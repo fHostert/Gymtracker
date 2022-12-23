@@ -68,4 +68,8 @@ public class TemplateFragment extends Fragment {
         }
         return view;
     }
+
+    public String getName() {
+        return workout.getName();
+    }
 }

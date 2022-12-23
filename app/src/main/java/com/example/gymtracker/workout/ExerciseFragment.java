@@ -1,5 +1,6 @@
 package com.example.gymtracker.workout;
 
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 
 
@@ -9,8 +10,10 @@ import androidx.fragment.app.FragmentContainerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -57,10 +60,6 @@ public class ExerciseFragment extends Fragment {
         //Exercise name
         ((TextView) view.findViewById(R.id.name_of_exercise_text_view)).
                 setText(exercise.getName());
-        //view.findViewById(R.id.name_of_exercise_text_view).
-        //        setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT), 85.0);
-        Log.d("ExerciseName", exercise.getName());
-        Log.d("LengthOFString", String.valueOf(exercise.getName().length()));
 
         //add Sets
         for (Set set : exercise.getSets()) {
@@ -73,6 +72,7 @@ public class ExerciseFragment extends Fragment {
                     .add(newContainer.getId(), setFragment).commit();
             exerciseLinearLayout.addView(newContainer);
         }
+
         return view;
     }
 

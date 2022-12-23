@@ -279,7 +279,6 @@ public final class DatabaseManager {
         long startTime = System.currentTimeMillis();
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
                 Locale.getDefault()).format(new Date());
-        Log.d("DATE", date);
         String query = String.format(l,
                 "INSERT INTO CurrentWorkoutMetadata VALUES ('%s', %d, '%s');",
                 workoutName, startTime, date);
@@ -611,6 +610,31 @@ public final class DatabaseManager {
         return workouts;
     }
 
+    public static void deleteTemplate(String templateName) {
+        String query = String.format("DELETE FROM Templates WHERE name = '%s';", templateName);
+        db.execSQL(query);
+    }
+
+    public static void addExerciseToTemplate(String templateName, String exerciseName) {
+        int exerciseID = getExerciseID(exerciseName);
+        String query = String.format(l, "INSERT INTO Templates VALUES " +
+                "('%s', %d, 3);", templateName, exerciseID);
+        db.execSQL(query);
+    }
+
+    public static void deleteExerciseFromTemplate(String templateName, String exerciseName) {
+        int exerciseID = getExerciseID(exerciseName);
+        String query = String.format(l, "DELETE FROM Templates " +
+                "WHERE name = '%s' AND exerciseID = %d;", templateName, exerciseID);
+        db.execSQL(query);
+    }
+
+    public static void renameTemplate(String templateName, String newTemplateName) {
+        String query = String.format(l, "UPDATE Templates SET name = '%s' " +
+                        "WHERE name = '%s';", newTemplateName, templateName);
+        db.execSQL(query);
+    }
+
     public static boolean doesTemplateExist(String name) {
         String query = String.format("SELECT name FROM Templates WHERE name = '%s';", name);
         Cursor resultSet = db.rawQuery(query, null);
@@ -724,7 +748,6 @@ public final class DatabaseManager {
     ##############################################################################################*/
     public static void dropTable(String table) {
         if (doesTableExist(table)) {
-            Log.d("DROPPING TABLE", table);
             String query = String.format("DROP TABLE \"%s\";", table);
             db.execSQL(query);
         }

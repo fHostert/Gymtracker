@@ -80,22 +80,29 @@ public class WorkoutFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //add Exercise
+        if (resultCode == RESULT_OK && requestCode == 0) {
+            addEmptyExercise(data.getExtras().getString("ITEM"));
+        }
+        //replace Exercise
+        else if (resultCode == RESULT_OK && requestCode == 1) {
+            replaceExercise(data.getExtras().getString("ITEM"));
+        }
+    }
+
     public void addExerciseClick() {
         final Intent intent = new Intent(getContext(), ChooseActivity.class);
+        String[] exercisesInWorkout = workout.getExerciseNames();
         intent.putExtra("LIST", DatabaseManager.getExercises());
+        intent.putExtra("REMOVE_LIST", exercisesInWorkout);
         intent.putExtra("TITLE", getResources().getString(R.string.addExercise));
         startActivityForResult(intent, 0);
     }
 
     private void addEmptyExercise(String exerciseName) {
-        for (ExerciseFragment e : exerciseFragments) {
-            if (Objects.equals(e.getName(), exerciseName)) {
-                Toast.makeText(getContext(),
-                        getResources().getString(R.string.exerciseAlreadyInWorkout),
-                        Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
         LinearLayout workoutLinearLayout = getView().findViewById(R.id.workout_linear_layout);
         Exercise exercise = new Exercise(DatabaseManager.getExerciseID(exerciseName));
         ExerciseFragment exerciseFragment = ExerciseFragment.newInstance(exercise);
@@ -110,20 +117,10 @@ public class WorkoutFragment extends Fragment {
             DatabaseManager.insertSetIntoCurrentWorkout(
                     exercise.getExerciseID(), workoutLinearLayout.getChildCount(), set);
         }
+        workout.addExercise(exerciseName);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        //add Exercise
-        if (resultCode == RESULT_OK && requestCode == 0) {
-          addEmptyExercise(data.getExtras().getString("ITEM"));
-        }
-        //replace Exercise
-        else if (resultCode == RESULT_OK && requestCode == 1) {
-            replaceExercise(data.getExtras().getString("ITEM"));
-        }
-    }
+
 
     public void moveExerciseUp(ExerciseFragment exerciseFragment) {
         LinearLayout workoutLinearLayout = getView().findViewById(R.id.workout_linear_layout);
@@ -179,6 +176,7 @@ public class WorkoutFragment extends Fragment {
                 break;
             }
         }
+        workout.removeExercise(exerciseFragment.getName());
     }
 
     /**
@@ -206,6 +204,8 @@ public class WorkoutFragment extends Fragment {
                 break;
             }
         }
+        workout.removeExercise(exerciseFragmentToBeReplaced.getName());
+        workout.addExercise(exerciseName);
     }
 
     public void deleteLastSet(ExerciseFragment exerciseFragment) {

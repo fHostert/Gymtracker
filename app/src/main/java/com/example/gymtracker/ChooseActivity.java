@@ -7,13 +7,19 @@ import android.text.TextWatcher;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ChooseActivity extends AppCompatActivity {
 
     String title = "";
     String[] list = null;
+    String[] removeList = null;
+    String packet = "";
 
 
     @Override
@@ -25,13 +31,26 @@ public class ChooseActivity extends AppCompatActivity {
         if (extras != null) {
             title = extras.getString("TITLE");
             list = extras.getStringArray("LIST");
+            packet = extras.getString("PACKET");
+            removeList = extras.getStringArray("REMOVE_LIST");
+        }
+        ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(list));
+        if (removeList != null) {
+            arrayList.removeAll(Arrays.asList(removeList));
         }
         this.setTitle(title);
+
+        if (arrayList.size() == 0) {
+            Toast.makeText(this,
+                    getResources().getString(R.string.nothingLeftToAdd),
+                    Toast.LENGTH_SHORT).show();
+            finish();
+        }
 
         //Fill ListView with list extra
         ListView listView = findViewById(R.id.exercises_list_view);
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, list);
+                android.R.layout.simple_list_item_1, arrayList);
         listView.setAdapter(arrayAdapter);
         listView.setOnItemClickListener((adapterView, view, i, l) -> {
 
@@ -40,9 +59,10 @@ public class ChooseActivity extends AppCompatActivity {
             for (int j = 0; j<arrayAdapter.getCount(); j++) {
                 filteredList[j] = arrayAdapter.getItem(j);
             }
-
-            setResult(RESULT_OK,
-                    (new Intent()).putExtra("ITEM", filteredList[i]));
+            Intent intent = new Intent();
+            intent.putExtra("ITEM", filteredList[i]);
+            intent.putExtra("PACKET", packet);
+            setResult(RESULT_OK, intent);
             finish();
         });
 

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,14 +19,14 @@ import com.example.gymtracker.TextViewTableRowFragment;
 import com.example.gymtracker.helper.DatabaseManager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class AddTemplateActivity extends AppCompatActivity {
 
     private String name = "";
-    private ArrayList<String> exercises = new ArrayList<>();
+    private final ArrayList<String> exercises = new ArrayList<>();
 
-    boolean doubleBackToExitPressedOnce = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,38 +49,19 @@ public class AddTemplateActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        if (doubleBackToExitPressedOnce) {
-            super.onBackPressed();
-            return;
-        }
-
-        this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this,
-                getResources().getString(R.string.doublePressToExitAddTemplate),
-                Toast.LENGTH_SHORT).show();
-
-        new Handler(Looper.getMainLooper()).postDelayed(()
-                -> doubleBackToExitPressedOnce=false, 2000);
-    }
-
     public void addExerciseToTemplateClick(View view) {
+        String[] exercisesInTemplate = new String[exercises.size()];
+        for (int i = 0; i < exercisesInTemplate.length; i++) {
+            exercisesInTemplate[i] = exercises.get(i);
+        }
         final Intent intent = new Intent(this, ChooseActivity.class);
         intent.putExtra("LIST", DatabaseManager.getExercises());
+        intent.putExtra("REMOVE_LIST", exercisesInTemplate);
         intent.putExtra("TITLE", getResources().getString(R.string.addExerciseToTemplate));
         startActivityForResult(intent, 0);
     }
 
     private void addExerciseToTemplate(String exerciseName) {
-        for (String exercise : exercises) {
-            if (Objects.equals(exercise, exerciseName)) {
-                Toast.makeText(this,
-                        getResources().getString(R.string.toastExerciseAlreadyInNewTemplate),
-                        Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
         exercises.add(exerciseName);
 
         LinearLayout exerciseContainer = findViewById(R.id.new_template_exercises_layout);
@@ -94,6 +76,7 @@ public class AddTemplateActivity extends AppCompatActivity {
 
     public void saveTemplateClick(View view) {
         DatabaseManager.saveTemplate(name, exercises);
+        setResult(RESULT_OK, new Intent());
         finish();
     }
 }

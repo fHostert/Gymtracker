@@ -19,6 +19,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,16 +29,19 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.history.HistoryFragment;
 import com.example.gymtracker.templates.AddTemplateActivity;
+import com.example.gymtracker.templates.TemplateFragment;
 import com.example.gymtracker.workout.ExerciseFragment;
 import com.example.gymtracker.workout.SetFragment;
 import com.example.gymtracker.workout.WorkoutFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -182,6 +186,19 @@ public class MainActivity extends AppCompatActivity {
         else if (resultCode == RESULT_OK && requestCode == 3) {
             renameExercise(data.getExtras().getString("ITEM"));
         }
+        //remove Exercise from template
+        else if (resultCode == RESULT_OK && requestCode == 4) {
+            deleteExerciseFromTemplate(data.getExtras().getString("PACKET"),
+                    data.getExtras().getString("ITEM"));
+        }
+        //add Exercise to template
+        else if (resultCode == RESULT_OK && requestCode == 5) {
+            addToTemplate(data.getExtras().getString("PACKET"),
+                    data.getExtras().getString("ITEM"));
+        }
+        else if (resultCode == RESULT_OK && requestCode == 6) {
+            reload();
+        }
     }
 
     public void reload() {
@@ -241,6 +258,9 @@ public class MainActivity extends AppCompatActivity {
             DatabaseManager.deleteExercise(exerciseName);
             ((HistoryFragment) getSupportFragmentManager().
                     findFragmentByTag("history_fragment")).reload();
+            Toast.makeText(this,
+                    getResources().getString(R.string.exerciseDeleted),
+                    Toast.LENGTH_SHORT).show();
         });
         //If cancel, return
         alert.setNegativeButton(getResources().getString(R.string.no), (dialog, whichButton) -> {
@@ -276,6 +296,9 @@ public class MainActivity extends AppCompatActivity {
                 //If ok, continue
                 newAlert.setPositiveButton(getResources().getString(R.string.yes), (dialogInterface1, i1) -> {
                     DatabaseManager.mergeExercises(newExerciseName, exerciseName);
+                    Toast.makeText(this,
+                            getResources().getString(R.string.exercisesMerged),
+                            Toast.LENGTH_SHORT).show();
                 });
                 //If cancel, return
                 newAlert.setNegativeButton(getResources().getString(R.string.no), (dialog, whichButton) -> {
@@ -286,6 +309,9 @@ public class MainActivity extends AppCompatActivity {
             //Just rename the exercise
             else {
                 DatabaseManager.renameExercise(exerciseName, newExerciseName);
+                Toast.makeText(this,
+                        getResources().getString(R.string.exerciseRenamed),
+                        Toast.LENGTH_SHORT).show();
             }
 
         });
@@ -325,7 +351,8 @@ public class MainActivity extends AppCompatActivity {
 
             final Intent intent = new Intent(this, AddTemplateActivity.class);
             intent.putExtra("NAME", newTemplateName);
-            startActivity(intent);
+            startActivityForResult(intent, 6);
+            reload();
 
         });
 
@@ -335,11 +362,112 @@ public class MainActivity extends AppCompatActivity {
         });
 
         alert.show();
-
-
     }
 
     public void templateMenuClick(View view) {
+        PopupMenu popup = new PopupMenu(this, view);
+        String templateName = getTemplateName(view);
+        popup.setOnMenuItemClickListener(menuItem -> {
+            int id = menuItem.getItemId();
+            if (id == R.id.delete_template_menu) {
+                deleteTemplate(templateName);
+            }
+            else if (id == R.id.add_to_template_menu) {
+                addToTemplate(templateName);
+            }
+            else if (id == R.id.delete_from_template_menu) {
+                deleteExerciseFromTemplate(templateName);
+            }
+            else if (id == R.id.rename_template_menu) {
+                renameTemplate(templateName);
+            }
+            return false;
+        });
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.template_menu, popup.getMenu());
+        popup.show();
+    }
+
+    public void deleteTemplate(String templateName) {
+        DatabaseManager.deleteTemplate(templateName);
+        reload();
+        Toast.makeText(this,
+                getResources().getString(R.string.templateDeleted),
+                Toast.LENGTH_SHORT).show();
+    }
+
+    public void addToTemplate(String templateName) {
+        Exercise[] exercises = DatabaseManager.getExercisesInTemplate(templateName);
+        String[] exercisesInTemplate = new String[exercises.length];
+        for (int i = 0; i < exercisesInTemplate.length; i++) {
+            exercisesInTemplate[i] = exercises[i].getName();
+        }
+        final Intent intent = new Intent(this, ChooseActivity.class);
+        intent.putExtra("LIST", DatabaseManager.getExercises());
+        intent.putExtra("REMOVE_LIST", exercisesInTemplate);
+        intent.putExtra("TITLE", getResources().getString(R.string.removeExercise));
+        intent.putExtra("PACKET", templateName);
+        startActivityForResult(intent, 5);
+    }
+
+    public void addToTemplate(String templateName, String exerciseName) {
+        DatabaseManager.addExerciseToTemplate(templateName, exerciseName);
+        reload();
+        Toast.makeText(this,
+                getResources().getString(R.string.exerciseAdded),
+                Toast.LENGTH_SHORT).show();
+    }
+
+    public void deleteExerciseFromTemplate(String templateName) {
+        Exercise[] exercises = DatabaseManager.getExercisesInTemplate(templateName);
+        String[] exercisesInTemplate = new String[exercises.length];
+        if (exercises.length == 1) {
+            Toast.makeText(this,
+                    getResources().getString(R.string.cantRemoveLastExercise),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        for (int i = 0; i < exercisesInTemplate.length; i++) {
+            exercisesInTemplate[i] = exercises[i].getName();
+        }
+        final Intent intent = new Intent(this, ChooseActivity.class);
+        intent.putExtra("LIST", exercisesInTemplate);
+        intent.putExtra("TITLE", getResources().getString(R.string.removeExercise));
+        intent.putExtra("PACKET", templateName);
+        startActivityForResult(intent, 4);
+    }
+
+    public void deleteExerciseFromTemplate(String templateName, String exerciseName) {
+        DatabaseManager.deleteExerciseFromTemplate(templateName, exerciseName);
+        reload();
+        Toast.makeText(this,
+                getResources().getString(R.string.exerciseRemoved),
+                Toast.LENGTH_SHORT).show();
+    }
+
+    public void renameTemplate(String templateName) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle(getResources().getString(R.string.changeTemplateName));
+        alert.setMessage(getResources().getString(R.string.changeTemplateNameText));
+        final View customLayout = getLayoutInflater().inflate(R.layout.alert, null);
+        alert.setView(customLayout);
+
+        alert.setPositiveButton(getResources().getString(R.string.ok), (dialogInterface, i) -> {
+            EditText et = customLayout.findViewById(R.id.alert_input_edit_text);
+            String newTemplateName = et.getText().toString();
+            DatabaseManager.renameTemplate(templateName, newTemplateName);
+            Toast.makeText(this,
+                    getResources().getString(R.string.templateRenamed),
+                    Toast.LENGTH_SHORT).show();
+            reload();
+        });
+
+        //If cancel, do nothing
+        alert.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
+            //Do nothing and cancel
+        });
+
+        alert.show();
     }
 
     /*##############################################################################################
@@ -418,6 +546,9 @@ public class MainActivity extends AppCompatActivity {
             String newWorkoutName = et.getText().toString();
             this.setTitle(newWorkoutName);
             DatabaseManager.changeCurrentWorkoutName(newWorkoutName);
+            Toast.makeText(this,
+                    getResources().getString(R.string.nameChanged),
+                    Toast.LENGTH_SHORT).show();
         });
 
         //If cancel, do nothing
@@ -447,6 +578,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             DatabaseManager.createNewExercise(newExerciseName);
+            Toast.makeText(this,
+                    getResources().getString(R.string.newExerciseCreated),
+                    Toast.LENGTH_SHORT).show();
         });
 
         //If cancel, do nothing
@@ -553,6 +687,12 @@ public class MainActivity extends AppCompatActivity {
         int setIndex = Integer.parseInt(String.valueOf(setIndexTV.getText()));
         ExerciseFragment exerciseFragment = getExerciseFragment(parentView);
         return exerciseFragment.getSetFragment(setIndex);
+    }
+
+    private String getTemplateName(View view) {
+        View parentView = ((View) view.getParent());
+        return (String)
+                ((TextView) parentView.findViewById(R.id.name_of_template_text_view)).getText();
     }
 
 

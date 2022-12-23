@@ -1,9 +1,11 @@
 package com.example.gymtracker.datastructures;
 
+import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.helper.Formatter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Workout implements Serializable {
     private final int ID;
@@ -62,5 +64,26 @@ public class Workout implements Serializable {
 
     public int getNumberOfPRs() {
         return numberOfPRs;
+    }
+
+    public String[] getExerciseNames() {
+        String[] exercisesInWorkout = new String[exercises.size()];
+        for (int i = 0; i < exercises.size(); i++) {
+            exercisesInWorkout[i] = exercises.get(i).getName();
+        }
+        return exercisesInWorkout;
+    }
+
+    public void removeExercise(String exerciseName) {
+        for (int i = 0; i < exercises.size(); i++) {
+            if (Objects.equals(exercises.get(i).getName(), exerciseName)) {
+                exercises.remove(i);
+                return;
+            }
+        }
+    }
+
+    public void addExercise(String exerciseName) {
+        exercises.add(new Exercise(DatabaseManager.getExerciseID(exerciseName)));
     }
 }

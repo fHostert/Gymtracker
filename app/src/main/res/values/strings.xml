@@ -5,7 +5,8 @@
     <string name="stats">Statistik</string>
     <string name="startEmptyWorkout">Leeres Workout starten</string>
     <string name="addExercise">Übung hinzufügen</string>
-    <string name="addExerciseToTemplate">Weitere Übung der Vorlage hinzufügen</string>
+    <string name="addExerciseToTemplate">Weitere Übung hinzufügen</string>
+    <string name="renameTemplate">Vorlage umbenennen</string>
     <string name="saveTemplate">Vorlage speichern</string>
     <string name="createNewExercise">Neue Übung erstellen</string>
     <string name="createNewExerciseText">Den Namen der neuen Übung eingeben:</string>
@@ -36,7 +37,6 @@
     <string name="sets">Sets</string>
     <string name="last">Vorheriges</string>
     <string name="KG">KG</string>
-    <string name="exerciseAlreadyInWorkout">Diese Übung befindet sich bereits im Workout.</string>
     <string name="changeWorkoutName">Workoutnamen ändern</string>
     <string name="moveExerciseUp">Übung nach oben verschieben</string>
     <string name="moveExerciseDown">Übung nach unten verschieben</string>
@@ -54,6 +54,7 @@
     <string name="renameExercise">Übung umbenennen</string>
     <string name="exportData">Verlaufsdaten exportieren</string>
     <string name="importData">Verlaufsdaten importieren</string>
+    <string name="addToTemplate">Übun</string>
     <string name="ok">OK</string>
     <string name="chooseExercise">Übung auswählen</string>#
     <string name="restoreWorkout">Letztes Workout wiederherstellen</string>
@@ -76,7 +77,6 @@
     <string name="toastDoubleExercise">Diese Übung existiert bereits.</string>
     <string name="toastDoubleTemplate">Diese Vorlage exisitert bereits.</string>
     <string name="toastNeverDoneExercise">Keine Details - diese Übung wurde noch nie durchgeführt.</string>
-    <string name="toastExerciseAlreadyInNewTemplate">Diese Übung ist in dieser Vorlage bereits vertreten.</string>
     <string name="toastTemplateAlreadyExists">Diese Vorlage existiert bereits.</string>
     <string name="toastTemplateIsEmpty">Füge der Vorlage erst eine Übung hinzu.</string>
     <string name="toastTemplateNameIsEmpty">Gib einen Namen für die Vorlage ein.</string>
@@ -140,5 +140,18 @@
     </string-array>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="newExerciseCreated">Neue Übung erstellt</string>
+    <string name="nameChanged">Namen geändert.</string>
+    <string name="exerciseDeleted">Übung gelöscht</string>
+    <string name="exerciseRenamed">Übung umbenannt</string>
+    <string name="exercisesMerged">Übungen zusammengeführt</string>
+    <string name="exerciseRemoved">Übung entfernt</string>
+    <string name="templateDeleted">Vorlage gelöscht</string>
+    <string name="cantRemoveLastExercise">Die letzte Übung kann nicht entfernt werden. Löschen Sie stattdessen die Vorlage.</string>
+    <string name="exerciseAdded">Übung hinzugefügt</string>
+    <string name="changeTemplateName">Vorlagennamen ändern</string>
+    <string name="changeTemplateNameText">Den neuen Namen für die Vorlage eingeben:</string>
+    <string name="templateRenamed">Vorlage umbennant</string>
+    <string name="nothingLeftToAdd">Es ist nichts mehr zum hinzufügen übrig.</string>
 
 </resources>
