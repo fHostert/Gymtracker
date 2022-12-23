@@ -13,7 +13,6 @@ import com.example.gymtracker.datastructures.Workout;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
@@ -538,6 +537,46 @@ public final class DatabaseManager {
         db.execSQL(query);
     }
 
+    public static void loadTemplate(String templateName) {
+        createCurrentWorkoutMetadataTable();
+        createCurrentWorkoutTable();
+        setCurrentWorkoutMetadata(templateName);
+        int position = 1;
+        for (Exercise exercise : getExercisesInTemplate(templateName)) {
+            for (int i = 0; i < exercise.getSets().size(); i++) {
+                String query = String.format(l,
+                        "INSERT INTO CurrentWorkout VALUES (%d, %d, %d, %d, '%s');",
+                        exercise.getExerciseID(), position, i + 1,
+                        exercise.getSets().get(i).getReps(),
+                        Formatter.formatFloat(exercise.getSets().get(i).getWeight()));
+                db.execSQL(query);
+            }
+            position++;
+        }
+    }
+
+    public static void saveTemplate(String name, ArrayList<String> exercises) {
+        for (String exerciseName : exercises) {
+            String query = String.format(l, "INSERT INTO Templates VALUES ('%s', %d, 3);",
+                    name, getExerciseID(exerciseName));
+            db.execSQL(query);
+        }
+    }
+
+    public static Exercise[] getExercisesInTemplate(String templateName) {
+        String query = String.format("SELECT exerciseID, numberOfSets FROM Templates " +
+                        "WHERE name = '%s'", templateName);
+        Cursor resultSet = db.rawQuery(query, null);
+        Exercise[] erg = new Exercise[resultSet.getCount()];
+        resultSet.moveToFirst();
+        for (int i = 0; i < resultSet.getCount(); i++) {
+            erg[i] = new Exercise(resultSet.getInt(0), resultSet.getInt(1));
+            resultSet.moveToNext();
+        }
+        resultSet.close();
+        return erg;
+    }
+
     public static ArrayList<Workout> getTemplates() {
         String query = "SELECT DISTINCT name FROM Templates";
         Cursor resultSet = db.rawQuery(query, null);
@@ -559,7 +598,7 @@ public final class DatabaseManager {
                 int exerciseID = resultSet.getInt(0);
 
                 ArrayList<Set> sets = new ArrayList<>();
-                for (int j = 0; i < resultSet.getInt(1); j++) {
+                for (int j = 0; j < resultSet.getInt(1); j++) {
                     sets.add(new Set(j + 1, 0, 0));
                 }
                 exercises.add(new Exercise(exerciseID, sets));
@@ -570,6 +609,14 @@ public final class DatabaseManager {
 
         resultSet.close();
         return workouts;
+    }
+
+    public static boolean doesTemplateExist(String name) {
+        String query = String.format("SELECT name FROM Templates WHERE name = '%s';", name);
+        Cursor resultSet = db.rawQuery(query, null);
+        boolean erg = resultSet.getCount() != 0;
+        resultSet.close();
+        return erg;
     }
 
     /*##############################################################################################
@@ -598,7 +645,11 @@ public final class DatabaseManager {
     public static void deleteExercise(String exercise) {
         int exerciseID = getExerciseID(exercise);
 
-        String query = String.format(l, "DELETE FROM Exercises WHERE ID = %d;", exerciseID);
+        String query = String.format(l,
+                "DELETE FROM Templates WHERE exerciseID = %d;", exerciseID);
+        db.execSQL(query);
+
+        query = String.format(l, "DELETE FROM Exercises WHERE ID = %d;", exerciseID);
         db.execSQL(query);
 
         //find workouts that only had this exercise in them and delete them
@@ -620,6 +671,7 @@ public final class DatabaseManager {
     }
 
     public static void renameExercise(String exerciseName, String newExerciseName) {
+        //TODO Handle the setIndexes when both exercises are in the same workout
         int exerciseID = getExerciseID(exerciseName);
         String query = String.format(l, "UPDATE Exercises SET name = '%s' " +
                 "WHERE ID = %d;", newExerciseName, exerciseID);

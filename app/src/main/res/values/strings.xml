@@ -61,6 +61,7 @@
     <string name="cancel">Abbrechen</string>
     <string name="prweight">Persönlicher Rekord (Gewicht):</string>
     <string name="doublePressToExit">Drücke die Zurücktaste erneut, um die App zu schließen.</string>
+    <string name="doublePressToExitAddTemplate">Drücke die Zurücktaste erneut, um die Erstellung abzubrechen.</string>
     <string name="delete">löschen</string>
     <string name="prvolume">Persönlicher Rekord (Volumen):</string>
     <string name="totalWeight">Gesamtgewicht:</string>
@@ -76,6 +77,7 @@
     <string name="toastDoubleTemplate">Diese Vorlage exisitert bereits.</string>
     <string name="toastNeverDoneExercise">Keine Details - diese Übung wurde noch nie durchgeführt.</string>
     <string name="toastExerciseAlreadyInNewTemplate">Diese Übung ist in dieser Vorlage bereits vertreten.</string>
+    <string name="toastTemplateAlreadyExists">Diese Vorlage existiert bereits.</string>
     <string name="toastTemplateIsEmpty">Füge der Vorlage erst eine Übung hinzu.</string>
     <string name="toastTemplateNameIsEmpty">Gib einen Namen für die Vorlage ein.</string>
     <string name="toastNoRepsDone">Erst Wiederholungen eintragen.</string>

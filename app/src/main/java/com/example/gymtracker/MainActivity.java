@@ -31,6 +31,7 @@ import android.widget.Toast;
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.history.HistoryFragment;
+import com.example.gymtracker.templates.AddTemplateActivity;
 import com.example.gymtracker.workout.ExerciseFragment;
 import com.example.gymtracker.workout.SetFragment;
 import com.example.gymtracker.workout.WorkoutFragment;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         DatabaseManager.createExercisesTable(getResources().getStringArray(R.array.exercises));
         DatabaseManager.createHistoryTable();
         DatabaseManager.createWorkoutsTable();
+        DatabaseManager.createTemplatesTable();
         //DatabaseManager.dropTable("CurrentWorkout");
         //DatabaseManager.dropTable("CurrentWorkoutMetadata");
         //DatabaseManager.dropTable("History");
@@ -188,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
                 .replace(R.id.home_container, newHome).commit();
     }
 
-    private void restoreWorkout() {
+    public void restoreWorkout() {
         Workout workout = DatabaseManager.getCurrentWorkout();
         //build new workout
         if (workout != null) {
@@ -304,6 +306,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void createNewTemplate() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle(getResources().getString(R.string.addNewTemplate));
+        alert.setMessage(getResources().getString(R.string.addNewTemplateText));
+        final View customLayout = getLayoutInflater().inflate(R.layout.alert, null);
+        alert.setView(customLayout);
+
+        alert.setPositiveButton(getResources().getString(R.string.ok), (dialogInterface, i) -> {
+            EditText et = customLayout.findViewById(R.id.alert_input_edit_text);
+            String newTemplateName = et.getText().toString();
+
+            if (DatabaseManager.doesTemplateExist(newTemplateName)) {
+                Toast.makeText(this,
+                        getResources().getString(R.string.toastTemplateAlreadyExists),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            final Intent intent = new Intent(this, AddTemplateActivity.class);
+            intent.putExtra("NAME", newTemplateName);
+            startActivity(intent);
+
+        });
+
+        //If cancel, do nothing
+        alert.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
+            //Do nothing and cancel
+        });
+
+        alert.show();
+
 
     }
 

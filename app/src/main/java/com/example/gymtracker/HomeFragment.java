@@ -5,15 +5,16 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TableLayout;
+import android.widget.TextView;
 
+import com.example.gymtracker.templates.TemplateFragment;
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
+import com.example.gymtracker.workout.WorkoutFragment;
 
 import java.util.ArrayList;
 
@@ -50,6 +51,17 @@ public class HomeFragment extends Fragment {
             TemplateFragment newTemplate = TemplateFragment.newInstance(template);
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
             newContainer.setId(View.generateViewId());
+
+            //set OnClickListener for each template
+            newContainer.setOnClickListener(view1 -> {
+                TextView nameTV = view1.findViewById(R.id.name_of_template_text_view);
+                String workoutName = (String) nameTV.getText();
+
+                DatabaseManager.loadTemplate(workoutName);
+
+                ((MainActivity)getActivity()).restoreWorkout();
+            });
+
             getParentFragmentManager().beginTransaction()
                     .add(newContainer.getId(), newTemplate).commit();
             templateContainer.addView(newContainer);

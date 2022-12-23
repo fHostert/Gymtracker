@@ -16,29 +16,21 @@
                 android:onClick="startEmptyWorkoutClick"
                 android:text="@string/startEmptyWorkout"
                 style="@style/largeButton"/>
-            <Button
-                android:id="@+id/add_new_exercise_button"
-                android:onClick="addToExerciseTableClick"
-                android:text="@string/createNewExercise"
-                style="@style/largeButton"/>
-            <Button
-                android:id="@+id/add_new_template_button"
-                android:onClick="addNewTemplateClick"
-                android:text="@string/addNewTemplate"
-                style="@style/largeButton"/>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
                 android:background="@color/boarders"/>
+
+            <LinearLayout
+                android:id="@+id/template_container_linear_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            </LinearLayout>
         </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/template_container_linear_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
 
-    </LinearLayout>
 
 </ScrollView>

@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.example.gymtracker.helper.DatabaseManager;
@@ -66,7 +65,7 @@ public class ExerciseFragment extends Fragment {
         //add Sets
         for (Set set : exercise.getSets()) {
             LinearLayout exerciseLinearLayout = view.findViewById(R.id.exercise_table_layout);
-            SetFragment setFragment = SetFragment.newInstance(set, exercise.getDatabaseIndex());
+            SetFragment setFragment = SetFragment.newInstance(set, exercise.getExerciseID());
             setFragments.add(setFragment);
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
             newContainer.setId(View.generateViewId());
@@ -80,7 +79,7 @@ public class ExerciseFragment extends Fragment {
     public void addSet() {
         LinearLayout exerciseLinearLayout = getView().findViewById(R.id.exercise_table_layout);
         Set set = new Set(exerciseLinearLayout.getChildCount() + 1, 0, 0);
-        SetFragment setFragment = SetFragment.newInstance(set, exercise.getDatabaseIndex());
+        SetFragment setFragment = SetFragment.newInstance(set, exercise.getExerciseID());
         exercise.addSet(set);
         setFragments.add(setFragment);
         FragmentContainerView newContainer = new FragmentContainerView(getContext());
@@ -89,7 +88,7 @@ public class ExerciseFragment extends Fragment {
                 .add(newContainer.getId(), setFragment).commit();
         exerciseLinearLayout.addView(newContainer);
 
-        DatabaseManager.insertSetIntoCurrentWorkout(exercise.getDatabaseIndex(), set);
+        DatabaseManager.insertSetIntoCurrentWorkout(exercise.getExerciseID(), set);
     }
 
     public void replace(String newExerciseName) {
@@ -103,7 +102,7 @@ public class ExerciseFragment extends Fragment {
 
         //add empty Sets
         for (Set set : exercise.getSets()) {
-            SetFragment setFragment = SetFragment.newInstance(set, exercise.getDatabaseIndex());
+            SetFragment setFragment = SetFragment.newInstance(set, exercise.getExerciseID());
             setFragments.add(setFragment);
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
             newContainer.setId(View.generateViewId());
@@ -118,12 +117,12 @@ public class ExerciseFragment extends Fragment {
         setFragments.remove(setFragments.size() - 1);
         LinearLayout exerciseLinearLayout = getView().findViewById(R.id.exercise_table_layout);
         exerciseLinearLayout.removeViewAt(exerciseLinearLayout.getChildCount() - 1);
-        DatabaseManager.removeLastSet(exercise.getDatabaseIndex(), exercise.getSets().size() + 1);
+        DatabaseManager.removeLastSet(exercise.getExerciseID(), exercise.getSets().size() + 1);
 
     }
 
     public int getDatabaseIndex() {
-        return exercise.getDatabaseIndex();
+        return exercise.getExerciseID();
     }
 
     public String getName() {

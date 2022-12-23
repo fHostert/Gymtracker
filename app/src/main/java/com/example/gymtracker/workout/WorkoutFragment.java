@@ -108,7 +108,7 @@ public class WorkoutFragment extends Fragment {
 
         for (Set set : exercise.getSets()) {
             DatabaseManager.insertSetIntoCurrentWorkout(
-                    exercise.getDatabaseIndex(), workoutLinearLayout.getChildCount(), set);
+                    exercise.getExerciseID(), workoutLinearLayout.getChildCount(), set);
         }
     }
 

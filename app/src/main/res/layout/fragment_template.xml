@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TemplateFragment"
+    tools:context=".templates.TemplateFragment"
     android:background="@drawable/border"
     android:orientation="vertical"
     android:layout_marginHorizontal="@dimen/horizontal_margin_between_boxes"
@@ -37,28 +37,11 @@
     </LinearLayout>
 
     <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="100"
-        android:layout_marginBottom="@dimen/horizontal_margin_from_boxes_to_inside"
-        android:layout_marginHorizontal="@dimen/horizontal_margin_from_boxes_to_inside">
-
-        <TableRow>
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/exercises"
-                android:layout_weight="100"
-                android:textStyle="bold"
-                android:textSize="@dimen/large_text"/>
-        </TableRow>
-    </TableLayout>
-
-    <TableLayout
         android:id="@+id/template_exercises_table_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="100">
+        android:layout_marginBottom="@dimen/vertical_margin_from_boxes_to_inside"
+        android:layout_marginHorizontal="@dimen/horizontal_margin_from_boxes_to_inside">
     </TableLayout>
 
 </LinearLayout>

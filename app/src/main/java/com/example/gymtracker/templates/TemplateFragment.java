@@ -1,29 +1,25 @@
-package com.example.gymtracker;
+package com.example.gymtracker.templates;
 
-import android.app.AlertDialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
+import com.example.gymtracker.R;
+import com.example.gymtracker.TextViewTableRowFragment;
 import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.Workout;
-import com.example.gymtracker.workout.SetFragment;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link TemplateFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.Locale;
+
 public class TemplateFragment extends Fragment {
+
+    private static final Locale l = Locale.GERMAN;
 
     private static final String ARG_WORKOUT = "param1";
 
@@ -60,8 +56,10 @@ public class TemplateFragment extends Fragment {
 
         TableLayout tableLayout = view.findViewById(R.id.template_exercises_table_layout);
         for (Exercise exercise : workout.getExercises()) {
+            String newLineString = String.format(l,
+                    "%d × %s", exercise.getSets().size(), exercise.getName());
             TextViewTableRowFragment newLine = TextViewTableRowFragment.
-                    newInstance(exercise.getName());
+                    newInstance(newLineString, false);
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
             newContainer.setId(View.generateViewId());
             getParentFragmentManager().beginTransaction()

@@ -29,6 +29,14 @@ public class Exercise implements Serializable {
         sets.add(new Set(3, 0, 0));
     }
 
+    public Exercise(int databaseIndex, int numberOfEmptySets) {
+        this.databaseIndex = databaseIndex;
+        this.name = DatabaseManager.getExerciseName(databaseIndex);
+        for (int i = 0; i < numberOfEmptySets; i++) {
+            sets.add(new Set(i + 1, 0, 0));
+        }
+    }
+
     public void addSet(Set set) {
         sets.add(set);
     }
@@ -37,7 +45,7 @@ public class Exercise implements Serializable {
         sets.remove(sets.size() - 1);
     }
 
-    public int getDatabaseIndex() {
+    public int getExerciseID() {
         return databaseIndex;
     }
 

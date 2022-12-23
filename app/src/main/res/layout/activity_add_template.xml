@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".templates.AddTemplateActivity"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/add_template_name_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="@dimen/headline_size"
+        android:textStyle="bold"
+        android:text="Name des neuen Templates" />
+
+    <LinearLayout
+        android:id="@+id/new_template_exercises_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginHorizontal="@dimen/horizontal_margin_between_boxes"
+        android:layout_marginVertical="@dimen/vertical_margin_between_boxes"/>
+
+    <Button
+        android:id="@+id/add_exercise_to_template_button"
+        android:onClick="addExerciseToTemplateClick"
+        android:text="@string/addExerciseToTemplate"
+        style="@style/largeButton"
+        />
+
+    <Button
+        android:id="@+id/save_template_button"
+        android:onClick="saveTemplateClick"
+        android:text="@string/saveTemplate"
+        style="@style/largeButton"
+        />
+
+</LinearLayout>
