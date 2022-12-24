@@ -43,7 +43,6 @@
 
     <Button
         android:id="@+id/save_set_button"
-        android:onClick="saveSetClick"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/ok"

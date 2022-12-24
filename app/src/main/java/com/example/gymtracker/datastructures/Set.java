@@ -7,7 +7,13 @@ public class Set implements Serializable {
     private int reps;
     private float weight;
     private final boolean isPersonalRecord;
-    private boolean isDone;
+
+    public Set(int index) {
+        this.index = index;
+        this.reps = 0;
+        this.weight = 0;
+        this.isPersonalRecord = false;
+    }
 
     public Set(int index, int reps, float weight) {
         this.index = index;
@@ -49,13 +55,5 @@ public class Set implements Serializable {
 
     public boolean isPersonalRecord() {
         return isPersonalRecord;
-    }
-
-    public void setIsDone(boolean isDone) {
-        this.isDone = isDone;
-    }
-
-    public boolean getIsDone() {
-        return isDone;
     }
 }

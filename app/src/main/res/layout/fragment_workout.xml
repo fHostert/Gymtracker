@@ -13,7 +13,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
             <LinearLayout
-                android:id="@+id/workout_linear_layout"
+                android:id="@+id/exercise_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -26,7 +26,6 @@
                 android:layout_marginVertical="@dimen/vertical_margin_between_boxes">
                 <Button
                     android:id="@+id/add_exercise_button"
-                    android:onClick="addExerciseClick"
                     android:text="@string/addExercise"
                     style="@style/largeButton"/>
             </LinearLayout>

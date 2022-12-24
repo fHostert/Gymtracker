@@ -93,7 +93,7 @@ public class HistoryWorkoutFragment extends Fragment {
             alert.setPositiveButton("ok", (dialogInterface, i) -> {
                 DatabaseManager.deleteFromHistory(workout.getID());
                 Fragment thisFragment = getParentFragmentManager().
-                        findFragmentByTag(String.valueOf(workout.getID()));
+                        findFragmentByTag("HISTORYWORKOUT" + workout.getID());
                 getParentFragmentManager().beginTransaction().remove(thisFragment).commit();
 
             });

@@ -83,6 +83,12 @@ public final class DatabaseManager {
                         "SET exerciseID = %d, reps = 0, weight = 0 WHERE exerciseID = %d;",
                         indexOfNewExercise, indexOfOldExercise);
         db.execSQL(query);
+
+        //Delete all but 3 sets
+        query = String.format(l, "DELETE FROM CurrentWorkout " +
+                        "WHERE exerciseID = %d AND setIndex > 3;",
+                        indexOfNewExercise);
+        db.execSQL(query);
     }
 
     public static void removeLastSet(int exerciseID, int lastIndex) {

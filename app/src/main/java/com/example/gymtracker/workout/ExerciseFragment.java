@@ -1,6 +1,8 @@
 package com.example.gymtracker.workout;
 
-import android.graphics.PorterDuff;
+import static android.app.Activity.RESULT_OK;
+
+import android.content.Intent;
 import android.os.Bundle;
 
 
@@ -10,35 +12,38 @@ import androidx.fragment.app.FragmentContainerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.gymtracker.ChooseActivity;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.R;
 import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.Set;
 
-import java.util.ArrayList;
-
 public class ExerciseFragment extends Fragment {
 
     private static final String ARG_EXERCISE = "param1";
+    private static final String ARG_POSITION = "param2";
 
     private Exercise exercise;
-    private final ArrayList<SetFragment> setFragments = new ArrayList<>();
+    private int positionInWorkout;
 
     public ExerciseFragment() {
         // Required empty public constructor
     }
 
-    public static ExerciseFragment newInstance(Exercise exercise) {
+    public static ExerciseFragment newInstance(Exercise exercise, int positionInWorkout) {
         ExerciseFragment fragment = new ExerciseFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_EXERCISE, exercise);
+        args.putInt(ARG_POSITION, positionInWorkout);
         fragment.setArguments(args);
         return fragment;
     }
@@ -48,95 +53,185 @@ public class ExerciseFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             exercise = (Exercise) getArguments().getSerializable(ARG_EXERCISE);
+            positionInWorkout = getArguments().getInt(ARG_POSITION);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        //Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_exercise, container, false);
 
-        //Exercise name
+        //Set exercise name
         ((TextView) view.findViewById(R.id.name_of_exercise_text_view)).
                 setText(exercise.getName());
 
-        //add Sets
+        //Add Sets
         for (Set set : exercise.getSets()) {
-            LinearLayout exerciseLinearLayout = view.findViewById(R.id.exercise_table_layout);
-            SetFragment setFragment = SetFragment.newInstance(set, exercise.getExerciseID());
-            setFragments.add(setFragment);
-            FragmentContainerView newContainer = new FragmentContainerView(getContext());
-            newContainer.setId(View.generateViewId());
-            getParentFragmentManager().beginTransaction()
-                    .add(newContainer.getId(), setFragment).commit();
-            exerciseLinearLayout.addView(newContainer);
+            addSet(set, view, false);
         }
+
+        //Initialize buttons
+        Button addSetButton = view.findViewById(R.id.add_set_button);
+        addSetButton.setOnClickListener(view1 -> addEmptySet(true));
+
+        Button exerciseMenuButton = view.findViewById(R.id.exercise_menu_button);
+        exerciseMenuButton.setOnClickListener(view1 -> exerciseMenuClick());
 
         return view;
     }
 
-    public void addSet() {
-        LinearLayout exerciseLinearLayout = getView().findViewById(R.id.exercise_table_layout);
-        Set set = new Set(exerciseLinearLayout.getChildCount() + 1, 0, 0);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //replace Exercise
+        if (resultCode == RESULT_OK && requestCode == 0) {
+            replace(data.getExtras().getString("ITEM"));
+        }
+    }
+
+    public void addSet(Set set, View view, boolean addToCurrentWorkoutTable) {
+        LinearLayout setContainer = view.findViewById(R.id.set_container);
         SetFragment setFragment = SetFragment.newInstance(set, exercise.getExerciseID());
-        exercise.addSet(set);
-        setFragments.add(setFragment);
         FragmentContainerView newContainer = new FragmentContainerView(getContext());
         newContainer.setId(View.generateViewId());
         getParentFragmentManager().beginTransaction()
                 .add(newContainer.getId(), setFragment).commit();
-        exerciseLinearLayout.addView(newContainer);
+        setContainer.addView(newContainer);
 
-        DatabaseManager.insertSetIntoCurrentWorkout(exercise.getExerciseID(), set);
+        if (addToCurrentWorkoutTable) {
+            DatabaseManager.insertSetIntoCurrentWorkout(exercise.getExerciseID(), set);
+        }
+    }
+
+    public void addEmptySet(boolean addToCurrentWorkoutTable) {
+        LinearLayout setContainer = getView().findViewById(R.id.set_container);
+        int setIndex = setContainer.getChildCount() + 1;
+        Set set = new Set(setIndex);
+        addSet(set, getView(), addToCurrentWorkoutTable);
+    }
+
+    public void exerciseMenuClick() {
+        PopupMenu popup = new PopupMenu(getContext(), getView());
+        popup.setOnMenuItemClickListener(menuItem -> {
+            int id = menuItem.getItemId();
+            if (id == R.id.move_exercise_up_menu) {
+                moveExerciseUp();
+            }
+            else if (id == R.id.move_exercise_down_menu) {
+                moveExerciseDown();
+            }
+            else if (id == R.id.remove_exercise_menu) {
+                removeExercise();
+            }
+            else if (id == R.id.replace_exercise_menu) {
+                replaceExerciseClick();
+            }
+            else if (id == R.id.delete_last_set_menu) {
+                deleteLastSet();
+            }
+            return false;
+        });
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.exercise_menu, popup.getMenu());
+        popup.show();
+    }
+
+    public void moveExerciseUp() {
+        //Get the exercise container
+        LinearLayout exerciseContainer = ((View) getView().getParent().getParent())
+                .findViewById(R.id.exercise_container);
+
+        //Exercise already up
+        if (positionInWorkout == 0) {
+            Toast.makeText(getContext(),
+                    getResources().getString(R.string.toastExerciseAlreadyUp),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        //Update Database
+        DatabaseManager.moveExerciseUp(exercise.getExerciseID(), positionInWorkout);
+
+        //Swap exercises in parent container
+        View thisExercise = exerciseContainer.getChildAt(positionInWorkout);
+        exerciseContainer.removeViewAt(positionInWorkout);
+        exerciseContainer.addView(thisExercise, positionInWorkout - 1);
+
+        //Update position
+        positionInWorkout--;
+    }
+
+    public void moveExerciseDown() {
+        //Get the exercise container
+        LinearLayout exerciseContainer = ((View) getView().getParent().getParent())
+                .findViewById(R.id.exercise_container);
+
+        //Exercise already down
+        if (positionInWorkout == exerciseContainer.getChildCount() - 1) {
+            Toast.makeText(getContext(),
+                    getResources().getString(R.string.toastExerciseAlreadyDown),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        //Update Database
+        DatabaseManager.moveExerciseDown(exercise.getExerciseID(), positionInWorkout);
+
+        //Swap exercises in parent container
+        View thisExercise = exerciseContainer.getChildAt(positionInWorkout);
+        exerciseContainer.removeViewAt(positionInWorkout);
+        exerciseContainer.addView(thisExercise, positionInWorkout + 1);
+
+        //Update position
+        positionInWorkout++;
+    }
+
+    public void removeExercise() {
+        //Update Database
+        DatabaseManager.deleteExerciseFromCurrentWorkout(exercise.getExerciseID());
+
+        //Find exerciseFragment by unique tag and remove it
+        Fragment thisFragment = getParentFragmentManager().
+                findFragmentByTag("EXERCISE" + exercise.getName());
+        getParentFragmentManager().beginTransaction().remove(thisFragment).commit();
+        Toast.makeText(getContext(),
+                getResources().getString(R.string.exerciseRemoved),
+                Toast.LENGTH_SHORT).show();
+    }
+
+    public void replaceExerciseClick() {
+        final Intent intent = new Intent(getContext(), ChooseActivity.class);
+        intent.putExtra("LIST", DatabaseManager.getExercises());
+        intent.putExtra("REMOVE_LIST", new String[]{exercise.getName()});
+        intent.putExtra("TITLE", getResources().getString(R.string.replaceExerciseThrough));
+        startActivityForResult(intent, 0);
     }
 
     public void replace(String newExerciseName) {
+        //Update Database
+        DatabaseManager.replaceExercise(exercise.getExerciseID(),
+                DatabaseManager.getExerciseID(newExerciseName));
+
+        //Update exercise name
         ((TextView) getView().findViewById(R.id.name_of_exercise_text_view)).
                 setText(newExerciseName);
         exercise = new Exercise(DatabaseManager.getExerciseID(newExerciseName));
 
-        LinearLayout exerciseLinearLayout = getView().findViewById(R.id.exercise_table_layout);
-        exerciseLinearLayout.removeAllViews();
-        setFragments.clear();
+        //Remove old sets
+        LinearLayout setContainer = getView().findViewById(R.id.set_container);
+        setContainer.removeAllViews();
 
-        //add empty Sets
-        for (Set set : exercise.getSets()) {
-            SetFragment setFragment = SetFragment.newInstance(set, exercise.getExerciseID());
-            setFragments.add(setFragment);
-            FragmentContainerView newContainer = new FragmentContainerView(getContext());
-            newContainer.setId(View.generateViewId());
-            getParentFragmentManager().beginTransaction()
-                    .add(newContainer.getId(), setFragment).commit();
-            exerciseLinearLayout.addView(newContainer);
-        }
+        //Add empty Sets
+        addEmptySet(false);
+        addEmptySet(false);
+        addEmptySet(false);
     }
 
     public void deleteLastSet() {
-        exercise.deleteLastSet();
-        setFragments.remove(setFragments.size() - 1);
-        LinearLayout exerciseLinearLayout = getView().findViewById(R.id.exercise_table_layout);
-        exerciseLinearLayout.removeViewAt(exerciseLinearLayout.getChildCount() - 1);
-        DatabaseManager.removeLastSet(exercise.getExerciseID(), exercise.getSets().size() + 1);
-
+        LinearLayout setContainer = getView().findViewById(R.id.set_container);
+        setContainer.removeViewAt(setContainer.getChildCount() - 1);
+        DatabaseManager.removeLastSet(exercise.getExerciseID(), setContainer.getChildCount());
     }
-
-    public int getDatabaseIndex() {
-        return exercise.getExerciseID();
-    }
-
-    public String getName() {
-        return exercise.getName();
-    }
-
-    public SetFragment getSetFragment(int setIndex) {
-        return setFragments.get(setIndex - 1);
-    }
-
-    public int getSetCount() {
-        return exercise.getSets().size();
-    }
-
-
-
 }

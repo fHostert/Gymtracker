@@ -172,6 +172,16 @@ public class MainActivity extends AppCompatActivity {
         else if (id == R.id.create_new_template_menu) {
             createNewTemplate();
         }
+        else if (id == R.id.import_data_menu) {
+            Toast.makeText(this,
+                    getResources().getString(R.string.toBeImplemented),
+                    Toast.LENGTH_SHORT).show();
+        }
+        else if (id == R.id.export_data_menu) {
+            Toast.makeText(this,
+                    getResources().getString(R.string.toBeImplemented),
+                    Toast.LENGTH_SHORT).show();
+        }
         return true;
     }
 
@@ -179,24 +189,15 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         //delete Exercise
-        if (resultCode == RESULT_OK && requestCode == 2) {
+        if (resultCode == RESULT_OK && requestCode == 0) {
             deleteExercise(data.getExtras().getString("ITEM"));
         }
         //rename Exercise
-        else if (resultCode == RESULT_OK && requestCode == 3) {
+        else if (resultCode == RESULT_OK && requestCode == 1) {
             renameExercise(data.getExtras().getString("ITEM"));
         }
-        //remove Exercise from template
-        else if (resultCode == RESULT_OK && requestCode == 4) {
-            deleteExerciseFromTemplate(data.getExtras().getString("PACKET"),
-                    data.getExtras().getString("ITEM"));
-        }
-        //add Exercise to template
-        else if (resultCode == RESULT_OK && requestCode == 5) {
-            addToTemplate(data.getExtras().getString("PACKET"),
-                    data.getExtras().getString("ITEM"));
-        }
-        else if (resultCode == RESULT_OK && requestCode == 6) {
+        //create New template
+        else if (resultCode == RESULT_OK && requestCode == 2) {
             reload();
         }
     }
@@ -246,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
         final Intent intent = new Intent(this, ChooseActivity.class);
         intent.putExtra("LIST", DatabaseManager.getExercises());
         intent.putExtra("TITLE", getResources().getString(R.string.deleteExercise));
-        startActivityForResult(intent, 2);
+        startActivityForResult(intent, 0);
     }
 
     public void deleteExercise(String exerciseName) {
@@ -274,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
         final Intent intent = new Intent(this, ChooseActivity.class);
         intent.putExtra("LIST", DatabaseManager.getExercises());
         intent.putExtra("TITLE", getResources().getString(R.string.renameExercise));
-        startActivityForResult(intent, 3);
+        startActivityForResult(intent, 1);
     }
 
     public void renameExercise(String exerciseName) {
@@ -352,115 +353,9 @@ public class MainActivity extends AppCompatActivity {
 
             final Intent intent = new Intent(this, AddTemplateActivity.class);
             intent.putExtra("NAME", newTemplateName);
-            startActivityForResult(intent, 6);
+            startActivityForResult(intent, 2);
             reload();
 
-        });
-
-        //If cancel, do nothing
-        alert.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
-            //Do nothing and cancel
-        });
-
-        alert.show();
-    }
-
-    public void templateMenuClick(View view) {
-        PopupMenu popup = new PopupMenu(this, view);
-        String templateName = getTemplateName(view);
-        popup.setOnMenuItemClickListener(menuItem -> {
-            int id = menuItem.getItemId();
-            if (id == R.id.delete_template_menu) {
-                deleteTemplate(templateName);
-            }
-            else if (id == R.id.add_to_template_menu) {
-                addToTemplate(templateName);
-            }
-            else if (id == R.id.delete_from_template_menu) {
-                deleteExerciseFromTemplate(templateName);
-            }
-            else if (id == R.id.rename_template_menu) {
-                renameTemplate(templateName);
-            }
-            return false;
-        });
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.template_menu, popup.getMenu());
-        popup.show();
-    }
-
-    public void deleteTemplate(String templateName) {
-        DatabaseManager.deleteTemplate(templateName);
-        reload();
-        Toast.makeText(this,
-                getResources().getString(R.string.templateDeleted),
-                Toast.LENGTH_SHORT).show();
-    }
-
-    public void addToTemplate(String templateName) {
-        Exercise[] exercises = DatabaseManager.getExercisesInTemplate(templateName);
-        String[] exercisesInTemplate = new String[exercises.length];
-        for (int i = 0; i < exercisesInTemplate.length; i++) {
-            exercisesInTemplate[i] = exercises[i].getName();
-        }
-        final Intent intent = new Intent(this, ChooseActivity.class);
-        intent.putExtra("LIST", DatabaseManager.getExercises());
-        intent.putExtra("REMOVE_LIST", exercisesInTemplate);
-        intent.putExtra("TITLE", getResources().getString(R.string.removeExercise));
-        intent.putExtra("PACKET", templateName);
-        startActivityForResult(intent, 5);
-    }
-
-    public void addToTemplate(String templateName, String exerciseName) {
-        DatabaseManager.addExerciseToTemplate(templateName, exerciseName);
-        reload();
-        Toast.makeText(this,
-                getResources().getString(R.string.exerciseAdded),
-                Toast.LENGTH_SHORT).show();
-    }
-
-    public void deleteExerciseFromTemplate(String templateName) {
-        Exercise[] exercises = DatabaseManager.getExercisesInTemplate(templateName);
-        String[] exercisesInTemplate = new String[exercises.length];
-        if (exercises.length == 1) {
-            Toast.makeText(this,
-                    getResources().getString(R.string.cantRemoveLastExercise),
-                    Toast.LENGTH_SHORT).show();
-            return;
-        }
-        for (int i = 0; i < exercisesInTemplate.length; i++) {
-            exercisesInTemplate[i] = exercises[i].getName();
-        }
-        final Intent intent = new Intent(this, ChooseActivity.class);
-        intent.putExtra("LIST", exercisesInTemplate);
-        intent.putExtra("TITLE", getResources().getString(R.string.removeExercise));
-        intent.putExtra("PACKET", templateName);
-        startActivityForResult(intent, 4);
-    }
-
-    public void deleteExerciseFromTemplate(String templateName, String exerciseName) {
-        DatabaseManager.deleteExerciseFromTemplate(templateName, exerciseName);
-        reload();
-        Toast.makeText(this,
-                getResources().getString(R.string.exerciseRemoved),
-                Toast.LENGTH_SHORT).show();
-    }
-
-    public void renameTemplate(String templateName) {
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle(getResources().getString(R.string.changeTemplateName));
-        alert.setMessage(getResources().getString(R.string.changeTemplateNameText));
-        final View customLayout = getLayoutInflater().inflate(R.layout.alert, null);
-        alert.setView(customLayout);
-
-        alert.setPositiveButton(getResources().getString(R.string.ok), (dialogInterface, i) -> {
-            EditText et = customLayout.findViewById(R.id.alert_input_edit_text);
-            String newTemplateName = et.getText().toString();
-            DatabaseManager.renameTemplate(templateName, newTemplateName);
-            Toast.makeText(this,
-                    getResources().getString(R.string.templateRenamed),
-                    Toast.LENGTH_SHORT).show();
-            reload();
         });
 
         //If cancel, do nothing
@@ -474,10 +369,6 @@ public class MainActivity extends AppCompatActivity {
     /*##############################################################################################
     #########################################WORKOUT BUTTONS########################################
     ##############################################################################################*/
-    public void addExerciseClick(View view) {
-        globalWorkoutFragment.addExerciseClick();
-    }
-
     public void quitWorkout() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setMessage(getResources().getString(R.string.quitWorkoutText));
@@ -528,11 +419,6 @@ public class MainActivity extends AppCompatActivity {
         stopOngoingNotification();
         invalidateOptionsMenu();
         this.setTitle(getResources().getString(R.string.app_name));
-    }
-
-    public void addSetClick(View view) {
-        ExerciseFragment exerciseFragment = getExerciseFragment(view);
-        exerciseFragment.addSet();
     }
 
     private void changeWorkoutName() {
@@ -593,44 +479,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*##############################################################################################
-    #########################################EXERCISE BUTTONS#######################################
-    ##############################################################################################*/
-    public void exerciseMenuClick(View view) {
-        PopupMenu popup = new PopupMenu(this, view);
-        ExerciseFragment exerciseFragment = getExerciseFragment(view);
-        popup.setOnMenuItemClickListener(menuItem -> {
-            int id = menuItem.getItemId();
-            if (id == R.id.move_exercise_up_menu) {
-                globalWorkoutFragment.moveExerciseUp(exerciseFragment);
-            }
-            else if (id == R.id.move_exercise_down_menu) {
-                globalWorkoutFragment.moveExerciseDown(exerciseFragment);
-            }
-            else if (id == R.id.remove_exercise_menu) {
-                globalWorkoutFragment.removeExercise(exerciseFragment);
-            }
-            else if (id == R.id.replace_exercise_menu) {
-                globalWorkoutFragment.replaceExercise(exerciseFragment);
-            }
-            else if (id == R.id.delete_last_set_menu) {
-                globalWorkoutFragment.deleteLastSet(exerciseFragment);
-            }
-            return false;
-        });
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.exercise_menu, popup.getMenu());
-        popup.show();
-    }
-
-    /*##############################################################################################
-    ###########################################SET BUTTONS##########################################
-    ##############################################################################################*/
-    public void saveSetClick(View view) {
-        getSetFragment(view).saveSet();
-    }
-
-
-    /*##############################################################################################
     #########################################NOTIFICATIONS##########################################
     ##############################################################################################*/
     public void startOngoingNotification(){
@@ -665,36 +513,4 @@ public class MainActivity extends AppCompatActivity {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.cancel(notificationId);
     }
-
-    /*##############################################################################################
-    ############################################HELPER##############################################
-    ##############################################################################################*/
-    private ExerciseFragment getExerciseFragment(View view) {
-        View parentView = ((View) view.getParent());
-        String exerciseName = String.valueOf((
-                (TextView)parentView.findViewById(R.id.name_of_exercise_text_view)).getText());
-        ArrayList<ExerciseFragment> exercises = globalWorkoutFragment.getExerciseFragments();
-        for (ExerciseFragment exerciseFragment : exercises) {
-            if (Objects.equals(exerciseFragment.getName(), exerciseName)) {
-                return exerciseFragment;
-            }
-        }
-        return null;
-    }
-
-    private SetFragment getSetFragment(View view) {
-        View parentView = ((View) view.getParent().getParent().getParent());
-        TextView setIndexTV = ((View) view.getParent()).findViewById(R.id.set_index_text_view);
-        int setIndex = Integer.parseInt(String.valueOf(setIndexTV.getText()));
-        ExerciseFragment exerciseFragment = getExerciseFragment(parentView);
-        return exerciseFragment.getSetFragment(setIndex);
-    }
-
-    private String getTemplateName(View view) {
-        View parentView = ((View) view.getParent());
-        return (String)
-                ((TextView) parentView.findViewById(R.id.name_of_template_text_view)).getText();
-    }
-
-
 }

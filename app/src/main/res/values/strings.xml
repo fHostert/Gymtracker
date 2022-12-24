@@ -49,6 +49,7 @@
     <string name="workoutChangeName">Namen des Workouts ändern</string>
     <string name="workoutChangeNameEnterName">Den neuen Namen eingeben:</string>
     <string name="reps.">Wiederh.</string>
+    <string name="reps..">Wdhl.</string>
     <string name="deleteExercise">Übung löschen</string>
     <string name="deleteExerciseText">Soll diese Übung wirklich gelöscht werden? Sie wird ebenfalls aus dem Verlauf und allen Statistiken gelöscht. Diese Aktion kann NICHT rückgängig gemacht werden.</string>
     <string name="renameExercise">Übung umbenennen</string>
@@ -153,5 +154,6 @@
     <string name="changeTemplateNameText">Den neuen Namen für die Vorlage eingeben:</string>
     <string name="templateRenamed">Vorlage umbennant</string>
     <string name="nothingLeftToAdd">Es ist nichts mehr zum hinzufügen übrig.</string>
+    <string name="toBeImplemented">To be implemented</string>
 
 </resources>

@@ -24,7 +24,7 @@ public class HomeFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static HomeFragment newInstance(String param1, String param2) {
+    public static HomeFragment newInstance() {
         HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -34,8 +34,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
     }
 
     @Override
@@ -57,13 +55,18 @@ public class HomeFragment extends Fragment {
                 TextView nameTV = view1.findViewById(R.id.name_of_template_text_view);
                 String workoutName = (String) nameTV.getText();
 
+                //Load template in database
                 DatabaseManager.loadTemplate(workoutName);
 
+                //Handle as if app got closed during workout
+                //Templated will get loaded in.
                 ((MainActivity)getActivity()).restoreWorkout();
             });
 
+            //Give each template a unique tag and add it
             getParentFragmentManager().beginTransaction()
-                    .add(newContainer.getId(), newTemplate).commit();
+                    .add(newContainer.getId(), newTemplate,
+                            "TEMPLATE" + template.getName()).commit();
             templateContainer.addView(newContainer);
         }
         return view;

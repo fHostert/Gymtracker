@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class Workout implements Serializable {
     private final int ID;
-    private final String name;
+    private String name;
     private final int duration;
     private final String date;
     private final float totalWeight;
@@ -22,7 +22,7 @@ public class Workout implements Serializable {
         this.duration = -1;
         this.date = "";
         this.totalWeight = -1;
-        this.exercises = new ArrayList<Exercise>();
+        this.exercises = new ArrayList<>();
         this.numberOfPRs = 0;
         this.ID = -1;
     }
@@ -54,6 +54,10 @@ public class Workout implements Serializable {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getDuration() {

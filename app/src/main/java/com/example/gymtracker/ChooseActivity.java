@@ -19,7 +19,6 @@ public class ChooseActivity extends AppCompatActivity {
     String title = "";
     String[] list = null;
     String[] removeList = null;
-    String packet = "";
 
 
     @Override
@@ -29,17 +28,22 @@ public class ChooseActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
+            //The title of the activity
             title = extras.getString("TITLE");
+            //The list to choose from
             list = extras.getStringArray("LIST");
-            packet = extras.getString("PACKET");
+            //Items that should be removed from the list before choosing
             removeList = extras.getStringArray("REMOVE_LIST");
         }
+        //Remove items form removeList
         ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(list));
         if (removeList != null) {
             arrayList.removeAll(Arrays.asList(removeList));
         }
+        //Set Activity title
         this.setTitle(title);
 
+        //If somebody really wants to add all possible exercises to a workout this should stop it
         if (arrayList.size() == 0) {
             Toast.makeText(this,
                     getResources().getString(R.string.nothingLeftToAdd),
@@ -47,7 +51,7 @@ public class ChooseActivity extends AppCompatActivity {
             finish();
         }
 
-        //Fill ListView with list extra
+        //Fill ListView with list
         ListView listView = findViewById(R.id.exercises_list_view);
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1, arrayList);
@@ -59,9 +63,10 @@ public class ChooseActivity extends AppCompatActivity {
             for (int j = 0; j<arrayAdapter.getCount(); j++) {
                 filteredList[j] = arrayAdapter.getItem(j);
             }
+
+            //finish
             Intent intent = new Intent();
             intent.putExtra("ITEM", filteredList[i]);
-            intent.putExtra("PACKET", packet);
             setResult(RESULT_OK, intent);
             finish();
         });

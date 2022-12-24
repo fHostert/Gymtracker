@@ -25,7 +25,6 @@
 
             <Button
                 android:id="@+id/exercise_menu_button"
-                android:onClick="exerciseMenuClick"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/vertical_margin_from_boxes_to_inside"
@@ -70,7 +69,7 @@
     </TableLayout>
 
     <TableLayout
-        android:id="@+id/exercise_table_layout"
+        android:id="@+id/set_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:stretchColumns="*">
@@ -79,7 +78,6 @@
 
     <Button
         android:id="@+id/add_set_button"
-        android:onClick="addSetClick"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/addSet"

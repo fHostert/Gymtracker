@@ -87,7 +87,7 @@ public class HistoryFragment extends Fragment {
             newContainer.setId(View.generateViewId());
             getParentFragmentManager().beginTransaction()
                     .add(newContainer.getId(), historyWorkoutFragment,
-                    String.valueOf(workout.getID())).commit();
+                    "HISTORYFRAGMENT" + workout.getID()).commit();
             historyLinearLayout.addView(newContainer, 0);
         }
     }
