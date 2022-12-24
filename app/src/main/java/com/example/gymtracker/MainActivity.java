@@ -218,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
             globalWorkoutFragment = workoutFragment;
             this.setTitle(DatabaseManager.getCurrentWorkoutName());
         }
+        startWorkout();
     }
 
     /*##############################################################################################
@@ -278,8 +279,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void renameExercise(String exerciseName) {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setMessage(getResources().getString(R.string.changeExerciseName));
-        alert.setTitle(getResources().getString(R.string.changeExerciseNameText));
+        alert.setTitle(getResources().getString(R.string.changeExerciseName));
+        alert.setMessage(getResources().getString(R.string.changeExerciseNameText));
         final View customLayout = getLayoutInflater().inflate(R.layout.alert, null);
         alert.setView(customLayout);
 

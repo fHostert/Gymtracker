@@ -34,7 +34,7 @@ public class WorkoutFragment extends Fragment {
 
     private static final String ARG_WORKOUT = "param1";
 
-    private Workout workout = null;
+    private Workout workout;
     private final ArrayList<ExerciseFragment> exerciseFragments = new ArrayList<>();
     private ExerciseFragment exerciseFragmentToBeReplaced = null;
 
@@ -55,6 +55,9 @@ public class WorkoutFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             workout = (Workout) getArguments().getSerializable(ARG_WORKOUT);
+        }
+        else {
+            workout = new Workout(getResources().getString(R.string.defaultWorkoutName));
         }
     }
 

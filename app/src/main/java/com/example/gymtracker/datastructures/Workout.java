@@ -17,6 +17,16 @@ public class Workout implements Serializable {
 
     private final ArrayList<Exercise> exercises;
 
+    public Workout(String name) {
+        this.name = name;
+        this.duration = -1;
+        this.date = "";
+        this.totalWeight = -1;
+        this.exercises = new ArrayList<Exercise>();
+        this.numberOfPRs = 0;
+        this.ID = -1;
+    }
+
     public Workout(String name, ArrayList<Exercise> exercises) {
         this.name = name;
         this.duration = -1;
