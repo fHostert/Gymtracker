@@ -183,7 +183,7 @@ public final class DatabaseManager {
                 query = String.format(l, "INSERT INTO History " +
                                 "(workoutID, exerciseID, setIndex, reps, weight, tendency, isPR) " +
                                 "VALUES (%d, %d, %d, %d, '%s', %d, '%s');",
-                                workoutID, currentExerciseID, i, reps, weight, tendency, isPR);
+                                workoutID, currentExerciseID, i + 1, reps, weight, tendency, isPR);
                 db.execSQL(query);
 
                 resultSet.moveToNext();
@@ -695,7 +695,6 @@ public final class DatabaseManager {
     }
 
     public static void renameExercise(String exerciseName, String newExerciseName) {
-        //TODO Handle the setIndexes when both exercises are in the same workout
         int exerciseID = getExerciseID(exerciseName);
         String query = String.format(l, "UPDATE Exercises SET name = '%s' " +
                 "WHERE ID = %d;", newExerciseName, exerciseID);
@@ -703,6 +702,8 @@ public final class DatabaseManager {
     }
 
     public static void mergeExercises(String nameOfMainExercise, String nameOfOldExercise) {
+        //TODO Handle the setIndexes when both exercises are in the same workout
+        //TODO Templates
         int newID = getExerciseID(nameOfMainExercise);
         int oldID = getExerciseID(nameOfOldExercise);
         String query = String.format(l, "UPDATE History SET exerciseID = %d " +

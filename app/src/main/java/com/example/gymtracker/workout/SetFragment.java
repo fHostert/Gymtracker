@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -81,6 +82,15 @@ public class SetFragment extends Fragment {
             ((EditText)view.findViewById(R.id.reps_edit_text)).setText(String.valueOf(set.getReps()));
             colorSet(view);
         }
+
+        //initialize buttons
+       /* Button saveSetButton = view.findViewById(R.id.save_set_button);
+        saveSetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                saveSet();
+            }
+        });*/
         return view;
     }
 

@@ -217,8 +217,8 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().executePendingTransactions();
             globalWorkoutFragment = workoutFragment;
             this.setTitle(DatabaseManager.getCurrentWorkoutName());
+            startWorkout();
         }
-        startWorkout();
     }
 
     /*##############################################################################################

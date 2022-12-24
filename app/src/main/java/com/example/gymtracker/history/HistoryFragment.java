@@ -76,6 +76,9 @@ public class HistoryFragment extends Fragment {
     }
 
     public void update(){
+        if (!isInitialized) {
+            return;
+        }
         History history = DatabaseManager.getHistory(1);
         LinearLayout historyLinearLayout = getView().findViewById(R.id.history_linear_layout);
         for (Workout workout : history.getWorkouts()) {
