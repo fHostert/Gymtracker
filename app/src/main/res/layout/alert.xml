@@ -2,8 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".AlertFragment">
+    android:layout_height="match_parent">
 
     <EditText
         android:id="@+id/alert_input_edit_text"
@@ -12,7 +11,9 @@
         android:layout_marginHorizontal="25dp"
         android:digits="abcdefghijklmnopqrstuvwxyzüöäßABCDEFGHIJKLMNOPQRSTUVWXYZÜÖÄ1234567890(),&amp; "
         android:maxLength="20"
-        android:inputType="textCapSentences">
+        android:inputType="textCapSentences"
+        android:backgroundTint="@color/black"
+        android:textColor="@color/black">
     </EditText>
 
 </FrameLayout>
