@@ -29,7 +29,7 @@
                 android:layout_height="@dimen/menu_button_height"
                 android:layout_marginEnd="@dimen/vertical_margin_from_boxes_to_inside"
                 android:layout_weight="15"
-                android:background="@drawable/ic_baseline_menu_24"
+                android:background="@drawable/ic_baseline_more_vert_24"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:gravity="center"
                 android:backgroundTint="@color/buttonText">

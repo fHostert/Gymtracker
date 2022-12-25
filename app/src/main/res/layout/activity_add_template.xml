@@ -27,6 +27,7 @@
     <Button
         android:id="@+id/add_exercise_to_template_button"
         android:onClick="addExerciseToTemplateClick"
+        android:layout_height="@dimen/large_button_height"
         android:text="@string/addExerciseToTemplate"
         style="@style/largeButton"
         />
@@ -35,6 +36,7 @@
         android:id="@+id/save_template_button"
         android:onClick="saveTemplateClick"
         android:text="@string/saveTemplate"
+        android:layout_height="@dimen/large_button_height"
         style="@style/largeButton"
         />
 

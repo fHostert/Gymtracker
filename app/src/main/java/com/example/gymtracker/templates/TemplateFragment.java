@@ -214,6 +214,12 @@ public class TemplateFragment extends Fragment {
         alert.setPositiveButton(getResources().getString(R.string.ok), (dialogInterface, i) -> {
             EditText et = customLayout.findViewById(R.id.alert_input_edit_text);
             String newTemplateName = et.getText().toString();
+            if (DatabaseManager.doesTemplateExist(newTemplateName)) {
+                Toast.makeText(getContext(),
+                        getResources().getString(R.string.toastTemplateAlreadyExists),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
             DatabaseManager.renameTemplate(templateName, newTemplateName);
             Toast.makeText(getContext(),
                     getResources().getString(R.string.templateRenamed),
