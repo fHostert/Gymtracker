@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 homeContainer.setVisibility(View.VISIBLE);
                 historyContainer.setVisibility(View.INVISIBLE);
                 statsContainer.setVisibility(View.INVISIBLE);
-                this.setTitle(R.string.app_name);
+                this.setTitle(DatabaseManager.getCurrentWorkoutName());
             }
             else if (item.getItemId() == R.id.navigation_history) {
                 historyContainer.setVisibility(View.VISIBLE);
