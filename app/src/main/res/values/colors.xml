@@ -8,18 +8,20 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="colorPrimary">#FF6200EE</color>
-    <color name="colorPrimaryVariant">#FF3700B3</color>
+    <color name="colorPrimary">#001d3d</color>
+    <color name="colorPrimaryVariant">#000814</color>
     <color name="colorOnPrimary">#FFFFFFFF</color>
 
-    <color name="colorSecondary">#FF03DAC5</color>
+    <color name="colorSecondary">#ffc300</color>
     <color name="colorSecondaryVariant">#FF018786</color>
     <color name="colorOnSecondary">#FF000000</color>
 
-    <color name="boarders">#FF000000</color>
-    <color name="background">#FFFFFFFF</color>
-    <color name="buttonText">#FF000000</color>
+    <color name="boarders">#ffc300</color>
+    <color name="background">#003566</color>
+    <color name="textColor">#FFFFFFFF</color>
+    <color name="menuTextColor">#FF000000</color>
+    <color name="buttonText">#ffc300</color>
     <color name="hintTextColor">#FF999999</color>
-    <color name="setCompleted">#FF00FF00</color>
+    <color name="setCompleted">#38b000</color>
 
 </resources>

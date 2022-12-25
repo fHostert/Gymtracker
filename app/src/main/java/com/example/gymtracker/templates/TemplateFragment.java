@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -85,7 +86,7 @@ public class TemplateFragment extends Fragment {
         }
 
         //initialize buttons
-        Button templateMenuButton = view.findViewById(R.id.template_menu_button);
+        ImageButton templateMenuButton = view.findViewById(R.id.template_menu_button);
         templateMenuButton.setOnClickListener(view1 -> templateMenuClick());
         return view;
     }
@@ -106,7 +107,7 @@ public class TemplateFragment extends Fragment {
     }
 
     private void templateMenuClick() {
-        Button thisButton = getView().findViewById(R.id.template_menu_button);
+        ImageButton thisButton = getView().findViewById(R.id.template_menu_button);
         PopupMenu popup = new PopupMenu(getContext(), thisButton);
         String templateName = template.getName();
         popup.setOnMenuItemClickListener(menuItem -> {

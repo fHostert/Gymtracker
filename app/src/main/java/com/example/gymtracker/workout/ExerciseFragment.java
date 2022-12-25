@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -77,7 +78,7 @@ public class ExerciseFragment extends Fragment {
         Button addSetButton = view.findViewById(R.id.add_set_button);
         addSetButton.setOnClickListener(view1 -> addEmptySet(true));
 
-        Button exerciseMenuButton = view.findViewById(R.id.exercise_menu_button);
+        ImageButton exerciseMenuButton = view.findViewById(R.id.exercise_menu_button);
         exerciseMenuButton.setOnClickListener(view1 -> exerciseMenuClick());
 
         return view;
@@ -114,7 +115,7 @@ public class ExerciseFragment extends Fragment {
     }
 
     public void exerciseMenuClick() {
-        Button thisButton = getView().findViewById(R.id.exercise_menu_button);
+        ImageButton thisButton = getView().findViewById(R.id.exercise_menu_button);
         PopupMenu popup = new PopupMenu(getContext(), thisButton);
         popup.setOnMenuItemClickListener(menuItem -> {
             int id = menuItem.getItemId();

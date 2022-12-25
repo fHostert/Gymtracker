@@ -2,7 +2,14 @@
 <resources>
     <style name="largeButton" parent="android:Widget.Material.Button.Borderless">
         <item name="android:textColor">@color/buttonText</item>
-        <item name="android:layout_height">60dp</item>
         <item name="android:layout_width">match_parent</item>
+    </style>
+
+    <style name="textColorButton" parent="android:Widget.Material.Button.Borderless">
+        <item name="android:textColor">@color/buttonText</item>
+    </style>
+
+    <style name="itemTextStyle.AppTheme" parent="@android:style/TextAppearance.Widget.IconMenu.Item">
+        <item name="android:textColor">@color/menuTextColor</item>
     </style>
 </resources>

@@ -13,5 +13,11 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <item name="android:navigationBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:actionMenuTextColor">@color/menuTextColor</item>
+        <item name="android:itemTextAppearance">@style/itemTextStyle.AppTheme</item>
+        <item name="android:textColorPrimary">@color/textColor</item>
+        <item name="android:textColorSecondary">@color/textColor</item>
+        <item name="android:textColorTertiary">@color/textColor</item>
     </style>
 </resources>

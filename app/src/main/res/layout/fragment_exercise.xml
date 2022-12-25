@@ -23,17 +23,17 @@
                 android:textSize="@dimen/headline_size"
                 android:textStyle="bold" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/exercise_menu_button"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/menu_button_height"
                 android:layout_marginEnd="@dimen/vertical_margin_from_boxes_to_inside"
                 android:layout_weight="15"
                 android:background="@drawable/ic_baseline_menu_24"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:gravity="center">
-            </Button>
-
+                android:gravity="center"
+                android:backgroundTint="@color/buttonText">
+            </ImageButton>
         </LinearLayout>
 
     <TableLayout
@@ -79,10 +79,11 @@
 
     <Button
         android:id="@+id/add_set_button"
-        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         android:text="@string/addSet"
-        android:textSize="@dimen/medium_text">
+        android:textSize="@dimen/medium_text"
+        style="@style/largeButton">
     </Button>
 
     <View

@@ -2,6 +2,7 @@ package com.example.gymtracker.workout;
 
 import android.os.Bundle;
 
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;

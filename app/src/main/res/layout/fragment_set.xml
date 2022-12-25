@@ -49,6 +49,7 @@
         android:layout_height="wrap_content"
         android:text="@string/ok"
         android:gravity="center"
-        android:layout_weight="20"/>
+        android:layout_weight="20"
+        style="@style/textColorButton"/>
 
 </TableRow>

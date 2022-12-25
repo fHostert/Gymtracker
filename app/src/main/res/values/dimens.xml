@@ -5,6 +5,8 @@
     <dimen name="large_text">18sp</dimen>
     <dimen name="headline_size">25sp</dimen>
     <dimen name="boarder_size">3dp</dimen>
+    <dimen name="large_button_height">60dp</dimen>
+    <dimen name="menu_button_height">50dp</dimen>
     <dimen name="vertical_margin_between_boxes">5dp</dimen>
     <dimen name="horizontal_margin_between_boxes">5dp</dimen>
     <dimen name="vertical_margin_from_boxes_to_inside">5dp</dimen>
