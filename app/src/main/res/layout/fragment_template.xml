@@ -6,6 +6,7 @@
     tools:context=".templates.TemplateFragment"
     android:background="@drawable/border"
     android:orientation="vertical"
+    android:foreground="?android:attr/selectableItemBackground"
     android:layout_marginHorizontal="@dimen/horizontal_margin_between_boxes"
     android:layout_marginVertical="@dimen/vertical_margin_between_boxes">
 
@@ -30,6 +31,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@drawable/ic_baseline_menu_24"
+            android:foreground="?android:attr/selectableItemBackground"
             android:layout_weight="15"
             android:layout_gravity="center">
         </Button>

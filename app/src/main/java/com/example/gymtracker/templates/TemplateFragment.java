@@ -4,6 +4,10 @@ import static android.app.Activity.RESULT_OK;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -83,7 +87,6 @@ public class TemplateFragment extends Fragment {
         //initialize buttons
         Button templateMenuButton = view.findViewById(R.id.template_menu_button);
         templateMenuButton.setOnClickListener(view1 -> templateMenuClick());
-
         return view;
     }
 
@@ -102,8 +105,9 @@ public class TemplateFragment extends Fragment {
         }
     }
 
-    public void templateMenuClick() {
-        PopupMenu popup = new PopupMenu(getContext(), getView());
+    private void templateMenuClick() {
+        Button thisButton = getView().findViewById(R.id.template_menu_button);
+        PopupMenu popup = new PopupMenu(getContext(), thisButton);
         String templateName = template.getName();
         popup.setOnMenuItemClickListener(menuItem -> {
             int id = menuItem.getItemId();
@@ -126,7 +130,7 @@ public class TemplateFragment extends Fragment {
         popup.show();
     }
 
-    public void deleteTemplate(String templateName) {
+    private void deleteTemplate(String templateName) {
         DatabaseManager.deleteTemplate(templateName);
         Fragment thisFragment = getParentFragmentManager().
                 findFragmentByTag("TEMPLATE" + template.getName());
@@ -136,7 +140,7 @@ public class TemplateFragment extends Fragment {
                 Toast.LENGTH_SHORT).show();
     }
 
-    public void addToTemplate(String templateName) {
+    private void addToTemplate(String templateName) {
         Exercise[] exercises = DatabaseManager.getExercisesInTemplate(templateName);
         String[] exercisesInTemplate = new String[exercises.length];
         for (int i = 0; i < exercisesInTemplate.length; i++) {
@@ -150,7 +154,7 @@ public class TemplateFragment extends Fragment {
         startActivityForResult(intent, 1);
     }
 
-    public void addToTemplate(String templateName, String exerciseName) {
+    private void addToTemplate(String templateName, String exerciseName) {
         DatabaseManager.addExerciseToTemplate(templateName, exerciseName);
 
         TableLayout tableLayout = getView().findViewById(R.id.template_exercises_table_layout);
@@ -170,7 +174,7 @@ public class TemplateFragment extends Fragment {
                 Toast.LENGTH_SHORT).show();
     }
 
-    public void deleteExerciseFromTemplate(String templateName) {
+    private void deleteExerciseFromTemplate(String templateName) {
         Exercise[] exercises = DatabaseManager.getExercisesInTemplate(templateName);
         String[] exercisesInTemplate = new String[exercises.length];
         if (exercises.length == 1) {
@@ -189,7 +193,7 @@ public class TemplateFragment extends Fragment {
         startActivityForResult(intent, 0);
     }
 
-    public void deleteExerciseFromTemplate(String templateName, String exerciseName) {
+    private void deleteExerciseFromTemplate(String templateName, String exerciseName) {
         DatabaseManager.deleteExerciseFromTemplate(templateName, exerciseName);
         Fragment exerciseRowFragment = getParentFragmentManager().
                 findFragmentByTag("TEMPLATEROW" + exerciseName);
@@ -199,7 +203,7 @@ public class TemplateFragment extends Fragment {
                 Toast.LENGTH_SHORT).show();
     }
 
-    public void renameTemplate(String templateName) {
+    private void renameTemplate(String templateName) {
         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
         alert.setTitle(getResources().getString(R.string.changeTemplateName));
         alert.setMessage(getResources().getString(R.string.changeTemplateNameText));
@@ -223,9 +227,5 @@ public class TemplateFragment extends Fragment {
         });
 
         alert.show();
-    }
-
-    public String getName() {
-        return template.getName();
     }
 }

@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
@@ -113,7 +114,8 @@ public class ExerciseFragment extends Fragment {
     }
 
     public void exerciseMenuClick() {
-        PopupMenu popup = new PopupMenu(getContext(), getView());
+        Button thisButton = getView().findViewById(R.id.exercise_menu_button);
+        PopupMenu popup = new PopupMenu(getContext(), thisButton);
         popup.setOnMenuItemClickListener(menuItem -> {
             int id = menuItem.getItemId();
             if (id == R.id.move_exercise_up_menu) {
