@@ -25,7 +25,7 @@ import com.example.gymtracker.helper.DatabaseManager;
 public class HistoryFragment extends Fragment {
 
     private boolean isInitialized = false;
-    private final int howManyWorkoutsToLoad = 10;
+    private final int howManyWorkoutsToLoad = 1000;
 
     public HistoryFragment() {
         // Required empty public constructor

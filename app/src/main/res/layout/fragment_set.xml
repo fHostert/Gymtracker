@@ -29,7 +29,8 @@
         android:gravity="center"
         android:inputType="numberDecimal"
         android:maxLength="6"
-        android:layout_weight="20"/>
+        android:layout_weight="20"
+        android:textColorHint="@color/hintTextColor" />
 
     <EditText
         android:id="@+id/reps_edit_text"
@@ -39,7 +40,8 @@
         android:inputType="number"
         android:gravity="center"
         android:layout_weight="20"
-        android:maxLength="3"/>
+        android:maxLength="3"
+        android:textColorHint="@color/hintTextColor"/>
 
     <Button
         android:id="@+id/save_set_button"

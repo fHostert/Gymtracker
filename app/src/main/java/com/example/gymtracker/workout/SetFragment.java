@@ -29,6 +29,10 @@ public class SetFragment extends Fragment {
     private Set set;
     private int exerciseID;
 
+    private EditText weightET;
+    private EditText repsET;
+    private boolean areHintsSet;
+
     public SetFragment() {
         // Required empty public constructor
     }
@@ -56,6 +60,9 @@ public class SetFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_set, container, false);
+        weightET = ((EditText) view.findViewById(R.id.weight_edit_text));
+        repsET = ((EditText)view.findViewById(R.id.reps_edit_text));
+        areHintsSet = false;
 
         ///Fill fields
         //Set index field
@@ -76,11 +83,17 @@ public class SetFragment extends Fragment {
                 setText(lastSetString);
 
         //Reps and weight field
+        //Restoring workout
         if (set.getReps() != 0) {
-            ((EditText)view.findViewById(R.id.weight_edit_text)).
-                    setText(Formatter.formatFloat(set.getWeight()));
-            ((EditText)view.findViewById(R.id.reps_edit_text)).setText(String.valueOf(set.getReps()));
+            weightET.setText(Formatter.formatFloat(set.getWeight()));
+            repsET.setText(String.valueOf(set.getReps()));
             colorSet(view);
+        }
+        //Set last set as hint
+        else if (!lastSetString.equals("-")){
+            weightET.setHint(Formatter.formatFloat(lastSet.getWeight()));
+            repsET.setHint(String.valueOf(lastSet.getReps()));
+            areHintsSet = true;
         }
 
         //initialize buttons
@@ -91,6 +104,8 @@ public class SetFragment extends Fragment {
     }
 
     private void colorSet(View view) {
+        weightET.setHintTextColor(weightET.getCurrentTextColor());
+        repsET.setHintTextColor(repsET.getCurrentTextColor());
         view.findViewById(R.id.set_table_row).setBackgroundColor(
                 getResources().getColor(R.color.setCompleted));
     }
@@ -104,12 +119,18 @@ public class SetFragment extends Fragment {
         }
 
         //Get values
-        String repsString = String.valueOf(
-                ((EditText) getView().findViewById(R.id.reps_edit_text)).getText());
-        String weightString = String.valueOf(
-                ((EditText) getView().findViewById(R.id.weight_edit_text)).getText());
-        float weight = (weightString.equals("") ? 0 : Float.parseFloat(weightString));
+        String repsString = String.valueOf(repsET.getText());
+        String weightString = String.valueOf(weightET.getText());
+
+        //Get hints as values if set
+        repsString = (((repsString.equals("") && areHintsSet)
+                ? (String) repsET.getHint() : repsString));
+        weightString = (((weightString.equals("") && areHintsSet)
+                ? (String) weightET.getHint() : weightString));
+
+        //Cast data
         int reps = (repsString.equals("") ? 0: Integer.parseInt(repsString));
+        float weight = (weightString.equals("") ? 0 : Float.parseFloat(weightString));
         if (reps < 1) {
             Toast.makeText(getContext(),
                     getResources().getString(R.string.toastNoRepsDone),
@@ -117,6 +138,7 @@ public class SetFragment extends Fragment {
             return;
         }
 
+        //Update Database and color set
         set.setReps(reps);
         set.setWeight(weight);
         DatabaseManager.updateSet(exerciseID, set);

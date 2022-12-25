@@ -24,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -102,8 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 statsContainer.setVisibility(View.INVISIBLE);
                 this.setTitle(R.string.history);
 
-                ((HistoryFragment) getSupportFragmentManager().
-                        findFragmentByTag("history_fragment")).initialize();
+
             }
             else if (item.getItemId() == R.id.navigation_stats) {
                 statsContainer.setVisibility(View.VISIBLE);
@@ -113,6 +113,13 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
+
+        //This loads the history as soon as the main view is fully loaded
+        //so there is no lag if you switch to the history tab
+        final View rootView = getWindow().getDecorView().getRootView();
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(
+                () -> ((HistoryFragment) getSupportFragmentManager().
+                        findFragmentByTag("history_fragment")).initialize());
 
         //restore the last workout if it did not exit properly
         restoreWorkout();
