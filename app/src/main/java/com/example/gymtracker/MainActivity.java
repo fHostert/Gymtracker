@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -136,6 +137,15 @@ public class MainActivity extends AppCompatActivity {
         else {
             getMenuInflater().inflate(R.menu.home_menu, menu);
         }
+
+        //Color icons
+        for(int i = 0; i < menu.size(); i++){
+            Drawable drawable = menu.getItem(i).getIcon();
+            if(drawable != null) {
+                drawable.setTint(getColor(R.color.white));
+            }
+        }
+
         return true;
     }
 
