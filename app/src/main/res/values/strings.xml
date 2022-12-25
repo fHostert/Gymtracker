@@ -5,7 +5,7 @@
     <string name="stats">Statistik</string>
     <string name="startEmptyWorkout">Leeres Workout starten</string>
     <string name="addExercise">Übung hinzufügen</string>
-    <string name="addExerciseToTemplate">Weitere Übung hinzufügen</string>
+    <string name="addExerciseToTemplate">Übung hinzufügen</string>
     <string name="renameTemplate">Vorlage umbenennen</string>
     <string name="saveTemplate">Vorlage speichern</string>
     <string name="createNewExercise">Neue Übung erstellen</string>
@@ -97,7 +97,7 @@
     <string name="minute">Minute</string>
     <string name="minutes">Minuten</string>
     <string name="deleteWorkout">Workout löschen</string>
-    <string name="deleteTemplate">Template löschen</string>
+    <string name="deleteTemplate">Vorlage löschen</string>
     <string name="deleteWorkoutText">Soll dieses Workout wirklich aus dem Verlauf gelöscht werden? Es wird in keiner Statistik mehr auftauchen. Diese Aktion kann NICHT rückgängig gemacht werden.</string>
     <string name="deleteTemplateText">Soll dieses Template wirklich gelöscht werden?</string>
     <string name="notificationTitle">Laufendes Workout</string>

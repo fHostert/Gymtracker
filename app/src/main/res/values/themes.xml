@@ -19,5 +19,7 @@
         <item name="android:textColorPrimary">@color/textColor</item>
         <item name="android:textColorSecondary">@color/textColor</item>
         <item name="android:textColorTertiary">@color/textColor</item>
+        <!-- TODO Night mode -->
+
     </style>
 </resources>

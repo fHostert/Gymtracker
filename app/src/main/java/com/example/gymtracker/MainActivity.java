@@ -63,10 +63,6 @@ public class MainActivity extends AppCompatActivity {
         DatabaseManager.createHistoryTable();
         DatabaseManager.createWorkoutsTable();
         DatabaseManager.createTemplatesTable();
-        //DatabaseManager.dropTable("CurrentWorkout");
-        //DatabaseManager.dropTable("CurrentWorkoutMetadata");
-        //DatabaseManager.dropTable("History");
-        //DatabaseManager.dropTable("Workouts");
 
         //Bottom Navigation View Setup
         BottomNavigationView navView = findViewById(R.id.nav_view);
@@ -196,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                     getResources().getString(R.string.toBeImplemented),
                     Toast.LENGTH_SHORT).show();
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

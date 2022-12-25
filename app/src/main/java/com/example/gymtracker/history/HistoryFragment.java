@@ -64,7 +64,7 @@ public class HistoryFragment extends Fragment {
             newContainer.setId(View.generateViewId());
             getParentFragmentManager().beginTransaction()
                     .add(newContainer.getId(), historyWorkoutFragment,
-                    String.valueOf(workout.getID())).commit();
+                    "HISTORY_WORKOUT" + workout.getID()).commit();
             historyLinearLayout.addView(newContainer);
         }
         isInitialized = true;
@@ -87,7 +87,7 @@ public class HistoryFragment extends Fragment {
             newContainer.setId(View.generateViewId());
             getParentFragmentManager().beginTransaction()
                     .add(newContainer.getId(), historyWorkoutFragment,
-                    "HISTORYFRAGMENT" + workout.getID()).commit();
+                    "HISTORY_WORKOUT" + workout.getID()).commit();
             historyLinearLayout.addView(newContainer, 0);
         }
     }

@@ -81,7 +81,7 @@ public class TemplateFragment extends Fragment {
             newContainer.setId(View.generateViewId());
             getParentFragmentManager().beginTransaction()
                     .add(newContainer.getId(), newLine,
-                    "TEMPLATEROW" + exercise.getName()).commit();
+                    "TEMPLATE_ROW" + exercise.getName()).commit();
             tableLayout.addView(newContainer);
         }
 
@@ -96,33 +96,30 @@ public class TemplateFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         //remove Exercise from template
         if (resultCode == RESULT_OK && requestCode == 0) {
-            deleteExerciseFromTemplate(data.getExtras().getString("PACKET"),
-                    data.getExtras().getString("ITEM"));
+            deleteExerciseFromTemplate(data.getExtras().getString("ITEM"));
         }
         //add Exercise to template
         else if (resultCode == RESULT_OK && requestCode == 1) {
-            addToTemplate(data.getExtras().getString("PACKET"),
-                    data.getExtras().getString("ITEM"));
+            addToTemplate(data.getExtras().getString("ITEM"));
         }
     }
 
     private void templateMenuClick() {
         ImageButton thisButton = getView().findViewById(R.id.template_menu_button);
         PopupMenu popup = new PopupMenu(getContext(), thisButton);
-        String templateName = template.getName();
         popup.setOnMenuItemClickListener(menuItem -> {
             int id = menuItem.getItemId();
             if (id == R.id.delete_template_menu) {
-                deleteTemplate(templateName);
+                deleteTemplate();
             }
             else if (id == R.id.add_to_template_menu) {
-                addToTemplate(templateName);
+                addToTemplate();
             }
             else if (id == R.id.delete_from_template_menu) {
-                deleteExerciseFromTemplate(templateName);
+                deleteExerciseFromTemplate();
             }
             else if (id == R.id.rename_template_menu) {
-                renameTemplate(templateName);
+                renameTemplate();
             }
             return false;
         });
@@ -131,8 +128,8 @@ public class TemplateFragment extends Fragment {
         popup.show();
     }
 
-    private void deleteTemplate(String templateName) {
-        DatabaseManager.deleteTemplate(templateName);
+    private void deleteTemplate() {
+        DatabaseManager.deleteTemplate(template.getName());
         Fragment thisFragment = getParentFragmentManager().
                 findFragmentByTag("TEMPLATE" + template.getName());
         getParentFragmentManager().beginTransaction().remove(thisFragment).commit();
@@ -141,8 +138,8 @@ public class TemplateFragment extends Fragment {
                 Toast.LENGTH_SHORT).show();
     }
 
-    private void addToTemplate(String templateName) {
-        Exercise[] exercises = DatabaseManager.getExercisesInTemplate(templateName);
+    private void addToTemplate() {
+        Exercise[] exercises = DatabaseManager.getExercisesInTemplate(template.getName());
         String[] exercisesInTemplate = new String[exercises.length];
         for (int i = 0; i < exercisesInTemplate.length; i++) {
             exercisesInTemplate[i] = exercises[i].getName();
@@ -150,13 +147,12 @@ public class TemplateFragment extends Fragment {
         final Intent intent = new Intent(getContext(), ChooseActivity.class);
         intent.putExtra("LIST", DatabaseManager.getExercises());
         intent.putExtra("REMOVE_LIST", exercisesInTemplate);
-        intent.putExtra("TITLE", getResources().getString(R.string.removeExercise));
-        intent.putExtra("PACKET", templateName);
+        intent.putExtra("TITLE", getResources().getString(R.string.addExerciseToTemplate));
         startActivityForResult(intent, 1);
     }
 
-    private void addToTemplate(String templateName, String exerciseName) {
-        DatabaseManager.addExerciseToTemplate(templateName, exerciseName);
+    private void addToTemplate(String exerciseName) {
+        DatabaseManager.addExerciseToTemplate(template.getName(), exerciseName);
 
         TableLayout tableLayout = getView().findViewById(R.id.template_exercises_table_layout);
         String newLineString = String.format(l,
@@ -167,16 +163,18 @@ public class TemplateFragment extends Fragment {
         newContainer.setId(View.generateViewId());
         getParentFragmentManager().beginTransaction()
                 .add(newContainer.getId(), newLine,
-                "TEMPLATEROW" + exerciseName).commit();
+                "TEMPLATE_ROW" + exerciseName).commit();
         tableLayout.addView(newContainer);
+
+        template.addExercise(exerciseName);
 
         Toast.makeText(getContext(),
                 getResources().getString(R.string.exerciseAdded),
                 Toast.LENGTH_SHORT).show();
     }
 
-    private void deleteExerciseFromTemplate(String templateName) {
-        Exercise[] exercises = DatabaseManager.getExercisesInTemplate(templateName);
+    private void deleteExerciseFromTemplate() {
+        Exercise[] exercises = DatabaseManager.getExercisesInTemplate(template.getName());
         String[] exercisesInTemplate = new String[exercises.length];
         if (exercises.length == 1) {
             Toast.makeText(getContext(),
@@ -190,21 +188,23 @@ public class TemplateFragment extends Fragment {
         final Intent intent = new Intent(getContext(), ChooseActivity.class);
         intent.putExtra("LIST", exercisesInTemplate);
         intent.putExtra("TITLE", getResources().getString(R.string.removeExercise));
-        intent.putExtra("PACKET", templateName);
         startActivityForResult(intent, 0);
     }
 
-    private void deleteExerciseFromTemplate(String templateName, String exerciseName) {
-        DatabaseManager.deleteExerciseFromTemplate(templateName, exerciseName);
+    private void deleteExerciseFromTemplate(String exerciseName) {
+        DatabaseManager.deleteExerciseFromTemplate(template.getName(), exerciseName);
         Fragment exerciseRowFragment = getParentFragmentManager().
-                findFragmentByTag("TEMPLATEROW" + exerciseName);
+                findFragmentByTag("TEMPLATE_ROW" + exerciseName);
         getParentFragmentManager().beginTransaction().remove(exerciseRowFragment).commit();
+
+        template.removeExercise(exerciseName);
+
         Toast.makeText(getContext(),
                 getResources().getString(R.string.exerciseRemoved),
                 Toast.LENGTH_SHORT).show();
     }
 
-    private void renameTemplate(String templateName) {
+    private void renameTemplate() {
         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
         alert.setTitle(getResources().getString(R.string.changeTemplateName));
         alert.setMessage(getResources().getString(R.string.changeTemplateNameText));
@@ -220,12 +220,13 @@ public class TemplateFragment extends Fragment {
                         Toast.LENGTH_SHORT).show();
                 return;
             }
-            DatabaseManager.renameTemplate(templateName, newTemplateName);
+            DatabaseManager.renameTemplate(template.getName(), newTemplateName);
             Toast.makeText(getContext(),
                     getResources().getString(R.string.templateRenamed),
                     Toast.LENGTH_SHORT).show();
             ((TextView) getView().findViewById(R.id.name_of_template_text_view)).
-                    setText(templateName);
+                    setText(newTemplateName);
+            template.setName(newTemplateName);
         });
 
         //If cancel, do nothing

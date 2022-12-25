@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,7 +94,7 @@ public class HistoryWorkoutFragment extends Fragment {
             alert.setPositiveButton("ok", (dialogInterface, i) -> {
                 DatabaseManager.deleteFromHistory(workout.getID());
                 Fragment thisFragment = getParentFragmentManager().
-                        findFragmentByTag("HISTORYWORKOUT" + workout.getID());
+                        findFragmentByTag("HISTORY_WORKOUT" + workout.getID());
                 getParentFragmentManager().beginTransaction().remove(thisFragment).commit();
 
             });
