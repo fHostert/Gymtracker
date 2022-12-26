@@ -3,6 +3,11 @@ package com.example.gymtracker.helper;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -81,7 +86,7 @@ public class Formatter {
     }
 
     public static long convertDateToUnixTimestampSeconds(String dateString) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         Date date = null;
         try {
             date = sdf.parse(dateString);
@@ -89,5 +94,14 @@ public class Formatter {
             e.printStackTrace();
         }
         return date.getTime() / 1000;
+    }
+
+    public static int getDateDiff(String first, String second) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate firstDate = LocalDate.parse(first, formatter);
+        LocalDate secondDate = LocalDate.parse(second, formatter);
+        long days = ChronoUnit.DAYS.between(firstDate, secondDate);
+        return (int) days;
+
     }
 }

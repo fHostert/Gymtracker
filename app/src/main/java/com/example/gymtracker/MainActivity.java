@@ -23,12 +23,14 @@ import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.history.HistoryFragment;
+import com.example.gymtracker.stats.StatsFragment;
 import com.example.gymtracker.templates.AddTemplateActivity;
 import com.example.gymtracker.workout.WorkoutFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -110,12 +112,15 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        //This loads the history as soon as the main view is fully loaded
+        //This loads the history and stats as soon as the main view is fully loaded
         //so there is no lag if you switch to the history tab
         final View rootView = getWindow().getDecorView().getRootView();
-        rootView.getViewTreeObserver().addOnGlobalLayoutListener(
-                () -> ((HistoryFragment) getSupportFragmentManager().
-                        findFragmentByTag("history_fragment")).initialize());
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            ((HistoryFragment) getSupportFragmentManager().
+                    findFragmentByTag("history_fragment")).initialize();
+            ((StatsFragment) getSupportFragmentManager().
+                    findFragmentByTag("stats_fragment")).refreshDurationChart();
+        });
 
         //restore the last workout if it did not exit properly
         restoreWorkout();

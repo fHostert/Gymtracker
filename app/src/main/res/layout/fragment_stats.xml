@@ -1,13 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".stats.StatsFragment">
+    tools:context=".stats.StatsFragment"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/medium_text"
+        android:gravity="center"
+        android:text="@string/averageDailyTrainingTime">
+    </TextView>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/medium_text"
+            android:gravity="center"
+            android:text="@string/inTheLast"
+            android:layout_gravity="center">
+        </TextView>
+        <EditText
+            android:id="@+id/days_to_average_over_edit_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/daysToAverageOverDefault"
+            android:layout_marginHorizontal="2dp"
+            android:digits="0123456789"
+            android:inputType="number"
+            android:maxLength="3">
+        </EditText>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/medium_text"
+            android:gravity="center"
+            android:text="@string/days."
+            android:layout_gravity="center"
+            android:layout_marginStart="2dp">
+        </TextView>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/medium_text"
+        android:gravity="center"
+        android:text="@string/showForLast">
+    </TextView>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center">
+        <EditText
+            android:id="@+id/days_to_show_edit_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/daysToShowDefault"
+            android:layout_marginEnd="2dp"
+            android:digits="0123456789"
+            android:inputType="number"
+            android:maxLength="3">
+        </EditText>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/medium_text"
+            android:gravity="center"
+            android:text="@string/day."
+            android:layout_gravity="center"
+            android:layout_marginStart="2dp">
+        </TextView>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/refresh_chart_button"
+        android:layout_height="@dimen/large_button_height"
+        android:text="@string/refresh"
+        style="@style/largeButton"/>
+
+
+
+
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/trainings_duration_chart"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:layout_marginHorizontal="30dp"/>
-</FrameLayout>
+        android:layout_marginHorizontal="10dp"/>
+</LinearLayout>

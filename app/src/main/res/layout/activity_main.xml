@@ -49,6 +49,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/stats_container"
+        android:tag="stats_fragment"
         android:name="com.example.gymtracker.stats.StatsFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

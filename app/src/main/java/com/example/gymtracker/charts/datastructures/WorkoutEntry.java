@@ -17,5 +17,9 @@ public class WorkoutEntry {
         return date;
     }
 
+    public void addToDuration(int duration) {
+        this.duration += duration;
+    }
+
 
 }

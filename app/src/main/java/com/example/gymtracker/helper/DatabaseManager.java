@@ -776,6 +776,48 @@ public final class DatabaseManager {
         return workoutEntries;
     }
 
+    public static ArrayList<WorkoutEntry> getWorkoutEntries(int daysToShow, int daysToAverageOver) {
+        WorkoutEntry[] durationPerDay = new WorkoutEntry[daysToShow + daysToAverageOver];
+        String today = String.valueOf(LocalDate.now());
+        for (int i = 0; i < durationPerDay.length; i++) {
+            durationPerDay[i] = new WorkoutEntry(0, String.valueOf(LocalDate.now().minusDays(i)));
+        }
+
+        String query = "SELECT duration, date FROM Workouts ORDER BY date DESC";
+        Cursor resultSet = db.rawQuery(query, null);
+        if (resultSet.getCount() == 0) {
+            return null;
+        }
+        resultSet.moveToFirst();
+
+        do {
+            String date = resultSet.getString(1).substring(0, 10);
+            int dateDiffInDays = Formatter.getDateDiff(date, today);
+            if (dateDiffInDays >= daysToShow + daysToAverageOver) {
+                break;
+            }
+            durationPerDay[dateDiffInDays].addToDuration(resultSet.getInt(0));
+        }
+        while (resultSet.moveToNext());
+        resultSet.close();
+
+        ArrayList<WorkoutEntry> entries = new ArrayList<>();
+
+        int duration = 0;
+        for (int i = 0; i < daysToAverageOver; i++){
+           duration += durationPerDay[i].getDuration();
+        }
+
+        for (int i = 0; i < daysToShow; i++){
+            String currentDate = String.valueOf(LocalDate.now().minusDays(i));
+            entries.add(new WorkoutEntry(duration, currentDate));
+            duration -= durationPerDay[i].getDuration();
+            duration += durationPerDay[i + daysToAverageOver].getDuration();
+        }
+
+        return entries;
+    }
+
     /*##############################################################################################
     #############################################GENERAL############################################
     ##############################################################################################*/

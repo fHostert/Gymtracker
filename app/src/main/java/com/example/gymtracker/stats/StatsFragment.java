@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.gymtracker.R;
 import com.example.gymtracker.charts.ChartFormatter.DateFormatterXAxis;
@@ -19,10 +21,12 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.utils.EntryXComparator;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -30,19 +34,13 @@ import java.util.TimeZone;
 
 public class StatsFragment extends Fragment {
 
+    private EditText daysToAverageOverET;
+    private EditText daysToShowET;
+
     public StatsFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment StatsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static StatsFragment newInstance(String param1, String param2) {
         StatsFragment fragment = new StatsFragment();
         Bundle args = new Bundle();
@@ -60,35 +58,53 @@ public class StatsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_stats, container, false);
+        daysToAverageOverET = view.findViewById(R.id.days_to_average_over_edit_text);
+        daysToShowET = view.findViewById(R.id.days_to_show_edit_text);
 
-        LineChart chart = (LineChart) view.findViewById(R.id.trainings_duration_chart);
-        chart.getXAxis().setValueFormatter(new DateFormatterXAxis());
+        //Initialize buttons
+        Button refreshButton = view.findViewById(R.id.refresh_chart_button);
+        refreshButton.setOnClickListener(view1 -> refreshDurationChart());
 
-        ArrayList<WorkoutEntry> history = DatabaseManager.getWorkoutEntries();
+        return view;
+    }
+
+    private void refreshDurationChart(View view) {
+        String daysToShowString = String.valueOf(daysToShowET.getText());
+        String daysToAverageOverString = String.valueOf(daysToAverageOverET.getText());
+
+        int daysToShow = (daysToShowString.equals("") ? 0: Integer.parseInt(daysToShowString));
+        int daysToAverageOver = (daysToAverageOverString.equals("") ? 0 : Integer.parseInt(daysToAverageOverString));
+        ArrayList<WorkoutEntry> history = DatabaseManager.getWorkoutEntries(daysToShow, daysToAverageOver);
         if (history == null) {
-            return view;
+            return;
         }
-
+        LineChart chart = view.findViewById(R.id.trainings_duration_chart);
+        chart.getXAxis().setValueFormatter(new DateFormatterXAxis());
         List<Entry> entries = new ArrayList<>();
         for (WorkoutEntry entry : history) {
             long timestamp = Formatter.convertDateToUnixTimestampSeconds(entry.getDate());
             float durationInMinutes = (float) entry.getDuration() / 60;
-            entries.add(new Entry(timestamp, durationInMinutes));
+            float average = durationInMinutes / daysToAverageOver;
+            entries.add(new Entry(timestamp, average));
         }
 
+        //this fixes a common bug in the library
+        Collections.sort(entries, new EntryXComparator());
+
         LineDataSet dataSet = new LineDataSet(entries, "Label");
+        dataSet.setHighlightEnabled(false);
+        dataSet.setDrawHighlightIndicators(false);
         LineData lineData = new LineData(dataSet);
+        lineData.setHighlightEnabled(false);
+        chart.highlightValue(0, -1);
         chart.setData(lineData);
         chart.getXAxis().setLabelRotationAngle(90);
         chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         chart.invalidate(); // refresh
 
+    }
 
-
-
-
-
-
-        return view;
+    public void refreshDurationChart() {
+        refreshDurationChart(getView());
     }
 }

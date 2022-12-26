@@ -99,6 +99,7 @@
     <string name="deleteWorkout">Workout löschen</string>
     <string name="deleteTemplate">Vorlage löschen</string>
     <string name="deleteWorkoutText">Soll dieses Workout wirklich aus dem Verlauf gelöscht werden? Es wird in keiner Statistik mehr auftauchen. Diese Aktion kann NICHT rückgängig gemacht werden.</string>
+    <string name="refresh">Aktualisieren</string>
     <string name="deleteTemplateText">Soll dieses Template wirklich gelöscht werden?</string>
     <string name="notificationTitle">Laufendes Workout</string>
     <string name="notificationText">Speichere oder lösche das Workout, um zu beenden.</string>
@@ -139,6 +140,8 @@
         <item>Rotator</item>
         <item>Back Extensions</item>
     </string-array>
+
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="newExerciseCreated">Neue Übung erstellt</string>
@@ -155,5 +158,12 @@
     <string name="templateRenamed">Vorlage umbennant</string>
     <string name="nothingLeftToAdd">Es ist nichts mehr zum hinzufügen übrig.</string>
     <string name="toBeImplemented">To be implemented</string>
+    <string name="averageDailyTrainingTime">Durchschnittliche tägliche Trainingszeit</string>
+    <string name="inTheLast">in den letzten</string>
+    <string name="showForLast">Zeige Daten für die letzten</string>
+    <string name="days.">Tagen.</string>
+    <string name="day.">Tage.</string>
+    <string name="daysToAverageOverDefault">7</string>
+    <string name="daysToShowDefault">30</string>
 
 </resources>
