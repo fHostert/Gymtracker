@@ -4,27 +4,31 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.gymtracker.R;
+import com.example.gymtracker.charts.ChartFormatter.DateFormatterXAxis;
+import com.example.gymtracker.charts.datastructures.WorkoutEntry;
+import com.example.gymtracker.helper.DatabaseManager;
+import com.example.gymtracker.helper.Formatter;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link StatsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
+
 public class StatsFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     public StatsFragment() {
         // Required empty public constructor
@@ -42,8 +46,6 @@ public class StatsFragment extends Fragment {
     public static StatsFragment newInstance(String param1, String param2) {
         StatsFragment fragment = new StatsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -51,16 +53,42 @@ public class StatsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_stats, container, false);
+        View view = inflater.inflate(R.layout.fragment_stats, container, false);
+
+        LineChart chart = (LineChart) view.findViewById(R.id.trainings_duration_chart);
+        chart.getXAxis().setValueFormatter(new DateFormatterXAxis());
+
+        ArrayList<WorkoutEntry> history = DatabaseManager.getWorkoutEntries();
+        if (history == null) {
+            return view;
+        }
+
+        List<Entry> entries = new ArrayList<>();
+        for (WorkoutEntry entry : history) {
+            long timestamp = Formatter.convertDateToUnixTimestampSeconds(entry.getDate());
+            float durationInMinutes = (float) entry.getDuration() / 60;
+            entries.add(new Entry(timestamp, durationInMinutes));
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, "Label");
+        LineData lineData = new LineData(dataSet);
+        chart.setData(lineData);
+        chart.getXAxis().setLabelRotationAngle(90);
+        chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        chart.invalidate(); // refresh
+
+
+
+
+
+
+
+        return view;
     }
 }

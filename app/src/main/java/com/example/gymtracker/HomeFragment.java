@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.example.gymtracker.templates.TemplateFragment;
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
-import com.example.gymtracker.workout.WorkoutFragment;
 
 import java.util.ArrayList;
 

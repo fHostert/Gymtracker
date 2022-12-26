@@ -5,10 +5,9 @@
     android:layout_height="match_parent"
     tools:context=".stats.StatsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/trainings_duration_chart"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Hier kommt die Statistik hin" />
-
+        android:layout_height="300dp"
+        android:layout_marginHorizontal="30dp"/>
 </FrameLayout>

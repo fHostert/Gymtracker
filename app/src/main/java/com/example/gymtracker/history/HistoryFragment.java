@@ -5,27 +5,20 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.example.gymtracker.R;
 import com.example.gymtracker.datastructures.History;
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link HistoryFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class HistoryFragment extends Fragment {
 
     private boolean isInitialized = false;
-    private final int howManyWorkoutsToLoad = 1000;
+    private final int howManyWorkoutsToLoad = 10;
 
     public HistoryFragment() {
         // Required empty public constructor

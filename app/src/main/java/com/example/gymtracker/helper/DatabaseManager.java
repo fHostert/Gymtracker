@@ -6,16 +6,20 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.example.gymtracker.charts.datastructures.WorkoutEntry;
 import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.History;
 import com.example.gymtracker.datastructures.Set;
 import com.example.gymtracker.datastructures.Workout;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class DatabaseManager {
     private static SQLiteDatabase db;
@@ -342,16 +346,6 @@ public final class DatabaseManager {
         return nextID;
     }
 
-    public static String getTotalWeight(int workoutID) {
-        String query = String.format(l,
-                "SELECT totalWeight FROM Workouts WHERE ID = %d;", workoutID);
-        Cursor resultSet = db.rawQuery(query, null);
-        resultSet.moveToFirst();
-        String erg = Formatter.formatFloat(resultSet.getFloat(0));
-        resultSet.close();
-        return erg;
-    }
-
     /*##############################################################################################
     #############################################HISTORY############################################
     ##############################################################################################*/
@@ -519,19 +513,6 @@ public final class DatabaseManager {
         return isVolumeRecord || isWeightRecord;
     }
 
-    public static int[] getExerciseIDsFromWorkout(int workoutID) {
-        String query = String.format(l, "SELECT DISTINCT exerciseID FROM History " +
-                        "WHERE workoutID = %d;", workoutID);
-        Cursor resultSet = db.rawQuery(query, null);
-        int[] erg = new int[resultSet.getCount()];
-        resultSet.moveToFirst();
-        for (int i = 0; i < resultSet.getCount(); i++) {
-            erg[i] = resultSet.getInt(0);
-            resultSet.moveToNext();
-        }
-        resultSet.close();
-        return erg;
-    }
 
     /*##############################################################################################
     ############################################TEMPLATES###########################################
@@ -751,6 +732,51 @@ public final class DatabaseManager {
     }
 
     /*##############################################################################################
+    ##############################################STATS#############################################
+    ##############################################################################################*/
+    public static ArrayList<WorkoutEntry> getWorkoutEntries() {
+        /*String query = "SELECT duration, date FROM Workouts ORDER BY date ASC";
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        if (resultSet.getCount() == 0) {
+            return null;
+        }
+        WorkoutEntry[] workoutEntries = new WorkoutEntry[resultSet.getCount()];
+        for (int i = 0; i < resultSet.getCount(); i++) {
+            workoutEntries[i] = new WorkoutEntry(resultSet.getInt(0), resultSet.getString(1));
+            resultSet.moveToNext();
+        }*/
+
+        int steps = 31;
+        ArrayList<WorkoutEntry> workoutEntries = new ArrayList<>();
+
+        String query = "SELECT duration, date FROM Workouts ORDER BY date DESC";
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        if (resultSet.getCount() == 0) {
+            resultSet.close();
+            return null;
+        }
+
+        do {
+            int durationInInterval = 0;
+            String startDate = resultSet.getString(1);
+            String endDate = Formatter.subtractDaysFromDate(startDate, steps);
+            while (Formatter.isDateAfter(startDate, endDate) && !resultSet.isLast()) {
+                durationInInterval += resultSet.getInt(0);
+                startDate = resultSet.getString(1);
+                resultSet.moveToNext();
+            }
+            workoutEntries.add(new WorkoutEntry(durationInInterval, endDate));
+
+        } while (!resultSet.isLast());
+        resultSet.close();
+        workoutEntries.remove(workoutEntries.size() - 1);
+        Collections.reverse(workoutEntries);
+        return workoutEntries;
+    }
+
+    /*##############################################################################################
     #############################################GENERAL############################################
     ##############################################################################################*/
     public static void dropTable(String table) {
@@ -815,6 +841,28 @@ public final class DatabaseManager {
             while (resultSet.moveToNext());
         }
         resultSet.close();
+    }
+
+    public static void fillWorkoutsTable() {
+        for (int i = 0; i < 366; i++) {
+            int workoutID = getNextWorkoutID();
+            String workoutName = "Autogenerated workout";
+            float totalWeight = 0;
+            int numberOfPRs = 0;
+            Log.d("SOSOSOSO", String.valueOf(LocalDate.now().minusDays(i)));
+
+            //String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
+            //        Locale.getDefault()).format(LocalDate.now().minusDays(i));
+            String date = LocalDate.now().minusDays(i) + " 00:00:00";
+            int duration = ThreadLocalRandom.current().nextInt(1800, 5400);
+
+            String query = String.format(l, "INSERT INTO Workouts VALUES (%d, '%s', %d, '%s', '%s', %d)",
+                    workoutID, workoutName, duration, date,
+                    Formatter.formatFloat(totalWeight), numberOfPRs);
+            db.execSQL(query);
+        }
+
+
     }
 
 }

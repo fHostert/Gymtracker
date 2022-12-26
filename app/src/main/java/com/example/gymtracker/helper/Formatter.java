@@ -1,8 +1,11 @@
 package com.example.gymtracker.helper;
 
-import com.example.gymtracker.R;
-
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class Formatter {
     private Formatter (){
@@ -52,5 +55,39 @@ public class Formatter {
         date = date.replace("-", ".");
         date = date.substring(8) + date.substring(4, 8) + date.substring(0, 4);
         return date;
+    }
+
+    public static String subtractDaysFromDate(String date, int daysToAdd) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Calendar c = Calendar.getInstance();
+        try {
+            c.setTime(sdf.parse(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        c.add(Calendar.DATE, -daysToAdd);
+        return sdf.format(c.getTime());
+    }
+
+    public static boolean isDateAfter(String startDate, String endDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        boolean erg = false;
+        try {
+             erg = sdf.parse(startDate).after(sdf.parse(endDate));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return erg;
+    }
+
+    public static long convertDateToUnixTimestampSeconds(String dateString) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date date = null;
+        try {
+            date = sdf.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date.getTime() / 1000;
     }
 }

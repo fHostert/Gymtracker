@@ -20,33 +20,25 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.EditText;
-import android.widget.PopupMenu;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.history.HistoryFragment;
 import com.example.gymtracker.templates.AddTemplateActivity;
-import com.example.gymtracker.templates.TemplateFragment;
-import com.example.gymtracker.workout.ExerciseFragment;
-import com.example.gymtracker.workout.SetFragment;
 import com.example.gymtracker.workout.WorkoutFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
+
+    //TODO Alles auf private
+    //TODO Database umbennennen
 
     WorkoutFragment globalWorkoutFragment;
     private final int notificationId = 69;
