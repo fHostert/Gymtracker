@@ -46,6 +46,7 @@ public class HomeFragment extends Fragment {
 
         for (Workout template : templates) {
             TemplateFragment newTemplate = TemplateFragment.newInstance(template);
+
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
             newContainer.setId(View.generateViewId());
 

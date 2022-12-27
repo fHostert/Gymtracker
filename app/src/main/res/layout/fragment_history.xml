@@ -26,7 +26,8 @@
                 android:id="@+id/load_more_history_button"
                 android:layout_height="@dimen/large_button_height"
                 android:text="@string/loadMoreHistory"
-                style="@style/largeButton"/>
+                style="@style/largeButton"
+                android:visibility="gone"/>
         </LinearLayout>
 
 

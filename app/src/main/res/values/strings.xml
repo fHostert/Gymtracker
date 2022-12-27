@@ -175,5 +175,7 @@
     <string name="maxWeight">Maximalgewicht</string>
     <string name="andMaxWeightInKG">und Maximalgewicht in KG:</string>
     <string name="loadMoreHistory">10 weitere Einträge laden</string>
+    <string name="everythingLoaded">Bereits alles geladen</string>
+    <string name="detailView">Detailansicht</string>
 
 </resources>

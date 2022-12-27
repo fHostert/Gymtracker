@@ -1,6 +1,10 @@
 package com.example.gymtracker.datastructures;
 
+import com.example.gymtracker.helper.Formatter;
+
+
 import java.io.Serializable;
+import java.util.Locale;
 
 public class Set implements Serializable {
     private final int index;
@@ -8,6 +12,8 @@ public class Set implements Serializable {
     private float weight;
     private final boolean isPersonalRecord;
     private final int tendency;
+
+    private static final Locale l = Locale.GERMAN;
 
     public Set(int index) {
         this.index = index;
@@ -55,6 +61,13 @@ public class Set implements Serializable {
 
     public float getVolume() {
         return reps * weight;
+    }
+
+    public String getSetString() {
+        if (weight == 0) {
+            return String.format(l, "%d Wdhl.", reps);
+        }
+        return String.format(l, "%d × %skg", reps, Formatter.formatFloat(weight));
     }
 
     public boolean isPersonalRecord() {

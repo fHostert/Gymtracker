@@ -1,5 +1,8 @@
 package com.example.gymtracker.history;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -10,11 +13,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.Toast;
 
 import com.example.gymtracker.R;
+import com.example.gymtracker.TextViewTableRowFragment;
+import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.History;
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
+import com.example.gymtracker.templates.AddTemplateActivity;
 
 public class HistoryFragment extends Fragment {
 
@@ -62,12 +70,23 @@ public class HistoryFragment extends Fragment {
             HistoryWorkoutFragment historyWorkoutFragment = HistoryWorkoutFragment.newInstance(workout);
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
             newContainer.setId(View.generateViewId());
+
+            newContainer.setOnClickListener(view1 -> {
+                final Intent intent = new Intent(getContext(), HistoryDetailActivity.class);
+                intent.putExtra("WORKOUT", workout);
+                startActivity(intent);
+            });
+
             getParentFragmentManager().beginTransaction()
                     .add(newContainer.getId(), historyWorkoutFragment,
                     "HISTORY_WORKOUT" + workout.getID()).commit();
             historyLinearLayout.addView(newContainer);
         }
         isInitialized = true;
+
+        if (historyLinearLayout.getChildCount() > 9) {
+            view.findViewById(R.id.load_more_history_button).setVisibility(View.VISIBLE);
+        }
     }
 
     private void initialize() {
@@ -89,6 +108,13 @@ public class HistoryFragment extends Fragment {
         for (Workout workout : history.getWorkouts()) {
             HistoryWorkoutFragment historyWorkoutFragment = HistoryWorkoutFragment.newInstance(workout);
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
+
+            newContainer.setOnClickListener(view1 -> {
+                final Intent intent = new Intent(getContext(), HistoryDetailActivity.class);
+                intent.putExtra("WORKOUT", workout);
+                startActivity(intent);
+            });
+            
             newContainer.setId(View.generateViewId());
             getParentFragmentManager().beginTransaction()
                     .add(newContainer.getId(), historyWorkoutFragment,
@@ -103,9 +129,23 @@ public class HistoryFragment extends Fragment {
         History history = DatabaseManager.getHistory(howManyWorkoutsToLoad,
                 alreadyLoaded);
 
+        if (history.getWorkouts().size() == 0) {
+            Toast.makeText(getContext(),
+                    getResources().getString(R.string.everythingLoaded),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         for (Workout workout : history.getWorkouts()) {
             HistoryWorkoutFragment historyWorkoutFragment = HistoryWorkoutFragment.newInstance(workout);
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
+
+            newContainer.setOnClickListener(view1 -> {
+                final Intent intent = new Intent(getContext(), HistoryDetailActivity.class);
+                intent.putExtra("WORKOUT", workout);
+                startActivity(intent);
+            });
+
             newContainer.setId(View.generateViewId());
             getParentFragmentManager().beginTransaction()
                     .add(newContainer.getId(), historyWorkoutFragment,

@@ -81,4 +81,15 @@ public class Formatter {
         return (int) days;
 
     }
+
+    public static String tendency(int tendency) {
+        String erg = "➡";
+        if (tendency < 0) {
+            erg = "⬇";
+        }
+        else if (tendency > 0) {
+            erg = "⬆";
+        }
+        return erg;
+    }
 }
