@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".stats.StatsFragment"
     android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+    <Button
+        android:id="@+id/stats_for_exercise_button"
+        android:layout_height="@dimen/large_button_height"
+        android:text="@string/statsForExercise"
+        style="@style/largeButton"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/boarder_size"
+        android:background="@color/boarders"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -37,7 +54,8 @@
             android:layout_marginHorizontal="2dp"
             android:digits="0123456789"
             android:inputType="number"
-            android:maxLength="4">
+            android:maxLength="4"
+            android:textColor="@color/buttonText">
         </EditText>
         <TextView
             android:layout_width="match_parent"
@@ -72,7 +90,8 @@
             android:layout_marginEnd="2dp"
             android:digits="0123456789"
             android:inputType="number"
-            android:maxLength="4">
+            android:maxLength="4"
+            android:textColor="@color/buttonText">
         </EditText>
         <TextView
             android:layout_width="match_parent"
@@ -98,6 +117,62 @@
         android:id="@+id/trainings_duration_chart"
         android:layout_width="match_parent"
         android:layout_height="350dp"
-        android:layout_marginHorizontal="@dimen/horizontal_margin_between_boxes" />
+        android:layout_marginHorizontal="@dimen/horizontal_margin_between_boxes"
+        android:layout_marginBottom="@dimen/vertical_margin_between_boxes"/>
 
-</LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/boarder_size"
+        android:background="@color/boarders"/>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/workoutCount"
+            android:gravity="center"
+            android:textSize="@dimen/medium_text"
+            android:layout_marginTop="@dimen/vertical_margin_between_boxes"/>
+
+        <TextView
+            android:id="@+id/stats_workout_sum_text_view"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="@dimen/large_text"
+            android:layout_marginBottom="10dp"/>
+
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/workoutSumDuration"
+            android:gravity="center"
+            android:textSize="@dimen/medium_text"/>
+        <TextView
+            android:id="@+id/stats_duration_sum_text_view"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="@dimen/large_text"
+            android:layout_marginBottom="10dp"/>
+
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/totalWeightSum"
+            android:gravity="center"
+            android:textSize="@dimen/medium_text"/>
+        <TextView
+            android:id="@+id/stats_total_weight_sum_text_view"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="@dimen/large_text"
+            android:layout_marginBottom="10dp"/>
+
+    </LinearLayout>
+
+
+
+</ScrollView>

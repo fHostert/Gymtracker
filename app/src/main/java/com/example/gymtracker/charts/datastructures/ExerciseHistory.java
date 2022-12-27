@@ -20,6 +20,7 @@ public class ExerciseHistory {
     public String getName() {
         return name;
     }
+
     public ArrayList<ExerciseEntry> getEntries() {
         return entries;
     }

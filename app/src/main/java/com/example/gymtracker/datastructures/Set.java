@@ -7,12 +7,14 @@ public class Set implements Serializable {
     private int reps;
     private float weight;
     private final boolean isPersonalRecord;
+    private final int tendency;
 
     public Set(int index) {
         this.index = index;
         this.reps = 0;
         this.weight = 0;
         this.isPersonalRecord = false;
+        this.tendency = 0;
     }
 
     public Set(int index, int reps, float weight) {
@@ -20,13 +22,15 @@ public class Set implements Serializable {
         this.reps = reps;
         this.weight = weight;
         this.isPersonalRecord = false;
+        this.tendency = 0;
     }
 
-    public Set(int index, int reps, float weight, boolean isPersonalRecord) {
+    public Set(int index, int reps, float weight, int tendency, boolean isPersonalRecord) {
         this.index = index;
         this.reps = reps;
         this.weight = weight;
         this.isPersonalRecord = isPersonalRecord;
+        this.tendency = tendency;
     }
 
     public int getIndex() {
@@ -55,5 +59,9 @@ public class Set implements Serializable {
 
     public boolean isPersonalRecord() {
         return isPersonalRecord;
+    }
+
+    public int getTendency() {
+        return tendency;
     }
 }

@@ -62,29 +62,6 @@ public class Formatter {
         return date;
     }
 
-    public static String subtractDaysFromDate(String date, int daysToAdd) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        Calendar c = Calendar.getInstance();
-        try {
-            c.setTime(sdf.parse(date));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        c.add(Calendar.DATE, -daysToAdd);
-        return sdf.format(c.getTime());
-    }
-
-    public static boolean isDateAfter(String startDate, String endDate) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        boolean erg = false;
-        try {
-             erg = sdf.parse(startDate).after(sdf.parse(endDate));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return erg;
-    }
-
     public static long convertDateToUnixTimestampSeconds(String dateString) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         Date date = null;

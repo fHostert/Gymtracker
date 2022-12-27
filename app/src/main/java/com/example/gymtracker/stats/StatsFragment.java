@@ -1,18 +1,23 @@
 package com.example.gymtracker.stats;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.gymtracker.ChooseActivity;
 import com.example.gymtracker.R;
 import com.example.gymtracker.charts.ChartFormatter.DateFormatterXAxis;
 import com.example.gymtracker.charts.datastructures.WorkoutEntry;
@@ -25,14 +30,9 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.utils.EntryXComparator;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 public class StatsFragment extends Fragment {
 
@@ -81,7 +81,46 @@ public class StatsFragment extends Fragment {
         refreshDurationChart(view);
         styleChart(view);
 
+        Button statsForExerciseButton = view.findViewById(R.id.stats_for_exercise_button);
+        statsForExerciseButton.setOnClickListener(view1 -> statsForExerciseClick());
+
+        TextView workoutCountTV = view.findViewById(R.id.stats_workout_sum_text_view);
+        TextView totalDurationTV = view.findViewById(R.id.stats_duration_sum_text_view);
+        TextView totalWeightTV = view.findViewById(R.id.stats_total_weight_sum_text_view);
+
+        workoutCountTV.setText(String.valueOf(DatabaseManager.getWorkoutCount()));
+        totalDurationTV.setText(Formatter.formatTime(DatabaseManager.getTotalDuration() / 1000));
+        totalWeightTV.setText(String.format("%s KG", Formatter.formatFloat(DatabaseManager.getTotalWeight())));
+
         return view;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //stats for Exercise
+        if (resultCode == RESULT_OK && requestCode == 0) {
+            statsForExercise(data.getExtras().getString("ITEM"));
+        }
+    }
+
+    private void statsForExerciseClick() {
+        final Intent intent = new Intent(getContext(), ChooseActivity.class);
+        intent.putExtra("LIST", DatabaseManager.getExercisesDoneAtLeastOnce());
+        intent.putExtra("TITLE", getResources().getString(R.string.statsForExercise));
+        startActivityForResult(intent, 0);
+    }
+
+    private void statsForExercise(String exerciseName) {
+        if (DatabaseManager.wasExerciseNeverDone(exerciseName)) {
+            Toast.makeText(getContext(),
+                    getResources().getString(R.string.toastNeverDoneExercise),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        final Intent intent = new Intent(getContext(), StatsForExerciseActivity.class);
+        intent.putExtra("EXERCISE", exerciseName);
+        startActivity(intent);
     }
 
     private void refreshDurationChart(View view) {
@@ -130,10 +169,10 @@ public class StatsFragment extends Fragment {
         chart.setHighlightPerDragEnabled(false);
         chart.getXAxis().setLabelRotationAngle(65);
         chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        chart.getXAxis().setTextSize(getResources().getDimension(R.dimen.chart_text_size));
         chart.setBackgroundColor(getResources().getColor(R.color.chartBackground));
         chart.getXAxis().setTextColor(getResources().getColor(R.color.chartTextColor));
         chart.getAxisLeft().setTextColor(getResources().getColor(R.color.chartTextColor));
         chart.getAxisRight().setTextColor(getResources().getColor(R.color.chartTextColor));
-        chart.getXAxis().setTextSize(getResources().getDimension(R.dimen.chart_text_size));
     }
 }

@@ -159,6 +159,7 @@
     <string name="nothingLeftToAdd">Es ist nichts mehr zum hinzufügen übrig.</string>
     <string name="toBeImplemented">To be implemented</string>
     <string name="averageDailyTrainingTime">Durchschnittliche tägliche Trainingszeit</string>
+    <string name="statsFor">Statistiken für</string>
     <string name="inTheLast">in den letzten</string>
     <string name="showForLast">Zeige Daten für die letzten</string>
     <string name="days.">Tagen.</string>
@@ -166,5 +167,12 @@
     <string name="daysToAverageOverDefault">7</string>
     <string name="daysToShowDefault">30</string>
     <string name="trainingTimeInMinutes">Trainingszeit in Minuten:</string>
+    <string name="volume">Gesamtvolumen</string>
+    <string name="volumeAndMaxWeight">Volumen und Maximalgewicht</string>
+    <string name="ofFirst3SetsInKG">der ersten 3 Sätze in KG:</string>
+    <string name="ofFirst3Sets">der ersten 3 Sätze</string>
+    <string name="volumeOfFirst3Sets">Volumen der ersten 3 Sätze</string>
+    <string name="maxWeight">Maximalgewicht</string>
+    <string name="andMaxWeightInKG">und Maximalgewicht in KG:</string>
 
 </resources>

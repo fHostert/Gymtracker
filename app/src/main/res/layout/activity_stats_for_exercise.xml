@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".stats.StatsForExerciseActivity"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/large_text"
+            android:gravity="center"
+            android:text="@string/volumeAndMaxWeight"
+            android:layout_marginTop="@dimen/vertical_margin_between_boxes">
+        </TextView>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/large_text"
+            android:gravity="center"
+            android:text="@string/ofFirst3SetsInKG"
+            android:layout_marginTop="@dimen/vertical_margin_between_boxes">
+        </TextView>
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/exercise_volume_chart"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:layout_marginHorizontal="@dimen/horizontal_margin_between_boxes"
+            android:layout_marginBottom="@dimen/vertical_margin_between_boxes"/>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/prweight"
+            android:gravity="center"
+            android:textSize="@dimen/medium_text"
+            android:layout_marginTop="@dimen/vertical_margin_between_boxes"/>
+
+        <TextView
+            android:id="@+id/stats_best_weight_text_view"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="@dimen/large_text"
+            android:layout_marginBottom="@dimen/vertical_margin_between_boxes"/>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/prvolume"
+            android:gravity="center"
+            android:textSize="@dimen/medium_text"/>
+        <TextView
+            android:id="@+id/stats_best_volume_text_view"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="@dimen/large_text"
+            android:layout_marginBottom="10dp"/>
+
+    </LinearLayout>
+
+</ScrollView>

@@ -6,6 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.example.gymtracker.charts.datastructures.ExerciseEntry;
+import com.example.gymtracker.charts.datastructures.ExerciseHistory;
+import com.example.gymtracker.charts.datastructures.PersonalRecord;
 import com.example.gymtracker.charts.datastructures.WorkoutEntry;
 import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.History;
@@ -346,6 +349,21 @@ public final class DatabaseManager {
         return nextID;
     }
 
+    private static int[] getWorkoutIDsForExercise(int exerciseID) {
+        String query = String.format(l, "SELECT DISTINCT ID FROM Workouts, History " +
+                    "WHERE Workouts.ID = History.workoutID AND exerciseID = %d " +
+                    "ORDER BY DATE DESC;", exerciseID);
+        Cursor rs = db.rawQuery(query, null);
+        int numberOfIDs = rs.getCount();
+        int[] IDs = new int[numberOfIDs];
+        rs.moveToFirst();
+        for (int i = 0; i < numberOfIDs; i++) {
+            IDs[i] = rs.getInt(0);
+            rs.moveToNext();
+        }
+        return IDs;
+    }
+
     /*##############################################################################################
     #############################################HISTORY############################################
     ##############################################################################################*/
@@ -433,7 +451,7 @@ public final class DatabaseManager {
             ArrayList<Exercise> exercises = new ArrayList<>();
             for (int currentExerciseID : exerciseIDs) {
                 query = String.format(l,
-                        "SELECT reps, weight FROM History " +
+                        "SELECT reps, weight, tendency, isPR FROM History " +
                                 "WHERE workoutID = %d AND exerciseID = %d " +
                                 "ORDER BY setIndex ASC;",
                                 currentWorkoutID, currentExerciseID);
@@ -444,8 +462,7 @@ public final class DatabaseManager {
                 ArrayList<Set> sets = new ArrayList<>();
                 for (int i = 0; i < resultSet.getCount(); i++) {
                     sets.add(new Set(i + 1, resultSet.getInt(0), resultSet.getFloat(1),
-                            isSetPersonalRecord(currentExerciseID,  resultSet.getInt(0),
-                            resultSet.getFloat(1))));
+                            resultSet.getInt(2), resultSet.getInt(3) > 0));
                     resultSet.moveToNext();
                 }
                 exercises.add(new Exercise(currentExerciseID, sets));
@@ -512,7 +529,6 @@ public final class DatabaseManager {
         resultSet.close();
         return isVolumeRecord || isWeightRecord;
     }
-
 
     /*##############################################################################################
     ############################################TEMPLATES###########################################
@@ -713,6 +729,23 @@ public final class DatabaseManager {
         return erg;
     }
 
+    public static String[] getExercisesDoneAtLeastOnce() {
+        String query = "SELECT name FROM Exercises";
+        Cursor resultSet = db.rawQuery(query, null);
+        ArrayList<String> arrayList = new ArrayList<>();
+        resultSet.moveToFirst();
+        for (int i = 0; i < resultSet.getCount(); i++) {
+            if (!wasExerciseNeverDone(resultSet.getString(0))) {
+                arrayList.add(resultSet.getString(0));
+            }
+            resultSet.moveToNext();
+        }
+        resultSet.close();
+        String[] erg = new String[arrayList.size()];
+        erg = arrayList.toArray(erg);
+        return erg;
+    }
+
     public static int getExerciseID(String exerciseName) {
         String query = String.format("SELECT ID FROM Exercises WHERE name = '%s';", exerciseName);
         Cursor resultSet = db.rawQuery(query, null);
@@ -731,51 +764,18 @@ public final class DatabaseManager {
         return erg;
     }
 
+    public static boolean wasExerciseNeverDone(String exerciseName) {
+        int exerciseID = getExerciseID(exerciseName);
+        String query = String.format(l, "SELECT * FROM History WHERE exerciseID = '%d';", exerciseID);
+        Cursor resultSet = db.rawQuery(query, null);
+        boolean erg = resultSet.getCount() == 0;
+        resultSet.close();
+        return erg;
+    }
+
     /*##############################################################################################
     ##############################################STATS#############################################
     ##############################################################################################*/
-    public static ArrayList<WorkoutEntry> getWorkoutEntries() {
-        /*String query = "SELECT duration, date FROM Workouts ORDER BY date ASC";
-        Cursor resultSet = db.rawQuery(query, null);
-        resultSet.moveToFirst();
-        if (resultSet.getCount() == 0) {
-            return null;
-        }
-        WorkoutEntry[] workoutEntries = new WorkoutEntry[resultSet.getCount()];
-        for (int i = 0; i < resultSet.getCount(); i++) {
-            workoutEntries[i] = new WorkoutEntry(resultSet.getInt(0), resultSet.getString(1));
-            resultSet.moveToNext();
-        }*/
-
-        int steps = 31;
-        ArrayList<WorkoutEntry> workoutEntries = new ArrayList<>();
-
-        String query = "SELECT duration, date FROM Workouts ORDER BY date DESC";
-        Cursor resultSet = db.rawQuery(query, null);
-        resultSet.moveToFirst();
-        if (resultSet.getCount() == 0) {
-            resultSet.close();
-            return null;
-        }
-
-        do {
-            int durationInInterval = 0;
-            String startDate = resultSet.getString(1);
-            String endDate = Formatter.subtractDaysFromDate(startDate, steps);
-            while (Formatter.isDateAfter(startDate, endDate) && !resultSet.isLast()) {
-                durationInInterval += resultSet.getInt(0);
-                startDate = resultSet.getString(1);
-                resultSet.moveToNext();
-            }
-            workoutEntries.add(new WorkoutEntry(durationInInterval, endDate));
-
-        } while (!resultSet.isLast());
-        resultSet.close();
-        workoutEntries.remove(workoutEntries.size() - 1);
-        Collections.reverse(workoutEntries);
-        return workoutEntries;
-    }
-
     public static ArrayList<WorkoutEntry> getWorkoutEntries(int daysToShow, int daysToAverageOver) {
         WorkoutEntry[] durationPerDay = new WorkoutEntry[daysToShow + daysToAverageOver];
         String today = String.valueOf(LocalDate.now());
@@ -816,6 +816,103 @@ public final class DatabaseManager {
         }
 
         return entries;
+    }
+
+    public static ExerciseHistory getExerciseHistory(String exerciseName) {
+        int exerciseID = getExerciseID(exerciseName);
+        int[] workoutIDs = getWorkoutIDsForExercise(exerciseID);
+
+        if (workoutIDs.length == 0) {
+            return null;
+        }
+
+        ArrayList<ExerciseEntry> entries = new ArrayList<>();
+        for (int ID : workoutIDs) {
+            String query = String.format(l, "SELECT setIndex, reps, weight, tendency, isPR, date " +
+                    "FROM History, Workouts WHERE History.WorkoutID = Workouts.ID " +
+                    "AND exerciseID = %d AND ID = %d ORDER BY date DESC;", exerciseID, ID);
+            Cursor resultSet = db.rawQuery(query, null);
+            resultSet.moveToFirst();
+            ArrayList<Set> sets = new ArrayList<>();
+            do {
+                sets.add(new Set(resultSet.getInt(0), resultSet.getInt(1), resultSet.getFloat(2),
+                        resultSet.getInt(3), resultSet.getInt(4) > 0));
+            }
+            while (resultSet.moveToNext());
+            resultSet.moveToFirst();
+            entries.add((new ExerciseEntry(sets, resultSet.getString(5))));
+            resultSet.close();
+        }
+        return new ExerciseHistory(exerciseID, exerciseName, entries);
+    }
+
+    public static PersonalRecord getPersonalRecordVolume(String exerciseName) {
+        int exerciseID = getExerciseID(exerciseName);
+        String query = String.format(l,
+                "SELECT weight, reps, date FROM History, Workouts " +
+                "WHERE History.workoutID = Workouts.ID AND exerciseID = %d " +
+                "ORDER BY (weight * reps) DESC LIMIT 1;", exerciseID);
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        if (resultSet.getCount() == 0) {
+            return null;
+        }
+        float weight = resultSet.getFloat(0);
+        int reps = resultSet.getInt(1);
+        String date = resultSet.getString(2);
+        resultSet.close();
+        return new PersonalRecord(date, exerciseName, weight, reps);
+    }
+
+    public static PersonalRecord getPersonalRecordWeight(String exerciseName) {
+        int exerciseID = getExerciseID(exerciseName);
+        String query = String.format(l,
+                "SELECT weight, reps, date FROM History, Workouts " +
+                        "WHERE History.workoutID = Workouts.ID AND exerciseID = %d " +
+                        "ORDER BY weight DESC LIMIT 1;", exerciseID);
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        if (resultSet.getCount() == 0) {
+            return null;
+        }
+        float weight = resultSet.getFloat(0);
+        int reps = resultSet.getInt(1);
+        String date = resultSet.getString(2);
+        resultSet.close();
+        return new PersonalRecord(date, exerciseName, weight, reps);
+    }
+
+    public static int getWorkoutCount() {
+        String query = "SELECT COUNT(ID) FROM Workouts";
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        int erg = resultSet.getInt(0);
+        resultSet.close();
+        return erg;
+    }
+
+    public static int getTotalDuration() {
+        String query = "SELECT SUM(duration) FROM Workouts";
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        if (resultSet.getCount() == 0) {
+            return 0;
+        }
+        int erg = resultSet.getInt(0);
+        resultSet.close();
+        return erg;
+    }
+
+    public static float getTotalWeight() {
+        String query = "SELECT SUM(totalWeight) FROM Workouts";
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        if (resultSet.getCount() == 0) {
+            return 0;
+        }
+        float erg = resultSet.getFloat(0);
+        resultSet.close();
+        return erg;
     }
 
     /*##############################################################################################
