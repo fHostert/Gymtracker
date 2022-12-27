@@ -20,6 +20,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -110,16 +111,6 @@ public class MainActivity extends AppCompatActivity {
                 this.setTitle(R.string.stats);
             }
             return true;
-        });
-
-        //This loads the history and stats as soon as the main view is fully loaded
-        //so there is no lag if you switch to the history tab
-        final View rootView = getWindow().getDecorView().getRootView();
-        rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-            ((HistoryFragment) getSupportFragmentManager().
-                    findFragmentByTag("history_fragment")).initialize();
-            ((StatsFragment) getSupportFragmentManager().
-                    findFragmentByTag("stats_fragment")).refreshDurationChart();
         });
 
         //restore the last workout if it did not exit properly

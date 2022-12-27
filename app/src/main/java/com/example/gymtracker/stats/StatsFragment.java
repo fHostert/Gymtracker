@@ -4,6 +4,8 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,9 +63,23 @@ public class StatsFragment extends Fragment {
         daysToAverageOverET = view.findViewById(R.id.days_to_average_over_edit_text);
         daysToShowET = view.findViewById(R.id.days_to_show_edit_text);
 
-        //Initialize buttons
-        Button refreshButton = view.findViewById(R.id.refresh_chart_button);
-        refreshButton.setOnClickListener(view1 -> refreshDurationChart());
+        TextWatcher refreshChartTW = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                refreshDurationChart(view);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        };
+        daysToAverageOverET.addTextChangedListener(refreshChartTW);
+        daysToShowET.addTextChangedListener(refreshChartTW);
+
+        refreshDurationChart(view);
+        styleChart(view);
 
         return view;
     }
@@ -91,20 +107,33 @@ public class StatsFragment extends Fragment {
         //this fixes a common bug in the library
         Collections.sort(entries, new EntryXComparator());
 
-        LineDataSet dataSet = new LineDataSet(entries, "Label");
-        dataSet.setHighlightEnabled(false);
-        dataSet.setDrawHighlightIndicators(false);
+        //add data to set
+        LineDataSet dataSet = new LineDataSet(entries, "");
+        dataSet.setColor(getResources().getColor(R.color.boarders));
+        dataSet.setDrawCircles(false);
+        dataSet.setDrawValues(false);
+        dataSet.setLineWidth(getResources().getDimension(R.dimen.chart_line_width));
+
         LineData lineData = new LineData(dataSet);
-        lineData.setHighlightEnabled(false);
-        chart.highlightValue(0, -1);
         chart.setData(lineData);
-        chart.getXAxis().setLabelRotationAngle(90);
-        chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        chart.invalidate(); // refresh
+
+        //refresh
+        chart.invalidate();
 
     }
 
-    public void refreshDurationChart() {
-        refreshDurationChart(getView());
+    private void styleChart(View view) {
+        LineChart chart = view.findViewById(R.id.trainings_duration_chart);
+        chart.getLegend().setEnabled(false);
+        chart.getDescription().setEnabled(false);
+        chart.setHighlightPerTapEnabled(false);
+        chart.setHighlightPerDragEnabled(false);
+        chart.getXAxis().setLabelRotationAngle(65);
+        chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        chart.setBackgroundColor(getResources().getColor(R.color.chartBackground));
+        chart.getXAxis().setTextColor(getResources().getColor(R.color.chartTextColor));
+        chart.getAxisLeft().setTextColor(getResources().getColor(R.color.chartTextColor));
+        chart.getAxisRight().setTextColor(getResources().getColor(R.color.chartTextColor));
+        chart.getXAxis().setTextSize(getResources().getDimension(R.dimen.chart_text_size));
     }
 }

@@ -18,7 +18,9 @@
 
     <color name="boarders">#ffc300</color>
     <color name="background">#003566</color>
+    <color name="chartBackground">#004979</color>
     <color name="textColor">#FFFFFFFF</color>
+    <color name="chartTextColor">#FFFFFFFF</color>
     <color name="menuTextColor">#FF000000</color>
     <color name="buttonText">#ffc300</color>
     <color name="hintTextColor">#FF999999</color>

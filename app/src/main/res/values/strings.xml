@@ -165,5 +165,6 @@
     <string name="day.">Tage.</string>
     <string name="daysToAverageOverDefault">7</string>
     <string name="daysToShowDefault">30</string>
+    <string name="trainingTimeInMinutes">Trainingszeit in Minuten:</string>
 
 </resources>

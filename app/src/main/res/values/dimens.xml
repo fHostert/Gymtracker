@@ -11,4 +11,6 @@
     <dimen name="horizontal_margin_between_boxes">5dp</dimen>
     <dimen name="vertical_margin_from_boxes_to_inside">5dp</dimen>
     <dimen name="horizontal_margin_from_boxes_to_inside">10dp</dimen>
+    <dimen name="chart_text_size">4dp</dimen>
+    <dimen name="chart_line_width">0.75dp</dimen>
 </resources>

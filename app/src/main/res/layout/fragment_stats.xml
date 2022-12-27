@@ -11,7 +11,8 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/medium_text"
         android:gravity="center"
-        android:text="@string/averageDailyTrainingTime">
+        android:text="@string/averageDailyTrainingTime"
+        android:layout_marginVertical="@dimen/vertical_margin_between_boxes">
     </TextView>
 
     <LinearLayout
@@ -36,7 +37,7 @@
             android:layout_marginHorizontal="2dp"
             android:digits="0123456789"
             android:inputType="number"
-            android:maxLength="3">
+            android:maxLength="4">
         </EditText>
         <TextView
             android:layout_width="match_parent"
@@ -71,7 +72,7 @@
             android:layout_marginEnd="2dp"
             android:digits="0123456789"
             android:inputType="number"
-            android:maxLength="3">
+            android:maxLength="4">
         </EditText>
         <TextView
             android:layout_width="match_parent"
@@ -84,19 +85,19 @@
         </TextView>
     </LinearLayout>
 
-    <Button
-        android:id="@+id/refresh_chart_button"
-        android:layout_height="@dimen/large_button_height"
-        android:text="@string/refresh"
-        style="@style/largeButton"/>
-
-
-
-
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/large_text"
+        android:gravity="center"
+        android:text="@string/trainingTimeInMinutes"
+        android:layout_marginTop="@dimen/vertical_margin_between_boxes">
+    </TextView>
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/trainings_duration_chart"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_marginHorizontal="10dp"/>
+        android:layout_height="350dp"
+        android:layout_marginHorizontal="@dimen/horizontal_margin_between_boxes" />
+
 </LinearLayout>

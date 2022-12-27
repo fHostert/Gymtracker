@@ -42,15 +42,19 @@ public class HistoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_history, container, false);
+        View view = inflater.inflate(R.layout.fragment_history, container, false);
+
+        initialize(view);
+
+        return view;
     }
 
-    public void initialize(){
+    public void initialize(View view){
         if (isInitialized) {
             return;
         }
         History history = DatabaseManager.getHistory(howManyWorkoutsToLoad);
-        LinearLayout historyLinearLayout = getView().findViewById(R.id.history_linear_layout);
+        LinearLayout historyLinearLayout = view.findViewById(R.id.history_linear_layout);
         for (Workout workout : history.getWorkouts()) {
             HistoryWorkoutFragment historyWorkoutFragment = HistoryWorkoutFragment.newInstance(workout);
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
@@ -63,6 +67,10 @@ public class HistoryFragment extends Fragment {
         isInitialized = true;
     }
 
+    private void initialize() {
+        initialize(getView());
+    }
+
     public void reload() {
         isInitialized = false;
         initialize();
@@ -72,6 +80,7 @@ public class HistoryFragment extends Fragment {
         if (!isInitialized) {
             return;
         }
+        //only add the most recent workout
         History history = DatabaseManager.getHistory(1);
         LinearLayout historyLinearLayout = getView().findViewById(R.id.history_linear_layout);
         for (Workout workout : history.getWorkouts()) {
