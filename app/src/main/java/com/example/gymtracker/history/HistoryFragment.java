@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentContainerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.example.gymtracker.R;
@@ -45,6 +46,8 @@ public class HistoryFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
 
         initialize(view);
+        Button loadMoreHistoryButton = view.findViewById(R.id.load_more_history_button);
+        loadMoreHistoryButton.setOnClickListener(view1 -> loadMoreHistory());
 
         return view;
     }
@@ -53,7 +56,7 @@ public class HistoryFragment extends Fragment {
         if (isInitialized) {
             return;
         }
-        History history = DatabaseManager.getHistory(howManyWorkoutsToLoad);
+        History history = DatabaseManager.getHistory(howManyWorkoutsToLoad, 0);
         LinearLayout historyLinearLayout = view.findViewById(R.id.history_linear_layout);
         for (Workout workout : history.getWorkouts()) {
             HistoryWorkoutFragment historyWorkoutFragment = HistoryWorkoutFragment.newInstance(workout);
@@ -81,7 +84,7 @@ public class HistoryFragment extends Fragment {
             return;
         }
         //only add the most recent workout
-        History history = DatabaseManager.getHistory(1);
+        History history = DatabaseManager.getHistory(1, 0);
         LinearLayout historyLinearLayout = getView().findViewById(R.id.history_linear_layout);
         for (Workout workout : history.getWorkouts()) {
             HistoryWorkoutFragment historyWorkoutFragment = HistoryWorkoutFragment.newInstance(workout);
@@ -91,6 +94,23 @@ public class HistoryFragment extends Fragment {
                     .add(newContainer.getId(), historyWorkoutFragment,
                     "HISTORY_WORKOUT" + workout.getID()).commit();
             historyLinearLayout.addView(newContainer, 0);
+        }
+    }
+
+    private void loadMoreHistory() {
+        LinearLayout historyLinearLayout = getView().findViewById(R.id.history_linear_layout);
+        int alreadyLoaded = historyLinearLayout.getChildCount();
+        History history = DatabaseManager.getHistory(howManyWorkoutsToLoad,
+                alreadyLoaded);
+
+        for (Workout workout : history.getWorkouts()) {
+            HistoryWorkoutFragment historyWorkoutFragment = HistoryWorkoutFragment.newInstance(workout);
+            FragmentContainerView newContainer = new FragmentContainerView(getContext());
+            newContainer.setId(View.generateViewId());
+            getParentFragmentManager().beginTransaction()
+                    .add(newContainer.getId(), historyWorkoutFragment,
+                            "HISTORY_WORKOUT" + workout.getID()).commit();
+            historyLinearLayout.addView(newContainer);
         }
     }
 }

@@ -419,10 +419,11 @@ public final class DatabaseManager {
         db.execSQL(query);
     }
 
-    public static History getHistory(int top) {
+    public static History getHistory(int top, int offset) {
         //Get IDs of workouts to be returned
         String query = String.format(l,
-                "SELECT DISTINCT ID FROM Workouts ORDER BY date DESC LIMIT %d;", top);
+                "SELECT DISTINCT ID FROM Workouts " +
+                        "ORDER BY date DESC LIMIT %d OFFSET %d;", top, offset);
         Cursor resultSet = db.rawQuery(query, null);
         resultSet.moveToFirst();
         int[] workoutIDs = new int[resultSet.getCount()];

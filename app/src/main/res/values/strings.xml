@@ -174,5 +174,6 @@
     <string name="volumeOfFirst3Sets">Volumen der ersten 3 Sätze</string>
     <string name="maxWeight">Maximalgewicht</string>
     <string name="andMaxWeightInKG">und Maximalgewicht in KG:</string>
+    <string name="loadMoreHistory">10 weitere Einträge laden</string>
 
 </resources>
