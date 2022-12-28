@@ -3,16 +3,20 @@ package com.example.gymtracker;
 import static android.database.sqlite.SQLiteDatabase.openOrCreateDatabase;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -36,6 +40,7 @@ import com.example.gymtracker.templates.AddTemplateActivity;
 import com.example.gymtracker.workout.WorkoutFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.io.FileNotFoundException;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -53,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Setup database
-        SQLiteDatabase db = openOrCreateDatabase("GymtrackerNew", MODE_PRIVATE,null);
+        SQLiteDatabase db = openOrCreateDatabase("Gymtracker", MODE_PRIVATE,null);
         DatabaseManager.initialize(db);
         DatabaseManager.createExercisesTable(getResources().getStringArray(R.array.exercises));
         DatabaseManager.createHistoryTable();
@@ -181,14 +186,10 @@ public class MainActivity extends AppCompatActivity {
             createNewTemplate();
         }
         else if (id == R.id.import_data_menu) {
-            Toast.makeText(this,
-                    getResources().getString(R.string.toBeImplemented),
-                    Toast.LENGTH_SHORT).show();
+            importDatabase();
         }
         else if (id == R.id.export_data_menu) {
-            Toast.makeText(this,
-                    getResources().getString(R.string.toBeImplemented),
-                    Toast.LENGTH_SHORT).show();
+            exportDatabase();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -369,6 +370,72 @@ public class MainActivity extends AppCompatActivity {
         //If cancel, do nothing
         alert.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
             //Do nothing and cancel
+        });
+
+        alert.show();
+    }
+
+    private void exportDatabase() {
+        boolean hasPermission =
+                (ContextCompat.checkSelfPermission(
+                        this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED);
+
+        if (!hasPermission) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    112);
+        }
+
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setMessage(getResources().getString(R.string.exportDataText));
+        alert.setTitle(getResources().getString(R.string.exportData));
+
+        //If ok, continue
+        alert.setPositiveButton(getResources().getString(R.string.ok), (dialogInterface, i) -> {
+            if (DatabaseManager.exportDatabase(this.getDatabasePath("Gymtracker").getAbsolutePath())) {
+                Toast.makeText(this,
+                        getResources().getString(R.string.toastExportSuccess),
+                        Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(this,
+                        getResources().getString(R.string.toastExportFail),
+                        Toast.LENGTH_SHORT).show();
+            }
+
+
+        });
+        //If cancel, return
+        alert.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
+        });
+
+        alert.show();
+    }
+
+    private void importDatabase() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setMessage(getResources().getString(R.string.importDataText));
+        alert.setTitle(getResources().getString(R.string.importData));
+
+        //If ok, continue
+        alert.setPositiveButton(getResources().getString(R.string.ok), (dialogInterface, i) -> {
+            if (DatabaseManager.importDatabase(this.getDatabasePath("Gymtracker").getAbsolutePath())) {
+                Toast.makeText(this,
+                        getResources().getString(R.string.toastImportSuccess),
+                        Toast.LENGTH_SHORT).show();
+                reload();
+            }
+            else {
+                Toast.makeText(this,
+                        getResources().getString(R.string.toastImportFail),
+                        Toast.LENGTH_SHORT).show();
+            }
+
+
+        });
+        //If cancel, return
+        alert.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
         });
 
         alert.show();

@@ -4,6 +4,7 @@ package com.example.gymtracker.helper;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 import android.util.Log;
 
 import com.example.gymtracker.charts.datastructures.ExerciseEntry;
@@ -15,10 +16,14 @@ import com.example.gymtracker.datastructures.History;
 import com.example.gymtracker.datastructures.Set;
 import com.example.gymtracker.datastructures.Workout;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
@@ -936,6 +941,50 @@ public final class DatabaseManager {
     /*##############################################################################################
     #############################################GENERAL############################################
     ##############################################################################################*/
+    public static boolean exportDatabase(String databasePath) {
+        try {
+            File download = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+            if (download.canWrite()) {
+                String backupDBPath = "GymtrackerExport.db";
+                File currentDB = new File(databasePath);
+                File backupDB = new File(download, backupDBPath);
+
+                FileChannel src = new FileInputStream(currentDB).getChannel();
+                FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                dst.transferFrom(src, 0, src.size());
+                src.close();
+                dst.close();
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static boolean importDatabase(String databasePath) {
+        try {
+            File download = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+            if (download.canWrite()) {
+                String backupDBPath  = "GymtrackerExport.db";
+                File currentDB = new File(databasePath);
+                File backupDB  = new File(download, backupDBPath);
+
+                FileChannel src = new FileInputStream(backupDB).getChannel();
+                FileChannel dst = new FileOutputStream(currentDB).getChannel();
+                dst.transferFrom(src, 0, src.size());
+                src.close();
+                dst.close();
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public static void dropTable(String table) {
         if (doesTableExist(table)) {
             String query = String.format("DROP TABLE \"%s\";", table);

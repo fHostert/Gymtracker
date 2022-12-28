@@ -70,10 +70,10 @@ public class TemplateFragment extends Fragment {
                 setText(template.getName());
 
         //last done
-        String today = new SimpleDateFormat("yyyy-MM-dd",
-                Locale.getDefault()).format(new Date());
         String lastDone = DatabaseManager.getLastDateDoneTemplate(template.getName());
         if (lastDone != null) {
+            String today = new SimpleDateFormat("yyyy-MM-dd",
+                    Locale.getDefault()).format(new Date());
             int dateDiff = Formatter.getDateDiff(lastDone.substring(0, 10), today);
             String days = (dateDiff == 1) ? getString(R.string.day) : getString(R.string.days);
             String text = getString(R.string.lastDoneDays) + " " + dateDiff + " " + days;
