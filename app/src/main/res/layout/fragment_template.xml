@@ -24,7 +24,17 @@
             android:text="Name der Vorlage"
             android:textSize="@dimen/headline_size"
             android:textStyle="bold"
-            android:layout_weight="85"/>
+            android:layout_weight="55"/>
+
+            <TextView
+                android:id="@+id/template_last_done_text_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Zuletzt vor 300 Tagen"
+                android:textSize="@dimen/small_text"
+                android:textStyle="bold"
+                android:layout_weight="30"/>
 
         <ImageButton
             android:id="@+id/template_menu_button"

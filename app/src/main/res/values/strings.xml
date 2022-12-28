@@ -178,5 +178,6 @@
     <string name="everythingLoaded">Bereits alles geladen</string>
     <string name="detailView">Detailansicht</string>
     <string name="exerciseHistory">Übungsverlauf:</string>
+    <string name="lastDoneDays">Zuletzt vor</string>
 
 </resources>

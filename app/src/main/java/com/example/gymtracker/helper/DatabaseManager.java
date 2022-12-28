@@ -464,7 +464,6 @@ public final class DatabaseManager {
                 for (int i = 0; i < resultSet.getCount(); i++) {
                     sets.add(new Set(i + 1, resultSet.getInt(0), resultSet.getFloat(1),
                             resultSet.getInt(2), resultSet.getInt(3) > 0));
-                    Log.d("isPR", String.valueOf(resultSet.getInt(3) > 0));
                     resultSet.moveToNext();
 
                 }
@@ -645,6 +644,22 @@ public final class DatabaseManager {
         String query = String.format("SELECT name FROM Templates WHERE name = '%s';", name);
         Cursor resultSet = db.rawQuery(query, null);
         boolean erg = resultSet.getCount() != 0;
+        resultSet.close();
+        return erg;
+    }
+
+    public static String getLastDateDoneTemplate(String templateName) {
+        String query = String.format("SELECT date FROM workouts WHERE name = '%s' " +
+                    "ORDER BY date desc LIMIT 1;", templateName);
+        Cursor resultSet = db.rawQuery(query, null);
+        String erg;
+        if (resultSet.getCount() == 0) {
+            erg = null;
+        }
+        else {
+            resultSet.moveToFirst();
+            erg = resultSet.getString(0);
+        }
         resultSet.close();
         return erg;
     }

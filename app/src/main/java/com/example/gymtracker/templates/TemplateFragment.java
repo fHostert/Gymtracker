@@ -25,7 +25,10 @@ import com.example.gymtracker.TextViewTableRowFragment;
 import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
+import com.example.gymtracker.helper.Formatter;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 public class TemplateFragment extends Fragment {
@@ -62,8 +65,26 @@ public class TemplateFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_template, container, false);
 
+        //title
         ((TextView) view.findViewById(R.id.name_of_template_text_view)).
                 setText(template.getName());
+
+        //last done
+        String today = new SimpleDateFormat("yyyy-MM-dd",
+                Locale.getDefault()).format(new Date());
+        String lastDone = DatabaseManager.getLastDateDoneTemplate(template.getName());
+        if (lastDone != null) {
+            int dateDiff = Formatter.getDateDiff(lastDone.substring(0, 10), today);
+            String days = (dateDiff == 1) ? getString(R.string.day) : getString(R.string.days);
+            String text = getString(R.string.lastDoneDays) + " " + dateDiff + " " + days;
+            ((TextView) view.findViewById(R.id.template_last_done_text_view)).
+                    setText(text);
+        }
+        else {
+            ((TextView) view.findViewById(R.id.template_last_done_text_view)).
+                    setVisibility(View.INVISIBLE);
+        }
+
 
         TableLayout tableLayout = view.findViewById(R.id.template_exercises_table_layout);
         for (Exercise exercise : template.getExercises()) {
