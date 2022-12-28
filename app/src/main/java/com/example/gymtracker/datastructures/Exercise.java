@@ -77,4 +77,12 @@ public class Exercise implements Serializable {
         return String.format(l, "%d × %skg",
                 bestSet.getReps(), Formatter.formatFloat(bestSet.getWeight()));
     }
+
+    public float getTotalWeight() {
+        float totalWeight = 0;
+        for (Set set : sets) {
+            totalWeight += set.getWeight();
+        }
+        return totalWeight;
+    }
 }

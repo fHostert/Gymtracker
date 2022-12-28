@@ -5,9 +5,10 @@ import android.util.Log;
 
 import com.example.gymtracker.datastructures.Set;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ExerciseEntry {
+public class ExerciseEntry  implements Serializable {
     private final ArrayList<Set> sets;
     private final String date;
 
@@ -33,6 +34,10 @@ public class ExerciseEntry {
             volume += sets.get(i).getReps() * sets.get(i).getWeight();
         }
         return volume;
+    }
+
+    public float getVolume(){
+        return getVolume(-1);
     }
 
     public float getMaxWeight() {

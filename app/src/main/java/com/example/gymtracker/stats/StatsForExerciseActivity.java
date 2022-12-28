@@ -1,8 +1,12 @@
 package com.example.gymtracker.stats;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentContainerView;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.gymtracker.R;
@@ -10,8 +14,12 @@ import com.example.gymtracker.charts.ChartFormatter.DateFormatterXAxis;
 import com.example.gymtracker.charts.datastructures.ExerciseEntry;
 import com.example.gymtracker.charts.datastructures.ExerciseHistory;
 import com.example.gymtracker.charts.datastructures.PersonalRecord;
+import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.helper.Formatter;
+import com.example.gymtracker.history.HistoryDetailActivity;
+import com.example.gymtracker.history.HistoryExerciseFragment;
+import com.example.gymtracker.history.HistoryWorkoutFragment;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -122,5 +130,15 @@ public class StatsForExerciseActivity extends AppCompatActivity {
 
         bestWeightTV.setText(String.format("%s am %s", bestWeight, Formatter.formatDate(weightPR.getDate())));
         bestVolumeTV.setText(String.format("%s am %s", bestVolume, Formatter.formatDate(volumePR.getDate())));
+
+        LinearLayout historyContainer = findViewById(R.id.exercise_history_linear_layout);
+        for (ExerciseEntry entry : history.getEntries()) {
+            HistoryExerciseFragment historyExerciseFragment = HistoryExerciseFragment.newInstance(entry);
+            FragmentContainerView newContainer = new FragmentContainerView(this);
+            newContainer.setId(View.generateViewId());
+            getSupportFragmentManager().beginTransaction()
+                    .add(newContainer.getId(), historyExerciseFragment).commit();
+            historyContainer.addView(newContainer);
+        }
     }
 }

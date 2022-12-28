@@ -24,6 +24,11 @@
         android:layout_marginHorizontal="@dimen/horizontal_margin_between_boxes"
         android:layout_marginVertical="@dimen/vertical_margin_between_boxes"/>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/boarders"/>
+
     <Button
         android:id="@+id/add_exercise_to_template_button"
         android:onClick="addExerciseToTemplateClick"
@@ -31,6 +36,11 @@
         android:text="@string/addExerciseToTemplate"
         style="@style/largeButton"
         />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/boarders"/>
 
     <Button
         android:id="@+id/save_template_button"

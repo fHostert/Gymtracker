@@ -89,7 +89,7 @@ public class StatsFragment extends Fragment {
         TextView totalWeightTV = view.findViewById(R.id.stats_total_weight_sum_text_view);
 
         workoutCountTV.setText(String.valueOf(DatabaseManager.getWorkoutCount()));
-        totalDurationTV.setText(Formatter.formatTime(DatabaseManager.getTotalDuration() / 1000));
+        totalDurationTV.setText(Formatter.formatTime(DatabaseManager.getTotalDuration()));
         totalWeightTV.setText(String.format("%s KG", Formatter.formatFloat(DatabaseManager.getTotalWeight())));
 
         return view;

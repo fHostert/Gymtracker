@@ -1,8 +1,9 @@
 package com.example.gymtracker.charts.datastructures;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ExerciseHistory {
+public class ExerciseHistory implements Serializable {
     private int ID;
     private String name;
     private ArrayList<ExerciseEntry> entries;

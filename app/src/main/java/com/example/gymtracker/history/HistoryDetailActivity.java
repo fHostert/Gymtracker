@@ -5,7 +5,9 @@ import androidx.fragment.app.FragmentContainerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 
@@ -35,15 +37,16 @@ public class HistoryDetailActivity extends AppCompatActivity {
         if (extras != null) {
             workout = (Workout) extras.getSerializable("WORKOUT");
         }
-        String title = workout.getDate() + " " + workout.getName();
+        String title = Formatter.formatDate(workout.getDate()) + " - " + workout.getName();
         this.setTitle(title);
 
         TableLayout container = findViewById(R.id.detail_view_container);
         for (Exercise exercise : workout.getExercises()) {
             for (Set set : exercise.getSets()) {
+                String personalRecord = (set.isPersonalRecord()) ? "\uD83C\uDFC6" : "";
                 String newLineString = String.format(l,
-                        "%s %d. %s %s: %s", Formatter.tendency(set.getTendency()),
-                        set.getIndex(), getString(R.string.set),
+                        "%s%s %d. %s %s: %s", personalRecord,
+                        Formatter.tendency(set.getTendency()), set.getIndex(), getString(R.string.set),
                         exercise.getName(), set.getSetString());
                 TextViewTableRowFragment newLine = TextViewTableRowFragment.
                         newInstance(newLineString, true);
@@ -53,6 +56,15 @@ public class HistoryDetailActivity extends AppCompatActivity {
                         .add(newContainer.getId(), newLine).commit();
                 container.addView(newContainer);
             }
+            View separator = new View(this);
+            int dimensionInDp =
+                    (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                3, getResources().getDisplayMetrics());
+            LinearLayout.LayoutParams lp= new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dimensionInDp);
+            separator.setLayoutParams(lp);
+            separator.setBackgroundColor(getColor(R.color.boarders));
+            container.addView(separator);
         }
+        container.removeViewAt(container.getChildCount() - 1);
     }
 }

@@ -66,6 +66,20 @@
             android:textSize="@dimen/large_text"
             android:layout_marginBottom="10dp"/>
 
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/exerciseHistory"
+            android:gravity="center"
+            android:textSize="@dimen/large_text"/>
+
+        <LinearLayout
+            android:id="@+id/exercise_history_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+        </LinearLayout>
+
     </LinearLayout>
 
 </ScrollView>

@@ -185,17 +185,17 @@ public final class DatabaseManager {
                 }
 
                 //isPR
-                String isPR = "FALSE";
+                int isPR = 0;
                 if (volumeSet == null || weightSet == null || volume > volumeSet.getVolume()
                         || resultSet.getFloat(1) > weightSet.getWeight()) {
-                    isPR = "TRUE";
+                    isPR = 1;
                     numberOfPRs++;
                 }
 
                 //insert into history
                 query = String.format(l, "INSERT INTO History " +
                                 "(workoutID, exerciseID, setIndex, reps, weight, tendency, isPR) " +
-                                "VALUES (%d, %d, %d, %d, '%s', %d, '%s');",
+                                "VALUES (%d, %d, %d, %d, '%s', %d, %d);",
                                 workoutID, currentExerciseID, i + 1, reps, weight, tendency, isPR);
                 db.execSQL(query);
 
@@ -370,7 +370,7 @@ public final class DatabaseManager {
     public static void createHistoryTable() {
         String query = "CREATE TABLE IF NOT EXISTS History(" +
                 "workoutID INT, exerciseID INT, setIndex INT, reps INT, weight REAL, " +
-                "tendency INT, isPR BOOLEAN);";
+                "tendency INT, isPR INT);";
         db.execSQL(query);
     }
 
@@ -464,7 +464,9 @@ public final class DatabaseManager {
                 for (int i = 0; i < resultSet.getCount(); i++) {
                     sets.add(new Set(i + 1, resultSet.getInt(0), resultSet.getFloat(1),
                             resultSet.getInt(2), resultSet.getInt(3) > 0));
+                    Log.d("isPR", String.valueOf(resultSet.getInt(3) > 0));
                     resultSet.moveToNext();
+
                 }
                 exercises.add(new Exercise(currentExerciseID, sets));
             }
