@@ -93,7 +93,7 @@ public final class DatabaseManager {
                 exerciseID);
         db.execSQL(query);
 
-        //update all exercises that are positioned before the deleted one
+        //update all exercises that are positioned after the deleted one
         query = String.format(l, "UPDATE CurrentWorkout SET position = position - 1 " +
                         "WHERE position > %d;",
                         oldPosition);
@@ -155,15 +155,16 @@ public final class DatabaseManager {
         if (isCurrentWorkoutEmpty()) {
             return false;
         }
-        createWorkoutsTable();
+
+        //Get metadata
         int workoutID = getNextWorkoutID();
         String workoutName = getCurrentWorkoutName();
-
         long duration = (System.currentTimeMillis() - getCurrentWorkoutStartTime()) / 1000;
         String currentDate = getCurrentWorkoutDate();
         float totalWeight = getTotalWeightOfCurrentWorkout();
+        int numberOfPRs = 0;
 
-        //Get exercise IDs
+        //Get distinct exercise IDs
         String query = "SELECT DISTINCT exerciseID FROM CurrentWorkout WHERE reps <> 0 " +
                         "ORDER BY position ASC;";
         Cursor rs = db.rawQuery(query, null);
@@ -175,16 +176,20 @@ public final class DatabaseManager {
             rs.moveToNext();
         }
 
-        int numberOfPRs = 0;
+        //Loop through exercises
         for (int currentExerciseID : exercisesIDs) {
-            query = String.format(l, "SELECT reps, weight FROM CurrentWorkout " +
+            //Get sets
+            query = String.format(l, "SELECT reps, weight, setIndex FROM CurrentWorkout " +
                             "WHERE exerciseID = %d AND reps <> 0 ORDER BY setIndex ASC;",
                             currentExerciseID);
             Cursor resultSet = db.rawQuery(query, null);
             resultSet.moveToFirst();
             Set volumeSet = getVolumePR(currentExerciseID);
             Set weightSet = getWeightPR(currentExerciseID);
-            //loop through sets and insert
+            float highestVolumeInCurrentWorkout = 0;
+            float highestWeightInCurrentWorkout = 0;
+
+            //Loop through sets and insert
             for (int i = 0; i < resultSet.getCount(); i++) {
                 int reps = resultSet.getInt(0);
                 String weight = Formatter.formatFloat(resultSet.getFloat(1));
@@ -200,9 +205,19 @@ public final class DatabaseManager {
                 }
 
                 //isPR
+                //Update records in current workout
+                if (volumeSet != null && highestVolumeInCurrentWorkout < volume) {
+                    highestVolumeInCurrentWorkout = volume;
+                }
+                if (weightSet != null && highestWeightInCurrentWorkout < resultSet.getFloat(1) ) {
+                    highestWeightInCurrentWorkout = resultSet.getFloat(1);
+                }
+
                 int isPR = 0;
                 if (volumeSet == null || weightSet == null || volume > volumeSet.getVolume()
-                        || resultSet.getFloat(1) > weightSet.getWeight()) {
+                        || resultSet.getFloat(1) > weightSet.getWeight() ||
+                        (volumeSet.isPR() & volumeSet.getIndex() == resultSet.getInt(2)) ||
+                        (weightSet.isPR() & weightSet.getIndex() == resultSet.getInt(2))) {
                     isPR = 1;
                     numberOfPRs++;
                 }
@@ -507,11 +522,44 @@ public final class DatabaseManager {
                 "WHERE exerciseID = %d ORDER BY (reps * weight) DESC LIMIT 1;", exerciseID);
         Cursor resultSet = db.rawQuery(query, null);
         resultSet.moveToFirst();
+
+        //save values from history to compare to values from currentWorkout
+        int setIndex;
+        int maxReps;
+        float maxWeight;
+        boolean isInCurrentWorkout = false;
         if (resultSet.getCount() == 0) {
+            resultSet.close();
+            setIndex = 0;
+            maxReps = 0;
+            maxWeight = 0;
+        }
+        else {
+            setIndex = resultSet.getInt(0);
+            maxReps = resultSet.getInt(1);
+            maxWeight = resultSet.getFloat(2);
+        }
+        query = String.format(l, "SELECT setIndex, reps, weight FROM CurrentWorkout " +
+                "WHERE exerciseID = %d ORDER BY (reps * weight) DESC LIMIT 1;", exerciseID);
+        resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+
+        //exercise was never done
+        if (resultSet.getCount() == 0 && setIndex == 0) {
             resultSet.close();
             return null;
         }
-        Set erg = new Set(resultSet.getInt(0), resultSet.getInt(1), resultSet.getFloat(2));
+
+        //Current workout has the best set
+        else if (resultSet.getCount() != 0 &&
+                resultSet.getInt(1) * resultSet.getFloat(2) > maxReps * maxWeight) {
+            setIndex = resultSet.getInt(0);
+            maxReps = resultSet.getInt(1);
+            maxWeight = resultSet.getFloat(2);
+            isInCurrentWorkout = true;
+        }
+
+        Set erg = new Set(setIndex, maxReps, maxWeight, isInCurrentWorkout);
         resultSet.close();
         return erg;
     }
@@ -521,11 +569,43 @@ public final class DatabaseManager {
                 "WHERE exerciseID = %d ORDER BY weight DESC LIMIT 1;", exerciseID);
         Cursor resultSet = db.rawQuery(query, null);
         resultSet.moveToFirst();
+
+        //save values from history to compare to values from currentWorkout
+        int setIndex;
+        int maxReps;
+        float maxWeight;
+        boolean isInCurrentWorkout = false;
         if (resultSet.getCount() == 0) {
+            resultSet.close();
+            setIndex = 0;
+            maxReps = 0;
+            maxWeight = 0;
+        }
+        else {
+            setIndex = resultSet.getInt(0);
+            maxReps = resultSet.getInt(1);
+            maxWeight = resultSet.getFloat(2);
+        }
+        query = String.format(l, "SELECT setIndex, reps, weight FROM CurrentWorkout " +
+                "WHERE exerciseID = %d ORDER BY weight DESC LIMIT 1;", exerciseID);
+        resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+
+        //exercise was never done
+        if (resultSet.getCount() == 0 && setIndex == 0) {
             resultSet.close();
             return null;
         }
-        Set erg = new Set(resultSet.getInt(0), resultSet.getInt(1), resultSet.getFloat(2));
+
+        //Current workout has the best set
+        else if (resultSet.getCount() != 0 && resultSet.getFloat(2) > maxWeight) {
+            setIndex = resultSet.getInt(0);
+            maxReps = resultSet.getInt(1);
+            maxWeight = resultSet.getFloat(2);
+            isInCurrentWorkout = true;
+        }
+
+        Set erg = new Set(setIndex, maxReps, maxWeight, isInCurrentWorkout);
         resultSet.close();
         return erg;
     }

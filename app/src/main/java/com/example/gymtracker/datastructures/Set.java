@@ -31,6 +31,14 @@ public class Set implements Serializable {
         this.tendency = 0;
     }
 
+    public Set(int index, int reps, float weight, boolean isPersonalRecord) {
+        this.index = index;
+        this.reps = reps;
+        this.weight = weight;
+        this.isPersonalRecord = isPersonalRecord;
+        this.tendency = 0;
+    }
+
     public Set(int index, int reps, float weight, int tendency, boolean isPersonalRecord) {
         this.index = index;
         this.reps = reps;
@@ -70,7 +78,7 @@ public class Set implements Serializable {
         return String.format(l, "%d × %skg", reps, Formatter.formatFloat(weight));
     }
 
-    public boolean isPersonalRecord() {
+    public boolean isPR() {
         return isPersonalRecord;
     }
 

@@ -3,7 +3,6 @@ package com.example.gymtracker.history;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentContainerView;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
@@ -14,10 +13,8 @@ import android.widget.TableLayout;
 import com.example.gymtracker.R;
 import com.example.gymtracker.TextViewTableRowFragment;
 import com.example.gymtracker.datastructures.Exercise;
-import com.example.gymtracker.datastructures.History;
 import com.example.gymtracker.datastructures.Set;
 import com.example.gymtracker.datastructures.Workout;
-import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.helper.Formatter;
 
 import java.util.Locale;
@@ -43,7 +40,7 @@ public class HistoryDetailActivity extends AppCompatActivity {
         TableLayout container = findViewById(R.id.detail_view_container);
         for (Exercise exercise : workout.getExercises()) {
             for (Set set : exercise.getSets()) {
-                String personalRecord = (set.isPersonalRecord()) ? "\uD83C\uDFC6" : "";
+                String personalRecord = (set.isPR()) ? "\uD83C\uDFC6" : "";
                 String newLineString = String.format(l,
                         "%s%s %d. %s %s: %s", personalRecord,
                         Formatter.tendency(set.getTendency()), set.getIndex(), getString(R.string.set),
