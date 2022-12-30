@@ -1,7 +1,6 @@
 package com.example.gymtracker.datastructures;
 
 import com.example.gymtracker.helper.DatabaseManager;
-import com.example.gymtracker.helper.Formatter;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -2,7 +2,7 @@ package com.example.gymtracker.charts.datastructures;
 
 public class WorkoutEntry {
     private int duration;
-    private String date;
+    private final String date;
 
     public WorkoutEntry(int duration, String date) {
         this.duration = duration;
@@ -20,6 +20,4 @@ public class WorkoutEntry {
     public void addToDuration(int duration) {
         this.duration += duration;
     }
-
-
 }

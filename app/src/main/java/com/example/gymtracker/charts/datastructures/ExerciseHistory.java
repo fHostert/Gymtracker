@@ -4,12 +4,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class ExerciseHistory implements Serializable {
-    private int ID;
-    private String name;
+    private final int ID;
+    private final String name;
     private ArrayList<ExerciseEntry> entries;
 
-    public ExerciseHistory(int id, String name, ArrayList<ExerciseEntry> entries) {
-        ID = id;
+    public ExerciseHistory(int ID, String name, ArrayList<ExerciseEntry> entries) {
+        this.ID = ID;
         this.name = name;
         this.entries = entries;
     }

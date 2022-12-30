@@ -310,6 +310,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this,
                             getResources().getString(R.string.exercisesMerged),
                             Toast.LENGTH_SHORT).show();
+                    reload();
                 });
                 //If cancel, return
                 newAlert.setNegativeButton(getResources().getString(R.string.no), (dialog, whichButton) -> {
@@ -323,6 +324,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this,
                         getResources().getString(R.string.exerciseRenamed),
                         Toast.LENGTH_SHORT).show();
+                reload();
             }
 
         });

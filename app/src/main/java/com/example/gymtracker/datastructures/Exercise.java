@@ -15,12 +15,6 @@ public class Exercise implements Serializable {
     private final String name;
     private ArrayList<Set> sets = new ArrayList<>();
 
-    public Exercise(int databaseIndex, ArrayList<Set> sets) {
-        this.databaseIndex = databaseIndex;
-        this.name = DatabaseManager.getExerciseName(databaseIndex);
-        this.sets = sets;
-    }
-
     public Exercise(int databaseIndex) {
         this.databaseIndex = databaseIndex;
         this.name = DatabaseManager.getExerciseName(databaseIndex);
@@ -29,20 +23,18 @@ public class Exercise implements Serializable {
         sets.add(new Set(3, 0, 0));
     }
 
+    public Exercise(int databaseIndex, ArrayList<Set> sets) {
+        this.databaseIndex = databaseIndex;
+        this.name = DatabaseManager.getExerciseName(databaseIndex);
+        this.sets = sets;
+    }
+
     public Exercise(int databaseIndex, int numberOfEmptySets) {
         this.databaseIndex = databaseIndex;
         this.name = DatabaseManager.getExerciseName(databaseIndex);
         for (int i = 0; i < numberOfEmptySets; i++) {
             sets.add(new Set(i + 1, 0, 0));
         }
-    }
-
-    public void addSet(Set set) {
-        sets.add(set);
-    }
-
-    public void deleteLastSet() {
-        sets.remove(sets.size() - 1);
     }
 
     public int getExerciseID() {
@@ -76,13 +68,5 @@ public class Exercise implements Serializable {
         }
         return String.format(l, "%d × %skg",
                 bestSet.getReps(), Formatter.formatFloat(bestSet.getWeight()));
-    }
-
-    public float getTotalWeight() {
-        float totalWeight = 0;
-        for (Set set : sets) {
-            totalWeight += set.getWeight();
-        }
-        return totalWeight;
     }
 }

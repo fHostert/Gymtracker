@@ -1,8 +1,5 @@
 package com.example.gymtracker.charts.datastructures;
 
-
-import android.util.Log;
-
 import com.example.gymtracker.datastructures.Set;
 
 import java.io.Serializable;
