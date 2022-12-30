@@ -178,6 +178,7 @@ public final class DatabaseManager {
 
         //Loop through exercises
         for (int currentExerciseID : exercisesIDs) {
+
             //Get sets
             query = String.format(l, "SELECT reps, weight, setIndex FROM CurrentWorkout " +
                             "WHERE exerciseID = %d AND reps <> 0 ORDER BY setIndex ASC;",
@@ -186,13 +187,12 @@ public final class DatabaseManager {
             resultSet.moveToFirst();
             Set volumeSet = getVolumePR(currentExerciseID);
             Set weightSet = getWeightPR(currentExerciseID);
-            float highestVolumeInCurrentWorkout = 0;
-            float highestWeightInCurrentWorkout = 0;
 
             //Loop through sets and insert
             for (int i = 0; i < resultSet.getCount(); i++) {
                 int reps = resultSet.getInt(0);
                 String weight = Formatter.formatFloat(resultSet.getFloat(1));
+
                 //tendency
                 int tendency = - 1;
                 Set lastSet = getLastSet(currentExerciseID, i + 1);
@@ -205,14 +205,6 @@ public final class DatabaseManager {
                 }
 
                 //isPR
-                //Update records in current workout
-                if (volumeSet != null && highestVolumeInCurrentWorkout < volume) {
-                    highestVolumeInCurrentWorkout = volume;
-                }
-                if (weightSet != null && highestWeightInCurrentWorkout < resultSet.getFloat(1) ) {
-                    highestWeightInCurrentWorkout = resultSet.getFloat(1);
-                }
-
                 int isPR = 0;
                 if (volumeSet == null || weightSet == null || volume > volumeSet.getVolume()
                         || resultSet.getFloat(1) > weightSet.getWeight() ||
@@ -228,11 +220,11 @@ public final class DatabaseManager {
                                 "VALUES (%d, %d, %d, %d, '%s', %d, %d);",
                                 workoutID, currentExerciseID, i + 1, reps, weight, tendency, isPR);
                 db.execSQL(query);
-
                 resultSet.moveToNext();
             }
         }
 
+        //Insert into workouts
         query = String.format(l, "INSERT INTO Workouts VALUES (%d, '%s', %d, '%s', '%s', %d)",
                         workoutID, workoutName, duration, currentDate,
                         Formatter.formatFloat(totalWeight), numberOfPRs);
