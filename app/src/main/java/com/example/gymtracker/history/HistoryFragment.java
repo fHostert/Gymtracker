@@ -1,7 +1,5 @@
 package com.example.gymtracker.history;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -13,16 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TableLayout;
 import android.widget.Toast;
 
 import com.example.gymtracker.R;
-import com.example.gymtracker.TextViewTableRowFragment;
-import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.History;
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
-import com.example.gymtracker.templates.AddTemplateActivity;
 
 public class HistoryFragment extends Fragment {
 

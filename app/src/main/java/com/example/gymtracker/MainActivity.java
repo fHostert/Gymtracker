@@ -65,7 +65,8 @@ public class MainActivity extends AppCompatActivity {
 
         //This Line fills the workout table with example data.
         //You can get advanced statistics for Bankdrücken
-        DatabaseManager.fillWorkoutsTable();
+        DatabaseManager.fillWorkoutsTable(100);
+        //DatabaseManager.dropAllTables();
 
         //Bottom Navigation View Setup
         BottomNavigationView navView = findViewById(R.id.nav_view);
