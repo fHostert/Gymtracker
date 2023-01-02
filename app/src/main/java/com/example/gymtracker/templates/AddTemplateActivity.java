@@ -74,7 +74,7 @@ public class AddTemplateActivity extends AppCompatActivity {
         exerciseContainer.addView(newContainer);
     }
 
-    public void saveTemplateClick(View view) {
+    private void saveTemplateClick(View view) {
         DatabaseManager.saveTemplate(name, exercises);
         setResult(RESULT_OK, new Intent());
         finish();

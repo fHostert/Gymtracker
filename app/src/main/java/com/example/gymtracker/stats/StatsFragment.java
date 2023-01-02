@@ -60,9 +60,10 @@ public class StatsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_stats, container, false);
+
+        //Refresh Chart on values changed
         daysToAverageOverET = view.findViewById(R.id.days_to_average_over_edit_text);
         daysToShowET = view.findViewById(R.id.days_to_show_edit_text);
-
         TextWatcher refreshChartTW = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
@@ -78,19 +79,23 @@ public class StatsFragment extends Fragment {
         daysToAverageOverET.addTextChangedListener(refreshChartTW);
         daysToShowET.addTextChangedListener(refreshChartTW);
 
+        //First Loading
         refreshDurationChart(view);
         styleChart(view);
 
+        //initialize Buttons
         Button statsForExerciseButton = view.findViewById(R.id.stats_for_exercise_button);
         statsForExerciseButton.setOnClickListener(view1 -> statsForExerciseClick());
 
+        //initialize TextViews
         TextView workoutCountTV = view.findViewById(R.id.stats_workout_sum_text_view);
         TextView totalDurationTV = view.findViewById(R.id.stats_duration_sum_text_view);
         TextView totalWeightTV = view.findViewById(R.id.stats_total_weight_sum_text_view);
 
         workoutCountTV.setText(String.valueOf(DatabaseManager.getWorkoutCount()));
         totalDurationTV.setText(Formatter.formatTime(DatabaseManager.getTotalDuration()));
-        totalWeightTV.setText(String.format("%s KG", Formatter.formatFloat(DatabaseManager.getTotalWeight())));
+        totalWeightTV.setText(String.format(
+                "%s KG", Formatter.formatFloat(DatabaseManager.getTotalWeight())));
 
         return view;
     }
@@ -124,12 +129,17 @@ public class StatsFragment extends Fragment {
     }
 
     private void refreshDurationChart(View view) {
+        //Get parameters
         String daysToShowString = String.valueOf(daysToShowET.getText());
         String daysToAverageOverString = String.valueOf(daysToAverageOverET.getText());
+        int daysToShow =
+                (daysToShowString.equals("") ? 0: Integer.parseInt(daysToShowString));
+        int daysToAverageOver =
+                (daysToAverageOverString.equals("") ? 0 : Integer.parseInt(daysToAverageOverString));
 
-        int daysToShow = (daysToShowString.equals("") ? 0: Integer.parseInt(daysToShowString));
-        int daysToAverageOver = (daysToAverageOverString.equals("") ? 0 : Integer.parseInt(daysToAverageOverString));
-        ArrayList<WorkoutEntry> history = DatabaseManager.getWorkoutEntries(daysToShow, daysToAverageOver);
+        //Get data
+        ArrayList<WorkoutEntry> history =
+                DatabaseManager.getWorkoutEntries(daysToShow, daysToAverageOver);
         if (history == null) {
             return;
         }

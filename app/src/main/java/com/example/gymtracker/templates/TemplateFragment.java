@@ -75,7 +75,7 @@ public class TemplateFragment extends Fragment {
             String today = new SimpleDateFormat("yyyy-MM-dd",
                     Locale.getDefault()).format(new Date());
             int dateDiff = Formatter.getDateDiff(lastDone.substring(0, 10), today);
-            String days = (dateDiff == 1) ? getString(R.string.day) : getString(R.string.days_);
+            String days = (dateDiff == 1) ? getString(R.string.day) : getString(R.string.daysPlural);
             String text = getString(R.string.lastDoneDays) + " " + dateDiff + " " + days;
             ((TextView) view.findViewById(R.id.template_last_done_text_view)).
                     setText(text);

@@ -141,9 +141,6 @@
         <item>Back Extensions</item>
     </string-array>
 
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="newExerciseCreated">Neue Übung erstellt</string>
     <string name="nameChanged">Namen geändert.</string>
     <string name="exerciseDeleted">Übung gelöscht</string>
@@ -163,9 +160,10 @@
     <string name="inTheLast">in den letzten</string>
     <string name="showForLast">Zeige Daten für die letzten</string>
     <string name="days.">Tagen.</string>
+    <string name="daysPlural">Tagen</string>
     <string name="day.">Tage.</string>
-    <string name="daysToAverageOverDefault">7</string>
-    <string name="daysToShowDefault">30</string>
+    <string name="daysToAverageOverDefault">1</string>
+    <string name="daysToShowDefault">7</string>
     <string name="trainingTimeInMinutes">Trainingszeit in Minuten:</string>
     <string name="volume">Gesamtvolumen</string>
     <string name="volumeAndMaxWeight">Volumen und Maximalgewicht</string>

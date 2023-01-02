@@ -50,6 +50,7 @@ public class StatsForExerciseActivity extends AppCompatActivity {
         }
         this.setTitle(exerciseName);
 
+        //style chart
         LineChart chart = findViewById(R.id.exercise_volume_chart);
         chart.getDescription().setEnabled(false);
         chart.setHighlightPerTapEnabled(false);
@@ -62,11 +63,11 @@ public class StatsForExerciseActivity extends AppCompatActivity {
         chart.getAxisLeft().setTextColor(getResources().getColor(R.color.boarders));
         chart.getAxisRight().setTextColor(getResources().getColor(R.color.red));
 
+        //Get data
         ExerciseHistory history = DatabaseManager.getExerciseHistory(exerciseName);
         if (history == null) {
             return;
         }
-
         chart.getXAxis().setValueFormatter(new DateFormatterXAxis());
         List<Entry> entriesVolume = new ArrayList<>();
         List<Entry> entriesWeight = new ArrayList<>();
@@ -101,6 +102,7 @@ public class StatsForExerciseActivity extends AppCompatActivity {
         //refresh
         chart.invalidate();
 
+        //Set textViews
         TextView bestWeightTV = findViewById(R.id.stats_best_weight_text_view);
         TextView bestVolumeTV =  findViewById(R.id.stats_best_volume_text_view);
         PersonalRecord weightPR = DatabaseManager.getPersonalRecordWeight(exerciseName);
@@ -128,8 +130,10 @@ public class StatsForExerciseActivity extends AppCompatActivity {
                     volumePR.getReps(),  getString(R.string.reps__));
         }
 
-        bestWeightTV.setText(String.format("%s am %s", bestWeight, Formatter.formatDate(weightPR.getDate())));
-        bestVolumeTV.setText(String.format("%s am %s", bestVolume, Formatter.formatDate(volumePR.getDate())));
+        bestWeightTV.setText(String.format(
+                "%s am %s", bestWeight, Formatter.formatDate(weightPR.getDate())));
+        bestVolumeTV.setText(String.format(
+                "%s am %s", bestVolume, Formatter.formatDate(volumePR.getDate())));
 
         LinearLayout historyContainer = findViewById(R.id.exercise_history_linear_layout);
         for (ExerciseEntry entry : history.getEntries()) {

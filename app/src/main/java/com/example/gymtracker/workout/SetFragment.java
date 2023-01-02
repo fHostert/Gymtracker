@@ -110,7 +110,7 @@ public class SetFragment extends Fragment {
                 getResources().getColor(R.color.setCompleted));
     }
 
-    public void saveSet() {
+    private void saveSet() {
         if (!DatabaseManager.arePreviousSetsDone(exerciseID, set.getIndex())){
             Toast.makeText(getContext(),
                     getResources().getString(R.string.toastFinishPreviousSetFirst),

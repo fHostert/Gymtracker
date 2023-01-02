@@ -91,7 +91,7 @@ public class ExerciseFragment extends Fragment {
         }
     }
 
-    public void addSet(Set set, View view, boolean addToCurrentWorkoutTable) {
+    private void addSet(Set set, View view, boolean addToCurrentWorkoutTable) {
         LinearLayout setContainer = view.findViewById(R.id.set_container);
         SetFragment setFragment = SetFragment.newInstance(set, exercise.getExerciseID());
         FragmentContainerView newContainer = new FragmentContainerView(getContext());
@@ -105,14 +105,14 @@ public class ExerciseFragment extends Fragment {
         }
     }
 
-    public void addEmptySet(boolean addToCurrentWorkoutTable) {
+    private void addEmptySet(boolean addToCurrentWorkoutTable) {
         LinearLayout setContainer = getView().findViewById(R.id.set_container);
         int setIndex = setContainer.getChildCount() + 1;
         Set set = new Set(setIndex);
         addSet(set, getView(), addToCurrentWorkoutTable);
     }
 
-    public void exerciseMenuClick() {
+    private void exerciseMenuClick() {
         ImageButton thisButton = getView().findViewById(R.id.exercise_menu_button);
         PopupMenu popup = new PopupMenu(getContext(), thisButton);
         popup.setOnMenuItemClickListener(menuItem -> {
@@ -139,7 +139,7 @@ public class ExerciseFragment extends Fragment {
         popup.show();
     }
 
-    public void moveExerciseUp() {
+    private void moveExerciseUp() {
         //Get the exercise container
         LinearLayout exerciseContainer = ((View) getView().getParent().getParent())
                 .findViewById(R.id.exercise_container);
@@ -164,7 +164,7 @@ public class ExerciseFragment extends Fragment {
         positionInWorkout--;
     }
 
-    public void moveExerciseDown() {
+    private void moveExerciseDown() {
         //Get the exercise container
         LinearLayout exerciseContainer = ((View) getView().getParent().getParent())
                 .findViewById(R.id.exercise_container);
@@ -189,7 +189,7 @@ public class ExerciseFragment extends Fragment {
         positionInWorkout++;
     }
 
-    public void removeExercise() {
+    private void removeExercise() {
         //Update Database
         DatabaseManager.deleteExerciseFromCurrentWorkout(exercise.getExerciseID());
 
@@ -202,7 +202,7 @@ public class ExerciseFragment extends Fragment {
                 Toast.LENGTH_SHORT).show();
     }
 
-    public void replaceExerciseClick() {
+    private void replaceExerciseClick() {
         final Intent intent = new Intent(getContext(), ChooseActivity.class);
         intent.putExtra("LIST", DatabaseManager.getExercises());
         intent.putExtra("REMOVE_LIST", new String[]{exercise.getName()});
@@ -210,7 +210,7 @@ public class ExerciseFragment extends Fragment {
         startActivityForResult(intent, 0);
     }
 
-    public void replace(String newExerciseName) {
+    private void replace(String newExerciseName) {
         //Update Database
         DatabaseManager.replaceExercise(exercise.getExerciseID(),
                 DatabaseManager.getExerciseID(newExerciseName));
@@ -230,7 +230,7 @@ public class ExerciseFragment extends Fragment {
         addEmptySet(false);
     }
 
-    public void deleteLastSet() {
+    private void deleteLastSet() {
         LinearLayout setContainer = getView().findViewById(R.id.set_container);
         setContainer.removeViewAt(setContainer.getChildCount() - 1);
         DatabaseManager.removeLastSet(exercise.getExerciseID(), setContainer.getChildCount());

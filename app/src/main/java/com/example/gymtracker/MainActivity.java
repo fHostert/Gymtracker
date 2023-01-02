@@ -15,6 +15,7 @@ import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -45,9 +46,6 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
-    //TODO Alles auf private
-    //TODO Database umbennennen
-
     WorkoutFragment globalWorkoutFragment;
     private final int notificationId = 69;
     boolean doubleBackToExitPressedOnce = false;
@@ -64,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
         DatabaseManager.createHistoryTable();
         DatabaseManager.createWorkoutsTable();
         DatabaseManager.createTemplatesTable();
+
+        //This Line fills the workout table with example data.
+        //You can get advanced statistics for Bankdrücken
+        DatabaseManager.fillWorkoutsTable();
 
         //Bottom Navigation View Setup
         BottomNavigationView navView = findViewById(R.id.nav_view);

@@ -25,6 +25,10 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 
+
+/*
+* The Database Schema can be found in the Documentation Folder.
+*/
 public final class DatabaseManager {
     private static SQLiteDatabase db;
     private static final Locale l = Locale.GERMAN;
@@ -167,14 +171,15 @@ public final class DatabaseManager {
         //Get distinct exercise IDs
         String query = "SELECT DISTINCT exerciseID FROM CurrentWorkout WHERE reps <> 0 " +
                         "ORDER BY position ASC;";
-        Cursor rs = db.rawQuery(query, null);
-        int numberOfExercises = rs.getCount();
+        Cursor resultSet = db.rawQuery(query, null);
+        int numberOfExercises = resultSet.getCount();
         int[] exercisesIDs = new int[numberOfExercises];
-        rs.moveToFirst();
+        resultSet.moveToFirst();
         for (int i = 0; i < numberOfExercises; i++) {
-            exercisesIDs[i] = rs.getInt(0);
-            rs.moveToNext();
+            exercisesIDs[i] = resultSet.getInt(0);
+            resultSet.moveToNext();
         }
+        resultSet.close();
 
         //Loop through exercises
         for (int currentExerciseID : exercisesIDs) {
@@ -183,10 +188,12 @@ public final class DatabaseManager {
             query = String.format(l, "SELECT reps, weight, setIndex FROM CurrentWorkout " +
                             "WHERE exerciseID = %d AND reps <> 0 ORDER BY setIndex ASC;",
                             currentExerciseID);
-            Cursor resultSet = db.rawQuery(query, null);
+            resultSet = db.rawQuery(query, null);
             resultSet.moveToFirst();
-            Set volumeSet = getVolumePR(currentExerciseID);
-            Set weightSet = getWeightPR(currentExerciseID);
+
+            //Current personal records, including the current workout
+            Set volumeSet = getVolumePRSet(currentExerciseID);
+            Set weightSet = getWeightPRSet(currentExerciseID);
 
             //Loop through sets and insert
             for (int i = 0; i < resultSet.getCount(); i++) {
@@ -222,6 +229,7 @@ public final class DatabaseManager {
                 db.execSQL(query);
                 resultSet.moveToNext();
             }
+            resultSet.close();
         }
 
         //Insert into workouts
@@ -335,7 +343,7 @@ public final class DatabaseManager {
         return name;
     }
 
-    public static long getCurrentWorkoutStartTime() {
+    private static long getCurrentWorkoutStartTime() {
         String query = "SELECT startTime FROM CurrentWorkoutMetadata;";
         Cursor rs = db.rawQuery(query, null);
         rs.moveToFirst();
@@ -344,7 +352,7 @@ public final class DatabaseManager {
         return startTime;
     }
 
-    public static String getCurrentWorkoutDate() {
+    private static String getCurrentWorkoutDate() {
         String query = "SELECT date FROM CurrentWorkoutMetadata;";
         Cursor rs = db.rawQuery(query, null);
         rs.moveToFirst();
@@ -375,14 +383,15 @@ public final class DatabaseManager {
         String query = String.format(l, "SELECT DISTINCT ID FROM Workouts, History " +
                     "WHERE Workouts.ID = History.workoutID AND exerciseID = %d " +
                     "ORDER BY DATE DESC;", exerciseID);
-        Cursor rs = db.rawQuery(query, null);
-        int numberOfIDs = rs.getCount();
+        Cursor resultSet = db.rawQuery(query, null);
+        int numberOfIDs = resultSet.getCount();
         int[] IDs = new int[numberOfIDs];
-        rs.moveToFirst();
+        resultSet.moveToFirst();
         for (int i = 0; i < numberOfIDs; i++) {
-            IDs[i] = rs.getInt(0);
-            rs.moveToNext();
+            IDs[i] = resultSet.getInt(0);
+            resultSet.moveToNext();
         }
+        resultSet.close();
         return IDs;
     }
 
@@ -413,7 +422,7 @@ public final class DatabaseManager {
         }
         int workoutIdOfLastWorkout = resultSet.getInt(0);
 
-
+        //get last set
         query = String.format(l,
                 "SELECT reps, weight, ID FROM History, Workouts " +
                         "WHERE History.workoutID = Workouts.ID " +
@@ -433,7 +442,7 @@ public final class DatabaseManager {
         return erg;
     }
 
-    public static void deleteFromHistory(int ID) {
+    public static void deleteWorkoutFromHistory(int ID) {
         String query = String.format(l, "DELETE FROM History WHERE workoutID = %d", ID);
         db.execSQL(query);
 
@@ -469,6 +478,7 @@ public final class DatabaseManager {
                 exerciseIDs[i] = resultSet.getInt(0);
                 resultSet.moveToNext();
             }
+            resultSet.close();
 
             //Fill exercise objects for current workout
             ArrayList<Exercise> exercises = new ArrayList<>();
@@ -509,7 +519,7 @@ public final class DatabaseManager {
         return new History(workouts);
     }
 
-    public static Set getVolumePR(int exerciseID) {
+    private static Set getVolumePRSet(int exerciseID) {
         String query = String.format(l, "SELECT setIndex, reps, weight FROM History " +
                 "WHERE exerciseID = %d ORDER BY (reps * weight) DESC LIMIT 1;", exerciseID);
         Cursor resultSet = db.rawQuery(query, null);
@@ -556,7 +566,7 @@ public final class DatabaseManager {
         return erg;
     }
 
-    public static Set getWeightPR(int exerciseID) {
+    private static Set getWeightPRSet(int exerciseID) {
         String query = String.format(l, "SELECT setIndex, reps, weight FROM History " +
                 "WHERE exerciseID = %d ORDER BY weight DESC LIMIT 1;", exerciseID);
         Cursor resultSet = db.rawQuery(query, null);
@@ -612,9 +622,12 @@ public final class DatabaseManager {
     }
 
     public static void loadTemplate(String templateName) {
+        //start workout
         createCurrentWorkoutMetadataTable();
         createCurrentWorkoutTable();
         setCurrentWorkoutMetadata(templateName);
+
+        //insert all sets from template into current workout
         int position = 1;
         for (Exercise exercise : getExercisesInTemplate(templateName)) {
             for (int i = 0; i < exercise.getSets().size(); i++) {
@@ -652,6 +665,7 @@ public final class DatabaseManager {
     }
 
     public static ArrayList<Workout> getTemplates() {
+        //get distinct names
         String query = "SELECT DISTINCT name FROM Templates";
         Cursor resultSet = db.rawQuery(query, null);
         String[] names = new String[resultSet.getCount()];
@@ -660,6 +674,8 @@ public final class DatabaseManager {
             names[i] = resultSet.getString(0);
             resultSet.moveToNext();
         }
+
+        //fill workouts
         ArrayList<Workout> workouts = new ArrayList<>();
         for (String name : names) {
             query = String.format("SELECT exerciseID, numberOfSets FROM Templates " +
@@ -780,6 +796,7 @@ public final class DatabaseManager {
                     resultSet.getInt(0));
             db.execSQL(query);
         }
+        resultSet.close();
 
         query = String.format(l, "DELETE FROM History WHERE exerciseID = %d;", exerciseID);
         db.execSQL(query);
@@ -794,7 +811,6 @@ public final class DatabaseManager {
 
     public static void mergeExercises(String nameOfMainExercise, String nameOfOldExercise) {
         //TODO Handle the setIndexes when both exercises are in the same workout
-        //TODO Templates
         int newID = getExerciseID(nameOfMainExercise);
         int oldID = getExerciseID(nameOfOldExercise);
         String query = String.format(l, "UPDATE History SET exerciseID = %d " +
@@ -865,19 +881,20 @@ public final class DatabaseManager {
     ##############################################STATS#############################################
     ##############################################################################################*/
     public static ArrayList<WorkoutEntry> getWorkoutEntries(int daysToShow, int daysToAverageOver) {
+        //Create an empty array for every day back to daysToShow + daysToAverageOver before today
         WorkoutEntry[] durationPerDay = new WorkoutEntry[daysToShow + daysToAverageOver];
         String today = String.valueOf(LocalDate.now());
         for (int i = 0; i < durationPerDay.length; i++) {
             durationPerDay[i] = new WorkoutEntry(0, String.valueOf(LocalDate.now().minusDays(i)));
         }
 
+        //add duration for each day in the array
         String query = "SELECT duration, date FROM Workouts ORDER BY date DESC";
         Cursor resultSet = db.rawQuery(query, null);
         if (resultSet.getCount() == 0) {
             return null;
         }
         resultSet.moveToFirst();
-
         do {
             String date = resultSet.getString(1).substring(0, 10);
             int dateDiffInDays = Formatter.getDateDiff(date, today);
@@ -889,16 +906,19 @@ public final class DatabaseManager {
         while (resultSet.moveToNext());
         resultSet.close();
 
-        ArrayList<WorkoutEntry> entries = new ArrayList<>();
-
+        //duration of the first day
         int duration = 0;
         for (int i = 0; i < daysToAverageOver; i++){
            duration += durationPerDay[i].getDuration();
         }
 
+        //add duration for each day
+        ArrayList<WorkoutEntry> entries = new ArrayList<>();
         for (int i = 0; i < daysToShow; i++){
             String currentDate = String.valueOf(LocalDate.now().minusDays(i));
             entries.add(new WorkoutEntry(duration, currentDate));
+
+            //update duration for the next day
             duration -= durationPerDay[i].getDuration();
             duration += durationPerDay[i + daysToAverageOver].getDuration();
         }
@@ -1067,25 +1087,32 @@ public final class DatabaseManager {
     }
 
     public static void fillWorkoutsTable() {
+        String query = String.format(
+                "SELECT * FROM workouts");
+        Cursor rs = db.rawQuery (query, null);
+        if (rs.getCount() > 10) {
+            return;
+        }
+        String workoutName = "Autogenerated";
+        float totalWeight = 0;
+        int numberOfPRs = 0;
         for (int i = 0; i < 366; i++) {
             int workoutID = getNextWorkoutID();
-            String workoutName = "Autogenerated workout";
-            float totalWeight = 0;
-            int numberOfPRs = 0;
-            Log.d("SOSOSOSO", String.valueOf(LocalDate.now().minusDays(i)));
 
-            //String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
-            //        Locale.getDefault()).format(LocalDate.now().minusDays(i));
             String date = LocalDate.now().minusDays(i) + " 00:00:00";
-            int duration = ThreadLocalRandom.current().nextInt(1800, 5400);
+            int duration = ThreadLocalRandom.current().nextInt(3000, 4800);
 
-            String query = String.format(l, "INSERT INTO Workouts VALUES (%d, '%s', %d, '%s', '%s', %d)",
+            query = String.format(l, "INSERT INTO Workouts VALUES (%d, '%s', %d, '%s', '%s', %d)",
                     workoutID, workoutName, duration, date,
                     Formatter.formatFloat(totalWeight), numberOfPRs);
             db.execSQL(query);
+            for (int j = 1; j < 4; j++) {
+                float weight = ThreadLocalRandom.current().nextInt(75, 85);
+                int reps = ThreadLocalRandom.current().nextInt(8, 14);
+                query = String.format(l, "INSERT INTO History VALUES (%d, 1, %d, %d, %s, 0, 0)",
+                        workoutID, j, reps, Formatter.formatFloat(weight));
+                db.execSQL(query);
+            }
         }
-
-
     }
-
 }

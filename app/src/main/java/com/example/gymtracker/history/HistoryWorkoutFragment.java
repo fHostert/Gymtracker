@@ -55,6 +55,7 @@ public class HistoryWorkoutFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_history_workout, container, false);
 
+        //fill exercises
         TableLayout historyTableLayout = view.findViewById(R.id.workout_history_table_layout);
         for (Exercise exercise : workout.getExercises()) {
             String exercisePara = String.format(
@@ -67,6 +68,8 @@ public class HistoryWorkoutFragment extends Fragment {
                     .add(newContainer.getId(), historyRowFragment).commit();
             historyTableLayout.addView(newContainer);
         }
+
+        //fill other fields
         ((TextView) view.findViewById(R.id.workout_name_text_view)).
                 setText(workout.getName());
         ((TextView) view.findViewById(R.id.workout_date_text_view)).
@@ -88,7 +91,7 @@ public class HistoryWorkoutFragment extends Fragment {
 
             //If ok, delete workout and hide this fragment
             alert.setPositiveButton("ok", (dialogInterface, i) -> {
-                DatabaseManager.deleteFromHistory(workout.getID());
+                DatabaseManager.deleteWorkoutFromHistory(workout.getID());
                 Fragment thisFragment = getParentFragmentManager().
                         findFragmentByTag("HISTORY_WORKOUT" + workout.getID());
                 getParentFragmentManager().beginTransaction().remove(thisFragment).commit();

@@ -80,7 +80,7 @@ public class WorkoutFragment extends Fragment {
         }
     }
 
-    public void addExerciseClick() {
+    private void addExerciseClick() {
         final Intent intent = new Intent(getContext(), ChooseActivity.class);
         String[] exercisesInWorkout = workout.getExerciseNames();
         intent.putExtra("LIST", DatabaseManager.getExercises());
