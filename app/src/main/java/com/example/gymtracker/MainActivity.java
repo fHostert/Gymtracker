@@ -22,6 +22,7 @@ import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -58,19 +59,21 @@ public class MainActivity extends AppCompatActivity {
         //Setup database
         SQLiteDatabase db = openOrCreateDatabase("Gymtracker", MODE_PRIVATE,null);
         DatabaseManager.initialize(db);
-
-        //This Line fills the workout table with example data.
-        //You can get advanced statistics for Bankdrücken
-        //DatabaseManager.dropAllTables();
-
-
-
         DatabaseManager.createExercisesTable(getResources().getStringArray(R.array.exercises));
         DatabaseManager.createHistoryTable();
         DatabaseManager.createWorkoutsTable();
         DatabaseManager.createTemplatesTable();
 
+
+        //DIE NÄCHSTE ZEILE KANN AUSKOMMENTIERT WERDEN, UM FÜR DIE LETZTEN 100 TAGE FAKE WORKOUTS
+        //IN DIE DATENBANK EINZUTRAGEN. DIE ÜBUNG BANKDRÜCKEN WIRD JEWEILS DURCHGEFÜHRT.
+        //SO KÖNNEN DIE STATISTIKEN GETESTET WERDEN
+
         //DatabaseManager.fillWorkoutsTable(100);
+
+        //DIE NÄCHSTE ZEILE LÖSCHT DIE FAKE WORKOUTS WIEDER AUS DER DATENBANK.
+
+        //DatabaseManager.deleteFakeEntries();
 
 
         //Bottom Navigation View Setup
@@ -194,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
             createNewTemplate();
         }
         else if (id == R.id.import_data_menu) {
-            importDatabase();
+            importDatabaseClick();
         }
         else if (id == R.id.export_data_menu) {
             exportDatabase();
@@ -213,9 +216,13 @@ public class MainActivity extends AppCompatActivity {
         else if (resultCode == RESULT_OK && requestCode == 1) {
             renameExercise(data.getExtras().getString("ITEM"));
         }
-        //create New template
+        //create new template
         else if (resultCode == RESULT_OK && requestCode == 2) {
             reload();
+        }
+        //import database
+        else if (resultCode == RESULT_OK && requestCode == 3) {
+            importDatabase(data.getData());
         }
     }
 
@@ -403,17 +410,18 @@ public class MainActivity extends AppCompatActivity {
 
         //If ok, continue
         alert.setPositiveButton(getResources().getString(R.string.ok), (dialogInterface, i) -> {
-            if (DatabaseManager.exportDatabase(this.getDatabasePath("Gymtracker").getAbsolutePath())) {
+            String exportPath = " " + DatabaseManager.exportDatabase(
+                    this.getDatabasePath("Gymtracker").getAbsolutePath());
+            if (!exportPath.equals(" ")) {
                 Toast.makeText(this,
-                        getResources().getString(R.string.toastExportSuccess),
-                        Toast.LENGTH_SHORT).show();
+                        getResources().getString(R.string.toastExportSuccess) + exportPath,
+                        Toast.LENGTH_LONG).show();
             }
             else {
                 Toast.makeText(this,
                         getResources().getString(R.string.toastExportFail),
                         Toast.LENGTH_SHORT).show();
             }
-
 
         });
         //If cancel, return
@@ -423,34 +431,41 @@ public class MainActivity extends AppCompatActivity {
         alert.show();
     }
 
-    private void importDatabase() {
+    private void importDatabaseClick() {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setMessage(getResources().getString(R.string.importDataText));
         alert.setTitle(getResources().getString(R.string.importData));
 
         //If ok, continue
         alert.setPositiveButton(getResources().getString(R.string.ok), (dialogInterface, i) -> {
-            if (DatabaseManager.importDatabase(this.getDatabasePath("Gymtracker").getAbsolutePath())) {
-                Toast.makeText(this,
-                        getResources().getString(R.string.toastImportSuccess),
-                        Toast.LENGTH_SHORT).show();
-                reload();
-                ((HistoryFragment) getSupportFragmentManager().
-                        findFragmentByTag("history_fragment")).reload();
-            }
-            else {
-                Toast.makeText(this,
-                        getResources().getString(R.string.toastImportFail),
-                        Toast.LENGTH_SHORT).show();
-            }
+            Intent intent = new Intent()
+                    .setType("*/*")
+                    .setAction(Intent.ACTION_GET_CONTENT);
 
-
+            startActivityForResult(Intent.createChooser(intent, "Select a file"), 3);
         });
         //If cancel, return
         alert.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
         });
 
         alert.show();
+    }
+
+    private void importDatabase(Uri uri) {
+        if (DatabaseManager.importDatabase(
+                this.getDatabasePath("Gymtracker").getAbsolutePath(), uri)) {
+            Toast.makeText(this,
+                    getResources().getString(R.string.toastImportSuccess),
+                    Toast.LENGTH_SHORT).show();
+            reload();
+            ((HistoryFragment) getSupportFragmentManager().
+                    findFragmentByTag("history_fragment")).reload();
+        }
+        else {
+            Toast.makeText(this,
+                    getResources().getString(R.string.toastImportFail),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     /*##############################################################################################

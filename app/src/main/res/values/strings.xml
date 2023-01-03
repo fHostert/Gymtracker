@@ -177,10 +177,10 @@
     <string name="detailView">Detailansicht</string>
     <string name="exerciseHistory">Übungsverlauf:</string>
     <string name="lastDoneDays">Zuletzt vor</string>
-    <string name="importDataText">Um fortzufahren, muss sich in dem Download Ordner ihres Geräts eine Datei mit dem Namen \"GymtrackerExport.db\" befinden. Diese Datei wird durch Auswählen von OK geladen. Die alte Datenbank wird gelöscht. Alle bisherigen Verläufe und Statistiken gehen verloren. Dieser Vorgang kann NICHT rückgängig gemacht werden.</string>
+    <string name="importDataText">Nach Auswahl von OK können Sie eine Datenbank-Datei auswählen, die geladen werden soll. Die alte Datenbank wird dabei überschrieben und gelöscht. Laden von unpassenden Dateien wird zu Fehlern führen. Dieser Vorgang kann NICHT rückgängig gemacht werden.</string>
     <string name="toastImportSuccess">Datenbank erfolgreich geladen.</string>
     <string name="toastImportFail">Die Datei konnte nicht geladen werden. Sicherstellen, dass sich die Datei am korrekten Ort befindet.</string>
-    <string name="toastExportSuccess">Die Datenbank wurde erfolgreich exportiert.</string>
+    <string name="toastExportSuccess">Die Datenbank wurde erfolgreich exportiert:</string>
     <string name="toastExportFail">Die Datenbank konnte nicht exportiert werden.</string>
     <string name="exportDataText">Durch Auswählen von OK wird der aktuelle Stand der Datenbank, inklusive Verlauf, Vorlagen, Übungen und Workouts in den Download Ordner ihres Gerätes exportiert. Dateien dieser Form können über die Import-Funktion geladen werden.</string>
 
