@@ -10,6 +10,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
@@ -101,7 +102,7 @@ public class ExerciseFragment extends Fragment {
         setContainer.addView(newContainer);
 
         if (addToCurrentWorkoutTable) {
-            DatabaseManager.insertSetIntoCurrentWorkout(exercise.getExerciseID(), set);
+            DatabaseManager.addSetToExerciseInCurrentWorkout(exercise.getExerciseID(), set);
         }
     }
 
@@ -160,6 +161,14 @@ public class ExerciseFragment extends Fragment {
         exerciseContainer.removeViewAt(positionInWorkout);
         exerciseContainer.addView(thisExercise, positionInWorkout - 1);
 
+        //Update positionInWorkout of other exercise
+        String nameOfAboveExercise = (String) ((TextView)
+                exerciseContainer.getChildAt(positionInWorkout).
+                        findViewById(R.id.name_of_exercise_text_view)).getText();
+        ((ExerciseFragment) getParentFragmentManager()
+                .findFragmentByTag("EXERCISE" + nameOfAboveExercise))
+                .addToPositionInWorkout(1);
+
         //Update position
         positionInWorkout--;
     }
@@ -185,6 +194,14 @@ public class ExerciseFragment extends Fragment {
         exerciseContainer.removeViewAt(positionInWorkout);
         exerciseContainer.addView(thisExercise, positionInWorkout + 1);
 
+        //Update positionInWorkout of other exercise
+        String nameOfBelowExercise = (String) ((TextView)
+                exerciseContainer.getChildAt(positionInWorkout).
+                        findViewById(R.id.name_of_exercise_text_view)).getText();
+        ((ExerciseFragment) getParentFragmentManager()
+                .findFragmentByTag("EXERCISE" + nameOfBelowExercise))
+                .addToPositionInWorkout(-1);
+
         //Update position
         positionInWorkout++;
     }
@@ -193,10 +210,13 @@ public class ExerciseFragment extends Fragment {
         //Update Database
         DatabaseManager.deleteExerciseFromCurrentWorkout(exercise.getExerciseID());
 
-        //Find exerciseFragment by unique tag and remove it
-        Fragment thisFragment = getParentFragmentManager().
-                findFragmentByTag("EXERCISE" + exercise.getName());
-        getParentFragmentManager().beginTransaction().remove(thisFragment).commit();
+        //Get the exercise container
+        LinearLayout exerciseContainer = ((View) getView().getParent().getParent())
+                .findViewById(R.id.exercise_container);
+        //Delete the exercise
+        exerciseContainer.removeViewAt(positionInWorkout);
+
+
         Toast.makeText(getContext(),
                 getResources().getString(R.string.exerciseRemoved),
                 Toast.LENGTH_SHORT).show();
@@ -234,5 +254,9 @@ public class ExerciseFragment extends Fragment {
         LinearLayout setContainer = getView().findViewById(R.id.set_container);
         setContainer.removeViewAt(setContainer.getChildCount() - 1);
         DatabaseManager.removeLastSet(exercise.getExerciseID(), setContainer.getChildCount());
+    }
+
+    public void addToPositionInWorkout(int difference) {
+        positionInWorkout += difference;
     }
 }

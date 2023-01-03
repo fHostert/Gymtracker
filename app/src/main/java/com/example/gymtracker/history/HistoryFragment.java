@@ -54,12 +54,13 @@ public class HistoryFragment extends Fragment {
         return view;
     }
 
-    public void initialize(View view){
+    private void initialize(View view){
         if (isInitialized) {
             return;
         }
         History history = DatabaseManager.getHistory(howManyWorkoutsToLoad, 0);
         LinearLayout historyLinearLayout = view.findViewById(R.id.history_linear_layout);
+        historyLinearLayout.removeAllViews();
         for (Workout workout : history.getWorkouts()) {
             HistoryWorkoutFragment historyWorkoutFragment = HistoryWorkoutFragment.newInstance(workout);
             FragmentContainerView newContainer = new FragmentContainerView(getContext());

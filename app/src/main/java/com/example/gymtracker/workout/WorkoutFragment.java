@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,9 +94,9 @@ public class WorkoutFragment extends Fragment {
         LinearLayout exerciseContainer = view.findViewById(R.id.exercise_container);
 
         //The position in the layout of the new exercise
-        int position = exerciseContainer.getChildCount();
+        int positionInLayout = exerciseContainer.getChildCount();
 
-        ExerciseFragment exerciseFragment = ExerciseFragment.newInstance(exercise, position);
+        ExerciseFragment exerciseFragment = ExerciseFragment.newInstance(exercise, positionInLayout);
         FragmentContainerView newContainer = new FragmentContainerView(getContext());
         newContainer.setId(View.generateViewId());
 

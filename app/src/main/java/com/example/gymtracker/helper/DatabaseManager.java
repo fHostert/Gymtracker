@@ -3,7 +3,6 @@ package com.example.gymtracker.helper;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
-import android.util.Log;
 
 import com.example.gymtracker.charts.datastructures.ExerciseEntry;
 import com.example.gymtracker.charts.datastructures.ExerciseHistory;
@@ -49,9 +48,7 @@ public final class DatabaseManager {
         db.execSQL(query);
     }
 
-    /**
-     * Called from workout fragment, where position of exercise is known.
-     */
+
     public static void insertSetIntoCurrentWorkout(int exerciseID, int position, Set set) {
         String query = String.format(l, "INSERT INTO CurrentWorkout VALUES " +
                         "(%d, %d, %d, %d, '%s')",
@@ -60,10 +57,7 @@ public final class DatabaseManager {
         db.execSQL(query);
     }
 
-    /**
-     * Called from exercise fragment, where position of exercise is not known.
-     */
-    public static void insertSetIntoCurrentWorkout(int exerciseID, Set set) {
+    public static void addSetToExerciseInCurrentWorkout(int exerciseID, Set set) {
         String query = String.format(l, "SELECT position FROM CurrentWorkout " +
                         "WHERE exerciseID = %d;", exerciseID);
         Cursor rs = db.rawQuery(query, null);

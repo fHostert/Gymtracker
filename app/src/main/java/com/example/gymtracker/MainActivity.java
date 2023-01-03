@@ -58,15 +58,20 @@ public class MainActivity extends AppCompatActivity {
         //Setup database
         SQLiteDatabase db = openOrCreateDatabase("Gymtracker", MODE_PRIVATE,null);
         DatabaseManager.initialize(db);
+
+        //This Line fills the workout table with example data.
+        //You can get advanced statistics for Bankdrücken
+        //DatabaseManager.dropAllTables();
+
+
+
         DatabaseManager.createExercisesTable(getResources().getStringArray(R.array.exercises));
         DatabaseManager.createHistoryTable();
         DatabaseManager.createWorkoutsTable();
         DatabaseManager.createTemplatesTable();
 
-        //This Line fills the workout table with example data.
-        //You can get advanced statistics for Bankdrücken
-        DatabaseManager.fillWorkoutsTable(100);
-        //DatabaseManager.dropAllTables();
+        //DatabaseManager.fillWorkoutsTable(100);
+
 
         //Bottom Navigation View Setup
         BottomNavigationView navView = findViewById(R.id.nav_view);
@@ -430,6 +435,8 @@ public class MainActivity extends AppCompatActivity {
                         getResources().getString(R.string.toastImportSuccess),
                         Toast.LENGTH_SHORT).show();
                 reload();
+                ((HistoryFragment) getSupportFragmentManager().
+                        findFragmentByTag("history_fragment")).reload();
             }
             else {
                 Toast.makeText(this,
@@ -573,7 +580,7 @@ public class MainActivity extends AppCompatActivity {
         notificationManager.createNotificationChannel(channel);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+                new Intent(this, MainActivity.class), PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this, "69")
