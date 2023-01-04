@@ -118,6 +118,9 @@ public class HistoryFragment extends Fragment {
         }
     }
 
+    /**
+     * Click on Button
+     */
     private void loadMoreHistory() {
         LinearLayout historyLinearLayout = getView().findViewById(R.id.history_linear_layout);
         int alreadyLoaded = historyLinearLayout.getChildCount();

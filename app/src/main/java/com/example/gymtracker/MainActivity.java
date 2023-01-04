@@ -47,7 +47,7 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
-    WorkoutFragment globalWorkoutFragment;
+
     private final int notificationId = 69;
     boolean doubleBackToExitPressedOnce = false;
 
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         DatabaseManager.createTemplatesTable();
 
 
-        //DIE NÄCHSTE ZEILE KANN AUSKOMMENTIERT WERDEN, UM FÜR DIE LETZTEN 100 TAGE FAKE WORKOUTS
+        //DIE NÄCHSTE ZEILE KANN EINKOMMENTIERT WERDEN, UM FÜR DIE LETZTEN 100 TAGE FAKE WORKOUTS
         //IN DIE DATENBANK EINZUTRAGEN. DIE ÜBUNG BANKDRÜCKEN WIRD JEWEILS DURCHGEFÜHRT.
         //SO KÖNNEN DIE STATISTIKEN GETESTET WERDEN
 
@@ -240,7 +240,6 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.home_container, workoutFragment).commit();
             getSupportFragmentManager().executePendingTransactions();
-            globalWorkoutFragment = workoutFragment;
             this.setTitle(DatabaseManager.getCurrentWorkoutName());
             startWorkout();
         }
@@ -250,9 +249,9 @@ public class MainActivity extends AppCompatActivity {
     ##########################################HOME BUTTONS##########################################
     ##############################################################################################*/
     public void startEmptyWorkoutClick(View view) {
-        globalWorkoutFragment = new WorkoutFragment();
+        WorkoutFragment newWorkout = new WorkoutFragment();
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.home_container, globalWorkoutFragment).commit();
+                .replace(R.id.home_container, newWorkout).commit();
         DatabaseManager.createCurrentWorkoutTable();
         DatabaseManager.createCurrentWorkoutMetadataTable();
         DatabaseManager.setCurrentWorkoutMetadata(
@@ -454,6 +453,7 @@ public class MainActivity extends AppCompatActivity {
     private void importDatabase(Uri uri) {
         if (DatabaseManager.importDatabase(
                 this.getDatabasePath("Gymtracker").getAbsolutePath(), uri)) {
+            //TODO check if database is valid and load backup if not
             Toast.makeText(this,
                     getResources().getString(R.string.toastImportSuccess),
                     Toast.LENGTH_SHORT).show();

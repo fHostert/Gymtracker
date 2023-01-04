@@ -1047,6 +1047,7 @@ public final class DatabaseManager {
     }
 
     public static boolean importDatabase(String databasePath, Uri uri) {
+        //TODO basic check if valid file was chosen
         try {
             File download = Environment
                     .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);

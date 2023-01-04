@@ -39,6 +39,8 @@ public class StatsForExerciseActivity extends AppCompatActivity {
 
     private static final Locale l = Locale.GERMAN;
 
+    //TODO Button to load more entries, like history
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
