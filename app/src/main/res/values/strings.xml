@@ -183,5 +183,8 @@
     <string name="toastExportSuccess">Die Datenbank wurde erfolgreich exportiert:</string>
     <string name="toastExportFail">Die Datenbank konnte nicht exportiert werden.</string>
     <string name="exportDataText">Durch Auswählen von OK wird der aktuelle Stand der Datenbank, inklusive Verlauf, Vorlagen, Übungen und Workouts in den Download Ordner ihres Gerätes exportiert. Dateien dieser Form können über die Import-Funktion geladen werden.</string>
+    <string name="workoutSaved">Workout gespeichert</string>
+    <string name="workoutDeleted">Workout verworfen</string>
+    <string name="noExerciseInTemplate">Erst mindestens eine Übung hinzufügen.</string>
 
 </resources>

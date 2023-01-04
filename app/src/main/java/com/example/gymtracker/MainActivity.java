@@ -481,6 +481,9 @@ public class MainActivity extends AppCompatActivity {
             DatabaseManager.dropTable("CurrentWorkout");
             DatabaseManager.dropTable("CurrentWorkoutMetadata");
             stopWorkout();
+            Toast.makeText(this,
+                    getResources().getString(R.string.workoutDeleted),
+                    Toast.LENGTH_SHORT).show();
         });
         //If cancel, return
         alert.setNegativeButton(getResources().getString(R.string.no), (dialog, whichButton) -> {
@@ -501,6 +504,9 @@ public class MainActivity extends AppCompatActivity {
                 ((HistoryFragment) getSupportFragmentManager().
                         findFragmentByTag("history_fragment")).update();
                 stopWorkout();
+                Toast.makeText(this,
+                        getResources().getString(R.string.workoutSaved),
+                        Toast.LENGTH_SHORT).show();
             }
             else {
                 Toast.makeText(this,

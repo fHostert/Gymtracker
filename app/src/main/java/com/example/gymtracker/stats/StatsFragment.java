@@ -117,12 +117,6 @@ public class StatsFragment extends Fragment {
     }
 
     private void statsForExercise(String exerciseName) {
-        if (DatabaseManager.wasExerciseNeverDone(exerciseName)) {
-            Toast.makeText(getContext(),
-                    getResources().getString(R.string.toastNeverDoneExercise),
-                    Toast.LENGTH_SHORT).show();
-            return;
-        }
         final Intent intent = new Intent(getContext(), StatsForExerciseActivity.class);
         intent.putExtra("EXERCISE", exerciseName);
         startActivity(intent);

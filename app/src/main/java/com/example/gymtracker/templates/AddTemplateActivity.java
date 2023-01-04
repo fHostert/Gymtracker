@@ -74,7 +74,13 @@ public class AddTemplateActivity extends AppCompatActivity {
         exerciseContainer.addView(newContainer);
     }
 
-    private void saveTemplateClick(View view) {
+    public void saveTemplateClick(View view) {
+        if (exercises.size() == 0) {
+            Toast.makeText(this,
+                    getResources().getString(R.string.noExerciseInTemplate),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
         DatabaseManager.saveTemplate(name, exercises);
         setResult(RESULT_OK, new Intent());
         finish();
