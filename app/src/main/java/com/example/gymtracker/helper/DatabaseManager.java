@@ -1083,6 +1083,9 @@ public final class DatabaseManager {
             return;
         }
         int[] workoutIDs = new int[resultSet.getCount()];
+        for (int i = 0; i < resultSet.getCount(); i++) {
+            workoutIDs[i] = resultSet.getInt(0);
+        }
         for (int id : workoutIDs) {
             query = String.format(l, "DELETE FROM history WHERE workoutID = %d;", id);
             db.execSQL(query);

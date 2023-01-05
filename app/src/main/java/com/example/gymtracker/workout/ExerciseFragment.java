@@ -232,8 +232,8 @@ public class ExerciseFragment extends Fragment {
 
     private void replace(String newExerciseName) {
         //Update Database
-        DatabaseManager.replaceExercise(exercise.getExerciseID(),
-                DatabaseManager.getExerciseID(newExerciseName));
+        DatabaseManager.replaceExercise(DatabaseManager.getExerciseID(newExerciseName),
+                exercise.getExerciseID());
 
         //Update exercise name
         ((TextView) getView().findViewById(R.id.name_of_exercise_text_view)).

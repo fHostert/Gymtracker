@@ -43,6 +43,7 @@ import com.example.gymtracker.workout.WorkoutFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
