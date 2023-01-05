@@ -138,15 +138,18 @@ public class StatsFragment extends Fragment {
             return;
         }
         LineChart chart = view.findViewById(R.id.trainings_duration_chart);
+
+        //This formatter transforms the unix timestamp to a date
         chart.getXAxis().setValueFormatter(new DateFormatterXAxis());
+
+        //Add data to entries list
         List<Entry> entries = new ArrayList<>();
-        for (WorkoutEntry entry : history) {
-            long timestamp = Formatter.convertDateToUnixTimestampSeconds(entry.getDate());
-            float durationInMinutes = (float) entry.getDuration() / 60;
+        for (WorkoutEntry workout : history) {
+            long timestamp = Formatter.convertDateToUnixTimestampSeconds(workout.getDate());
+            float durationInMinutes = (float) workout.getDuration() / 60;
             float average = durationInMinutes / daysToAverageOver;
             entries.add(new Entry(timestamp, average));
         }
-
         //this fixes a common bug in the library
         Collections.sort(entries, new EntryXComparator());
 
@@ -157,12 +160,12 @@ public class StatsFragment extends Fragment {
         dataSet.setDrawValues(false);
         dataSet.setLineWidth(getResources().getDimension(R.dimen.chart_line_width));
 
+        //bind set to chart
         LineData lineData = new LineData(dataSet);
         chart.setData(lineData);
 
         //refresh
         chart.invalidate();
-
     }
 
     private void styleChart(View view) {

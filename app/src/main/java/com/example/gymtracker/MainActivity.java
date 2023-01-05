@@ -118,8 +118,6 @@ public class MainActivity extends AppCompatActivity {
                 homeContainer.setVisibility(View.INVISIBLE);
                 statsContainer.setVisibility(View.INVISIBLE);
                 this.setTitle(R.string.history);
-
-
             }
             else if (item.getItemId() == R.id.navigation_stats) {
                 statsContainer.setVisibility(View.VISIBLE);
@@ -150,7 +148,6 @@ public class MainActivity extends AppCompatActivity {
                 drawable.setTint(getColor(R.color.white));
             }
         }
-
         return true;
     }
 
@@ -341,7 +338,6 @@ public class MainActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
                 reload();
             }
-
         });
 
         //If cancel, do nothing
