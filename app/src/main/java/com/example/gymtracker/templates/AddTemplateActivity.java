@@ -3,12 +3,17 @@ package com.example.gymtracker.templates;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentContainerView;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +52,62 @@ public class AddTemplateActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == 0) {
             addExerciseToTemplate(data.getExtras().getString("ITEM"));
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.add_template_menu, menu);
+
+        //Color icons
+        for(int i = 0; i < menu.size(); i++){
+            Drawable drawable = menu.getItem(i).getIcon();
+            if(drawable != null) {
+                drawable.setTint(getColor(R.color.white));
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        //create new exercise
+        if (id == R.id.create_new_exercise_menu_add_template) {
+            createNewExercise();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void createNewExercise() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setMessage(getResources().getString(R.string.createNewExerciseText));
+        alert.setTitle(getResources().getString(R.string.createNewExercise));
+        final View customLayout = getLayoutInflater().inflate(R.layout.alert, null);
+        alert.setView(customLayout);
+
+        alert.setPositiveButton(getResources().getString(R.string.ok), (dialogInterface, i) -> {
+            EditText et = customLayout.findViewById(R.id.alert_input_edit_text);
+            String newExerciseName = et.getText().toString();
+            for (String exercise : DatabaseManager.getExercises()) {
+                if (Objects.equals(exercise, newExerciseName) || newExerciseName.equals("")) {
+                    Toast.makeText(this,
+                            getResources().getString(R.string.exerciseAlreadyExists),
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+            DatabaseManager.createNewExercise(newExerciseName);
+            Toast.makeText(this,
+                    getResources().getString(R.string.newExerciseCreated),
+                    Toast.LENGTH_SHORT).show();
+        });
+
+        //If cancel, do nothing
+        alert.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
+            //Do nothing and cancel
+        });
+
+        alert.show();
     }
 
     public void addExerciseToTemplateClick(View view) {

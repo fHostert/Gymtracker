@@ -108,6 +108,16 @@ public class SetFragment extends Fragment {
         repsET.setHintTextColor(repsET.getCurrentTextColor());
         view.findViewById(R.id.set_table_row).setBackgroundColor(
                 getResources().getColor(R.color.setCompleted));
+
+        /* please ignore this
+        weightET.setTextColor(getResources().getColor(R.color.black));
+        repsET.setTextColor(getResources().getColor(R.color.black));
+        weightET.setHintTextColor(getResources().getColor(R.color.black));
+        repsET.setHintTextColor(getResources().getColor(R.color.black));
+        ((TextView) view.findViewById(R.id.last_set_text_view))
+                .setTextColor(getResources().getColor(R.color.black));
+        ((TextView) view.findViewById(R.id.set_index_text_view))
+                .setTextColor(getResources().getColor(R.color.black));*/
     }
 
     private void saveSet() {
