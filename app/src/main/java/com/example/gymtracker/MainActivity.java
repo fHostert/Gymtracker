@@ -361,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
             EditText et = customLayout.findViewById(R.id.alert_input_edit_text);
             String newTemplateName = et.getText().toString();
 
-            if (DatabaseManager.doesTemplateExist(newTemplateName)) {
+            if (DatabaseManager.doesTemplateExist(newTemplateName) || newTemplateName.equals("")) {
                 Toast.makeText(this,
                         getResources().getString(R.string.toastTemplateAlreadyExists),
                         Toast.LENGTH_SHORT).show();
@@ -557,7 +557,7 @@ public class MainActivity extends AppCompatActivity {
             EditText et = customLayout.findViewById(R.id.alert_input_edit_text);
             String newExerciseName = et.getText().toString();
             for (String exercise : DatabaseManager.getExercises()) {
-                if (Objects.equals(exercise, newExerciseName)) {
+                if (Objects.equals(exercise, newExerciseName) || newExerciseName.equals("")) {
                     Toast.makeText(this,
                             getResources().getString(R.string.exerciseAlreadyExists),
                             Toast.LENGTH_SHORT).show();

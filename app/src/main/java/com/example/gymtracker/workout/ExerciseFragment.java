@@ -10,7 +10,8 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
@@ -76,11 +77,16 @@ public class ExerciseFragment extends Fragment {
             addSet(set, view, false);
         }
 
-        //Add note
+        //Restore note
         if (!Objects.equals(exercise.getNote(), "")) {
             addNote(view);
             EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
             noteET.setText(exercise.getNote());
+        }
+        else if (!Objects.equals(DatabaseManager.getLastNote(exercise.getExerciseID()), "")) {
+            addNote(view);
+            EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
+            noteET.setText(DatabaseManager.getLastNote(exercise.getExerciseID()));
         }
 
         //Initialize buttons
@@ -90,8 +96,26 @@ public class ExerciseFragment extends Fragment {
         ImageButton exerciseMenuButton = view.findViewById(R.id.exercise_menu_button);
         exerciseMenuButton.setOnClickListener(view1 -> exerciseMenuClick());
 
-        Button saveNoteButton = view.findViewById(R.id.save_note_button);
-        saveNoteButton.setOnClickListener(view1 -> saveNoteClick());
+        ImageButton saveNoteButton = view.findViewById(R.id.delete_note_button);
+        saveNoteButton.setOnClickListener(view1 -> deleteNoteClick(view));
+
+        EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
+        noteET.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
+                String note = String.valueOf(noteET.getText());
+                DatabaseManager.addNoteToExercise(note, exercise.getExerciseID());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
 
         return view;
     }
@@ -286,16 +310,25 @@ public class ExerciseFragment extends Fragment {
         EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
         noteET.setVisibility(View.VISIBLE);
 
-        Button saveNoteButton = view.findViewById(R.id.save_note_button);
+        ImageButton saveNoteButton = view.findViewById(R.id.delete_note_button);
         saveNoteButton.setVisibility(View.VISIBLE);
+
+        String note = String.valueOf(noteET.getText());
+        if (!note.equals("")) {
+            DatabaseManager.addNoteToExercise(note, exercise.getExerciseID());
+        }
     }
 
-    private void saveNoteClick() {
-        EditText noteET = getView().findViewById(R.id.exercise_note_edit_text);
-        String note = String.valueOf(noteET.getText());
-        DatabaseManager.addNoteToExercise(note, exercise.getExerciseID());
+    private void deleteNoteClick(View view) {
+        DatabaseManager.deleteNoteFromExercise(exercise.getExerciseID());
         Toast.makeText(getContext(),
-                getResources().getString(R.string.noteSaved),
+                getResources().getString(R.string.noteDeleted),
                 Toast.LENGTH_SHORT).show();
+
+        EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
+        noteET.setVisibility(View.GONE);
+
+        ImageButton saveNoteButton = view.findViewById(R.id.delete_note_button);
+        saveNoteButton.setVisibility(View.GONE);
     }
 }

@@ -195,5 +195,6 @@
     <string name="addANote">Schreibe eine Notiz</string>
     <string name="noteSaved">Notiz gespeichert</string>
     <string name="note">Notiz:</string>
+    <string name="noteDeleted">Notiz gelöscht</string>
 
 </resources>

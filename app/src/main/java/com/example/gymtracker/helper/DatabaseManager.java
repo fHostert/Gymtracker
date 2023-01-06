@@ -319,6 +319,14 @@ public final class DatabaseManager {
         db.execSQL(query);
     }
 
+    public static void deleteNoteFromExercise(int exerciseID){
+        String query = String.format(l, "UPDATE CurrentWorkout " +
+                        "SET note = '' " +
+                        "WHERE exerciseID = %d AND setIndex = 1;",
+                        exerciseID);
+        db.execSQL(query);
+    }
+
     /*##############################################################################################
     #####################################CURRENTWORKOUTMETADATA#####################################
     ##############################################################################################*/
@@ -448,6 +456,23 @@ public final class DatabaseManager {
         }
         resultSet.moveToFirst();
         Set erg = new Set(setIndex, resultSet.getInt(0), resultSet.getFloat(1));
+        resultSet.close();
+        return erg;
+    }
+
+    public static String getLastNote(int exerciseID){
+        String query = String.format(l, "SELECT note FROM History, Workouts " +
+                        "WHERE History.workoutID = Workouts.ID AND " +
+                        "exerciseID = %d AND setIndex = 1 " +
+                        "ORDER BY date DESC LIMIT 1;",
+                exerciseID);
+        Cursor resultSet = db.rawQuery(query, null);
+        if (resultSet.getCount() == 0){
+            resultSet.close();
+            return "";
+        }
+        resultSet.moveToFirst();
+        String erg = resultSet.getString(0);
         resultSet.close();
         return erg;
     }
@@ -626,6 +651,8 @@ public final class DatabaseManager {
         return erg;
     }
 
+
+
     /*##############################################################################################
     ############################################TEMPLATES###########################################
     ##############################################################################################*/
@@ -646,7 +673,7 @@ public final class DatabaseManager {
         for (Exercise exercise : getExercisesInTemplate(templateName)) {
             for (int i = 0; i < exercise.getSets().size(); i++) {
                 String query = String.format(l,
-                        "INSERT INTO CurrentWorkout VALUES (%d, %d, %d, %d, '%s');",
+                        "INSERT INTO CurrentWorkout VALUES (%d, %d, %d, %d, '%s', '');",
                         exercise.getExerciseID(), position, i + 1,
                         exercise.getSets().get(i).getReps(),
                         Formatter.formatFloat(exercise.getSets().get(i).getWeight()));
