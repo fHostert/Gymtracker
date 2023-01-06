@@ -95,8 +95,9 @@ public class StatsForExerciseActivity extends AppCompatActivity {
         dataSetWeight.setAxisDependency(YAxis.AxisDependency.RIGHT);
         dataSetWeight.setColor(getResources().getColor(R.color.red));
         dataSetWeight.setDrawCircles(false);
-        dataSetWeight.setDrawValues(false);
         dataSetWeight.setLineWidth(getResources().getDimension(R.dimen.chart_line_width));
+        dataSetWeight.setValueTextColor(getResources().getColor(R.color.red));
+        dataSetWeight.setValueTextSize(getResources().getDimension(R.dimen.value_chart_text));
 
         LineData lineData = new LineData(dataSetVolume, dataSetWeight);
         chart.setData(lineData);

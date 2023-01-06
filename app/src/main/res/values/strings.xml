@@ -111,32 +111,37 @@
 
 
     <string-array name="exercises">
-
         <item>Bankdrücken</item>
         <item>Schrägbankdrücken</item>
         <item>Butterfly</item>
-        <item>Butterfly (Maschine)</item>
         <item>Schulterdrücken (KH)</item>
-        <item>Schulterdrücken (LH)</item>
+        <item>Schulterdrücken (MP)</item>
+        <item>Seitheben (KH)</item>
+        <item>Seitheben (Maschine)</item>
         <item>Trizeps-Pulldown</item>
+        <item>Trizeps (Maschine)</item>
         <item>Dips</item>
         <item>Latzug</item>
+        <item>Klimmzüge</item>
+        <item>Klimmzug (Maschine)</item>
         <item>Rudern (eng)</item>
         <item>Rudern (breit)</item>
         <item>Butterfly Reverse</item>
         <item>Hammercurls</item>
         <item>Bizepscurls (LH)</item>
-        <item>Klimmzüge</item>
         <item>Beinpresse</item>
+        <item>Lunges</item>
         <item>Leg Curls</item>
         <item>Leg Extensions</item>
         <item>Waden (KH)</item>
-        <item>Waden (LH)</item>
+        <item>Waden (MP)</item>
+        <item>Waden (Maschine)</item>
         <item>Adduktoren</item>
         <item>Abduktoren</item>
         <item>Hip Thrust</item>
         <item>Crunches</item>
         <item>Plank</item>
+        <item>Sit Ups (Maschine)</item>
         <item>Rotator</item>
         <item>Back Extensions</item>
     </string-array>

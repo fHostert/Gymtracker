@@ -252,8 +252,14 @@ public class ExerciseFragment extends Fragment {
 
     private void deleteLastSet() {
         LinearLayout setContainer = getView().findViewById(R.id.set_container);
+        if (setContainer.getChildCount() == 1) {
+            Toast.makeText(getContext(),
+                    getResources().getString(R.string.cantRemoveLastSet),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
         setContainer.removeViewAt(setContainer.getChildCount() - 1);
-        DatabaseManager.removeLastSet(exercise.getExerciseID(), setContainer.getChildCount());
+        DatabaseManager.removeLastSet(exercise.getExerciseID(), setContainer.getChildCount() + 1);
     }
 
     public void addToPositionInWorkout(int difference) {
