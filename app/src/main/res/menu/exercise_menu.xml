@@ -21,4 +21,8 @@
         android:id="@+id/delete_last_set_menu"
         android:title="@string/deleteLastSet" />
 
+    <item
+        android:id="@+id/add_exercise_note_menu"
+        android:title="@string/addNote" />
+
 </menu>

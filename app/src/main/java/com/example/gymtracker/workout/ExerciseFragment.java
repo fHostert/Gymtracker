@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -27,6 +28,8 @@ import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.R;
 import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.Set;
+
+import java.util.Objects;
 
 public class ExerciseFragment extends Fragment {
 
@@ -73,12 +76,22 @@ public class ExerciseFragment extends Fragment {
             addSet(set, view, false);
         }
 
+        //Add note
+        if (!Objects.equals(exercise.getNote(), "")) {
+            addNote(view);
+            EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
+            noteET.setText(exercise.getNote());
+        }
+
         //Initialize buttons
         Button addSetButton = view.findViewById(R.id.add_set_button);
         addSetButton.setOnClickListener(view1 -> addEmptySet(true));
 
         ImageButton exerciseMenuButton = view.findViewById(R.id.exercise_menu_button);
         exerciseMenuButton.setOnClickListener(view1 -> exerciseMenuClick());
+
+        Button saveNoteButton = view.findViewById(R.id.save_note_button);
+        saveNoteButton.setOnClickListener(view1 -> saveNoteClick());
 
         return view;
     }
@@ -132,6 +145,9 @@ public class ExerciseFragment extends Fragment {
             }
             else if (id == R.id.delete_last_set_menu) {
                 deleteLastSet();
+            }
+            else if (id == R.id.add_exercise_note_menu) {
+                addNote(getView());
             }
             return false;
         });
@@ -222,6 +238,10 @@ public class ExerciseFragment extends Fragment {
                 Toast.LENGTH_SHORT).show();
     }
 
+    public void addToPositionInWorkout(int difference) {
+        positionInWorkout += difference;
+    }
+
     private void replaceExerciseClick() {
         final Intent intent = new Intent(getContext(), ChooseActivity.class);
         intent.putExtra("LIST", DatabaseManager.getExercises());
@@ -262,7 +282,20 @@ public class ExerciseFragment extends Fragment {
         DatabaseManager.removeLastSet(exercise.getExerciseID(), setContainer.getChildCount() + 1);
     }
 
-    public void addToPositionInWorkout(int difference) {
-        positionInWorkout += difference;
+    private void addNote(View view) {
+        EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
+        noteET.setVisibility(View.VISIBLE);
+
+        Button saveNoteButton = view.findViewById(R.id.save_note_button);
+        saveNoteButton.setVisibility(View.VISIBLE);
+    }
+
+    private void saveNoteClick() {
+        EditText noteET = getView().findViewById(R.id.exercise_note_edit_text);
+        String note = String.valueOf(noteET.getText());
+        DatabaseManager.addNoteToExercise(note, exercise.getExerciseID());
+        Toast.makeText(getContext(),
+                getResources().getString(R.string.noteSaved),
+                Toast.LENGTH_SHORT).show();
     }
 }

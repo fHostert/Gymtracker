@@ -65,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
         DatabaseManager.createWorkoutsTable();
         DatabaseManager.createTemplatesTable();
 
+        //db.execSQL("ALTER TABLE history ADD COLUMN note VARCHAR DEFAULT '';");
+
 
         //DIE NÄCHSTE ZEILE KANN EINKOMMENTIERT WERDEN, UM FÜR DIE LETZTEN 100 TAGE FAKE WORKOUTS
         //IN DIE DATENBANK EINZUTRAGEN. DIE ÜBUNG BANKDRÜCKEN WIRD JEWEILS DURCHGEFÜHRT.
@@ -346,13 +348,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         alert.show();
-
-        for (String exercise : DatabaseManager.getExercises()) {
-            if (Objects.equals(exercise, exerciseName)) {
-
-                return;
-            }
-        }
     }
 
     public void createNewTemplate() {

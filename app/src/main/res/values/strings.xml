@@ -191,5 +191,9 @@
     <string name="workoutSaved">Workout gespeichert</string>
     <string name="workoutDeleted">Workout verworfen</string>
     <string name="noExerciseInTemplate">Erst mindestens eine Übung hinzufügen.</string>
+    <string name="addNote">Notiz hinzufügen</string>
+    <string name="addANote">Schreibe eine Notiz</string>
+    <string name="noteSaved">Notiz gespeichert</string>
+    <string name="note">Notiz:</string>
 
 </resources>

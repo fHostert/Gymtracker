@@ -14,6 +14,7 @@ public class Exercise implements Serializable {
     private final int databaseIndex;
     private final String name;
     private ArrayList<Set> sets = new ArrayList<>();
+    private String note = "";
 
     public Exercise(int databaseIndex) {
         this.databaseIndex = databaseIndex;
@@ -27,6 +28,13 @@ public class Exercise implements Serializable {
         this.databaseIndex = databaseIndex;
         this.name = DatabaseManager.getExerciseName(databaseIndex);
         this.sets = sets;
+    }
+
+    public Exercise(int databaseIndex, ArrayList<Set> sets, String note) {
+        this.databaseIndex = databaseIndex;
+        this.name = DatabaseManager.getExerciseName(databaseIndex);
+        this.sets = sets;
+        this.note = note;
     }
 
     public Exercise(int databaseIndex, int numberOfEmptySets) {
@@ -68,5 +76,9 @@ public class Exercise implements Serializable {
         }
         return String.format(l, "%d × %skg",
                 bestSet.getReps(), Formatter.formatFloat(bestSet.getWeight()));
+    }
+
+    public String getNote() {
+        return note;
     }
 }

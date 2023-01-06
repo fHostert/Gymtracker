@@ -47,14 +47,14 @@ public final class DatabaseManager {
     ##############################################################################################*/
     public static void createCurrentWorkoutTable() {
         String query = "CREATE TABLE IF NOT EXISTS CurrentWorkout" +
-                        "(exerciseID INT, position INT, setIndex INT, reps INT, weight REAL);";
+                        "(exerciseID INT, position INT, setIndex INT, reps INT, weight REAL, " +
+                        "note VARCHAR DEFAULT '');";
         db.execSQL(query);
     }
 
-
     public static void insertSetIntoCurrentWorkout(int exerciseID, int position, Set set) {
         String query = String.format(l, "INSERT INTO CurrentWorkout VALUES " +
-                        "(%d, %d, %d, %d, '%s')",
+                        "(%d, %d, %d, %d, '%s', '')",
                         exerciseID, position, set.getIndex(), set.getReps(),
                         Formatter.formatFloat(set.getWeight()));
         db.execSQL(query);
@@ -182,7 +182,7 @@ public final class DatabaseManager {
         for (int currentExerciseID : exercisesIDs) {
 
             //Get sets
-            query = String.format(l, "SELECT reps, weight, setIndex FROM CurrentWorkout " +
+            query = String.format(l, "SELECT reps, weight, setIndex, note FROM CurrentWorkout " +
                             "WHERE exerciseID = %d AND reps <> 0 ORDER BY setIndex ASC;",
                             currentExerciseID);
             resultSet = db.rawQuery(query, null);
@@ -194,6 +194,10 @@ public final class DatabaseManager {
 
             //Loop through sets and insert
             for (int i = 0; i < resultSet.getCount(); i++) {
+                String note = "";
+                if (i == 0) {
+                    note = resultSet.getString(3);
+                }
                 int reps = resultSet.getInt(0);
                 String weight = Formatter.formatFloat(resultSet.getFloat(1));
 
@@ -220,9 +224,9 @@ public final class DatabaseManager {
 
                 //insert into history
                 query = String.format(l, "INSERT INTO History " +
-                                "(workoutID, exerciseID, setIndex, reps, weight, tendency, isPR) " +
-                                "VALUES (%d, %d, %d, %d, '%s', %d, %d);",
-                                workoutID, currentExerciseID, i + 1, reps, weight, tendency, isPR);
+                        "(workoutID, exerciseID, setIndex, reps, weight, tendency, isPR, note) " +
+                        "VALUES (%d, %d, %d, %d, '%s', %d, %d, '%s');",
+                        workoutID, currentExerciseID, i + 1, reps, weight, tendency, isPR, note);
                 db.execSQL(query);
                 resultSet.moveToNext();
             }
@@ -261,13 +265,13 @@ public final class DatabaseManager {
 
         //Get exercise IDs
         String query = "SELECT DISTINCT exerciseID FROM CurrentWorkout ORDER BY position ASC;";
-        Cursor rs = db.rawQuery(query, null);
-        int numberOfExercises = rs.getCount();
+        Cursor resultSet = db.rawQuery(query, null);
+        int numberOfExercises = resultSet.getCount();
         int[] exercisesIDs = new int[numberOfExercises];
-        rs.moveToFirst();
+        resultSet.moveToFirst();
         for (int i = 0; i < numberOfExercises; i++) {
-            exercisesIDs[i] = rs.getInt(0);
-            rs.moveToNext();
+            exercisesIDs[i] = resultSet.getInt(0);
+            resultSet.moveToNext();
         }
 
         //create Workout
@@ -275,17 +279,18 @@ public final class DatabaseManager {
         for (int i = 0; i < numberOfExercises; i++) {
             ArrayList<Set> sets = new ArrayList<>();
             query = String.format(l,
-                    "SELECT setIndex, reps, weight FROM CurrentWorkout " +
+                    "SELECT setIndex, reps, weight, note FROM CurrentWorkout " +
                             "WHERE exerciseID = %d ORDER BY position ASC, setIndex ASC;",
                             exercisesIDs[i]);
-            rs = db.rawQuery(query, null);
-            rs.moveToFirst();
+            resultSet = db.rawQuery(query, null);
+            resultSet.moveToFirst();
+            String note = resultSet.getString(3);
             do {
-                sets.add(new Set(rs.getInt(0), rs.getInt(1), rs.getFloat(2)));
-            } while (rs.moveToNext());
-            exercises.add(new Exercise(exercisesIDs[i], sets));
+                sets.add(new Set(resultSet.getInt(0), resultSet.getInt(1), resultSet.getFloat(2)));
+            } while (resultSet.moveToNext());
+            exercises.add(new Exercise(exercisesIDs[i], sets, note));
         }
-        rs.close();
+        resultSet.close();
 
         return new Workout(getCurrentWorkoutName(), exercises);
     }
@@ -304,6 +309,14 @@ public final class DatabaseManager {
         while (resultSet.moveToNext());
         resultSet.close();
         return totalWeight;
+    }
+
+    public static void addNoteToExercise(String note, int exerciseID){
+        String query = String.format(l, "UPDATE CurrentWorkout " +
+                        "SET note = '%s' " +
+                        "WHERE exerciseID = %d AND setIndex = 1;",
+                        note, exerciseID);
+        db.execSQL(query);
     }
 
     /*##############################################################################################
@@ -398,7 +411,7 @@ public final class DatabaseManager {
     public static void createHistoryTable() {
         String query = "CREATE TABLE IF NOT EXISTS History(" +
                 "workoutID INT, exerciseID INT, setIndex INT, reps INT, weight REAL, " +
-                "tendency INT, isPR INT);";
+                "tendency INT, isPR INT, note VARCHAR DEFAULT '');";
         db.execSQL(query);
     }
 
@@ -481,7 +494,7 @@ public final class DatabaseManager {
             ArrayList<Exercise> exercises = new ArrayList<>();
             for (int currentExerciseID : exerciseIDs) {
                 query = String.format(l,
-                        "SELECT reps, weight, tendency, isPR FROM History " +
+                        "SELECT reps, weight, tendency, isPR, note FROM History " +
                                 "WHERE workoutID = %d AND exerciseID = %d " +
                                 "ORDER BY setIndex ASC;",
                                 currentWorkoutID, currentExerciseID);
@@ -490,13 +503,17 @@ public final class DatabaseManager {
 
                 //Fill sets objects for current exercise
                 ArrayList<Set> sets = new ArrayList<>();
+                String note = "";
                 for (int i = 0; i < resultSet.getCount(); i++) {
+                    if (i == 0){
+                        note = resultSet.getString(4);
+                    }
                     sets.add(new Set(i + 1, resultSet.getInt(0), resultSet.getFloat(1),
                             resultSet.getInt(2), resultSet.getInt(3) > 0));
                     resultSet.moveToNext();
 
                 }
-                exercises.add(new Exercise(currentExerciseID, sets));
+                exercises.add(new Exercise(currentExerciseID, sets, note));
             }
 
             //Get meta data

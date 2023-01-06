@@ -18,6 +18,7 @@ import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.Formatter;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public class HistoryDetailActivity extends AppCompatActivity {
 
@@ -39,6 +40,15 @@ public class HistoryDetailActivity extends AppCompatActivity {
 
         TableLayout container = findViewById(R.id.detail_view_container);
         for (Exercise exercise : workout.getExercises()) {
+            if (!Objects.equals(exercise.getNote(), "")) {
+                TextViewTableRowFragment newLine = TextViewTableRowFragment.
+                        newInstance(getString(R.string.note) + " " + exercise.getNote(), true);
+                FragmentContainerView newContainer = new FragmentContainerView(this);
+                newContainer.setId(View.generateViewId());
+                getSupportFragmentManager().beginTransaction()
+                        .add(newContainer.getId(), newLine).commit();
+                container.addView(newContainer);
+            }
             for (Set set : exercise.getSets()) {
                 String personalRecord = (set.isPR()) ? "\uD83C\uDFC6" : "";
                 String newLineString = String.format(l,
@@ -53,6 +63,8 @@ public class HistoryDetailActivity extends AppCompatActivity {
                         .add(newContainer.getId(), newLine).commit();
                 container.addView(newContainer);
             }
+
+            //add separator
             View separator = new View(this);
             int dimensionInDp =
                     (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
