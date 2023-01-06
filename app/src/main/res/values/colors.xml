@@ -25,6 +25,7 @@
     <color name="menuTextColor">#FF000000</color>
     <color name="buttonText">#ffc300</color>
     <color name="hintTextColor">#FF999999</color>
-    <color name="setCompleted">#38b000</color>
+    <color name="setCompleted">#386641</color>
+    <color name="setCompletedOld">#38b000</color>
 
 </resources>

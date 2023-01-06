@@ -79,12 +79,12 @@ public class ExerciseFragment extends Fragment {
 
         //Restore note
         if (!Objects.equals(exercise.getNote(), "")) {
-            addNote(view);
+            addNote(view, false);
             EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
             noteET.setText(exercise.getNote());
         }
         else if (!Objects.equals(DatabaseManager.getLastNote(exercise.getExerciseID()), "")) {
-            addNote(view);
+            addNote(view, false);
             EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
             noteET.setText(DatabaseManager.getLastNote(exercise.getExerciseID()));
         }
@@ -171,7 +171,7 @@ public class ExerciseFragment extends Fragment {
                 deleteLastSet();
             }
             else if (id == R.id.add_exercise_note_menu) {
-                addNote(getView());
+                addNote(getView(), true);
             }
             return false;
         });
@@ -306,9 +306,12 @@ public class ExerciseFragment extends Fragment {
         DatabaseManager.removeLastSet(exercise.getExerciseID(), setContainer.getChildCount() + 1);
     }
 
-    private void addNote(View view) {
+    private void addNote(View view, boolean giveFocus) {
         EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
         noteET.setVisibility(View.VISIBLE);
+        if (giveFocus) {
+            noteET.requestFocus();
+        }
 
         ImageButton saveNoteButton = view.findViewById(R.id.delete_note_button);
         saveNoteButton.setVisibility(View.VISIBLE);

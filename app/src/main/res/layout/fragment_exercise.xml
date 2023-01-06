@@ -47,21 +47,21 @@
             android:id="@+id/exercise_note_edit_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-
             android:hint="@string/addANote"
             android:textColorHint="@color/hintTextColor"
-            android:layout_weight="85"
+            android:layout_weight="90"
             android:inputType="textCapSentences"
             android:visibility="gone">
         </EditText>
 
         <ImageButton
             android:id="@+id/delete_note_button"
+            android:layout_gravity="center"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:text="@string/ok"
             android:gravity="center"
-            android:layout_weight="15"
+            android:layout_weight="10"
             android:background="@drawable/ic_baseline_delete_24"
             android:foreground="?android:attr/selectableItemBackground"
             style="@style/textColorButton"
