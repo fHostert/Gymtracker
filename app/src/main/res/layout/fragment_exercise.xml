@@ -49,6 +49,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/addANote"
             android:textColorHint="@color/hintTextColor"
+            android:digits="abcdefghijklmnopqrstuvwxyzüöäßABCDEFGHIJKLMNOPQRSTUVWXYZÜÖÄ1234567890(),&amp; "
             android:layout_weight="90"
             android:inputType="textCapSentences"
             android:visibility="gone">
