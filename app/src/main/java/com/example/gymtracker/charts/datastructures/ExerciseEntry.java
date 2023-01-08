@@ -8,10 +8,12 @@ import java.util.ArrayList;
 public class ExerciseEntry  implements Serializable {
     private final ArrayList<Set> sets;
     private final String date;
+    private final String note;
 
-    public ExerciseEntry(ArrayList<Set> sets, String date) {
+    public ExerciseEntry(ArrayList<Set> sets, String date, String note) {
         this.sets = sets;
         this.date = date;
+        this.note = note;
     }
 
     public ArrayList<Set> getSets() {
@@ -45,5 +47,9 @@ public class ExerciseEntry  implements Serializable {
             }
         }
         return maxWeight;
+    }
+
+    public String getNote() {
+        return note;
     }
 }

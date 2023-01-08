@@ -61,7 +61,8 @@ public class HistoryWorkoutFragment extends Fragment {
             String exercisePara = String.format(
                     l, "%d × %s", exercise.getSets().size(), exercise.getName());
             String bestSetPara = exercise.getBestSetString();
-            HistoryRowFragment historyRowFragment = HistoryRowFragment.newInstance(exercisePara, bestSetPara);
+            HistoryRowFragment historyRowFragment =
+                    HistoryRowFragment.newInstance(exercisePara, bestSetPara);
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
             newContainer.setId(View.generateViewId());
             getParentFragmentManager().beginTransaction()
@@ -89,7 +90,7 @@ public class HistoryWorkoutFragment extends Fragment {
             alert.setMessage(getResources().getString(R.string.deleteWorkoutText));
             alert.setTitle(getResources().getString(R.string.deleteWorkout));
 
-            //If ok, delete workout and hide this fragment
+            //If ok, delete workout and this fragment
             alert.setPositiveButton("ok", (dialogInterface, i) -> {
                 DatabaseManager.deleteWorkoutFromHistory(workout.getID());
                 Fragment thisFragment = getParentFragmentManager().

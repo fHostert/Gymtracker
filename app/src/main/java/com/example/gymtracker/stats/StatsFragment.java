@@ -127,9 +127,9 @@ public class StatsFragment extends Fragment {
         String daysToShowString = String.valueOf(daysToShowET.getText());
         String daysToAverageOverString = String.valueOf(daysToAverageOverET.getText());
         int daysToShow =
-                (daysToShowString.equals("") ? 0: Integer.parseInt(daysToShowString));
+            (daysToShowString.equals("") ? 0: Integer.parseInt(daysToShowString));
         int daysToAverageOver =
-                (daysToAverageOverString.equals("") ? 0 : Integer.parseInt(daysToAverageOverString));
+            (daysToAverageOverString.equals("") ? 0 : Integer.parseInt(daysToAverageOverString));
 
         //Get data
         ArrayList<WorkoutEntry> history =

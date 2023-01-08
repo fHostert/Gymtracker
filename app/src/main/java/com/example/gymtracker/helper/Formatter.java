@@ -16,6 +16,10 @@ public class Formatter {
     private Formatter (){
     }
 
+    /**
+     * @param f The float
+     * @return A String in the pattern of 99.99 or 99.9.
+     */
     public static String formatFloat(Float f) {
         String erg;
         if (f % 1 == 0) {
@@ -23,13 +27,17 @@ public class Formatter {
         }
         else {
             erg = (new DecimalFormat("0.00")).format(f);
-            if (erg.substring(erg.length() - 1).equals("0")) {
+            if (erg.endsWith("0")) {
                 erg = erg.substring(0, erg.length() - 1);
             }
         }
         return erg.replaceAll(",", ".");
     }
 
+    /**
+     * @param timeInSeconds The time in seconds
+     * @return A String in the pattern of 1d 1h 1min.
+     */
     public static String formatTime(int timeInSeconds) {
         int timeInMinutes = timeInSeconds / 60;
         int days = timeInMinutes / 1440;
@@ -62,6 +70,10 @@ public class Formatter {
         return date;
     }
 
+    /**
+     * @param dateString date in form yyyy-MM-dd HH:mm:ss.SSS
+     * @return Unix time stamp since that date
+     */
     public static long convertDateToUnixTimestampSeconds(String dateString) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         Date date = null;
@@ -73,6 +85,11 @@ public class Formatter {
         return date.getTime() / 1000;
     }
 
+    /**
+     * @param first first date
+     * @param second second date
+     * @return the time in days between both dates
+     */
     public static int getDateDiff(String first, String second) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate firstDate = LocalDate.parse(first, formatter);
@@ -82,6 +99,10 @@ public class Formatter {
 
     }
 
+    /**
+     * @param tendency should be -1, 0 or 1
+     * @return the corresponding emoji
+     */
     public static String tendency(int tendency) {
         String erg = "➡";
         if (tendency < 0) {

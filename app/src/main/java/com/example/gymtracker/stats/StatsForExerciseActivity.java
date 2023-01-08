@@ -3,7 +3,6 @@ package com.example.gymtracker.stats;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentContainerView;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -14,12 +13,8 @@ import com.example.gymtracker.charts.ChartFormatter.DateFormatterXAxis;
 import com.example.gymtracker.charts.datastructures.ExerciseEntry;
 import com.example.gymtracker.charts.datastructures.ExerciseHistory;
 import com.example.gymtracker.charts.datastructures.PersonalRecord;
-import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.helper.Formatter;
-import com.example.gymtracker.history.HistoryDetailActivity;
-import com.example.gymtracker.history.HistoryExerciseFragment;
-import com.example.gymtracker.history.HistoryWorkoutFragment;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -38,8 +33,6 @@ public class StatsForExerciseActivity extends AppCompatActivity {
     private String exerciseName;
 
     private static final Locale l = Locale.GERMAN;
-
-    //TODO Button to load more entries, like history
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +63,11 @@ public class StatsForExerciseActivity extends AppCompatActivity {
         if (history == null) {
             return;
         }
+
+        //set value formatter
         chart.getXAxis().setValueFormatter(new DateFormatterXAxis());
+
+        //create lists with data entries
         List<Entry> entriesVolume = new ArrayList<>();
         List<Entry> entriesWeight = new ArrayList<>();
         for (ExerciseEntry entry : history.getEntries()) {
@@ -138,9 +135,12 @@ public class StatsForExerciseActivity extends AppCompatActivity {
         bestVolumeTV.setText(String.format(
                 "%s am %s", bestVolume, Formatter.formatDate(volumePR.getDate())));
 
+        //fill exercise history
         LinearLayout historyContainer = findViewById(R.id.exercise_history_linear_layout);
         for (ExerciseEntry entry : history.getEntries()) {
-            HistoryExerciseFragment historyExerciseFragment = HistoryExerciseFragment.newInstance(entry);
+            //TODO Button to load more entries, like history
+            HistoryExerciseFragment historyExerciseFragment =
+                    HistoryExerciseFragment.newInstance(entry);
             FragmentContainerView newContainer = new FragmentContainerView(this);
             newContainer.setId(View.generateViewId());
             getSupportFragmentManager().beginTransaction()

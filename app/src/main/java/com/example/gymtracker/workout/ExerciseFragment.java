@@ -107,6 +107,7 @@ public class ExerciseFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                //update note on text change
                 EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
                 String note = String.valueOf(noteET.getText());
                 DatabaseManager.addNoteToExercise(note, exercise.getExerciseID());
@@ -256,7 +257,6 @@ public class ExerciseFragment extends Fragment {
         //Delete the exercise
         exerciseContainer.removeViewAt(positionInWorkout);
 
-
         Toast.makeText(getContext(),
                 getResources().getString(R.string.exerciseRemoved),
                 Toast.LENGTH_SHORT).show();
@@ -295,6 +295,7 @@ public class ExerciseFragment extends Fragment {
     }
 
     private void deleteLastSet() {
+        //Get parent container
         LinearLayout setContainer = getView().findViewById(R.id.set_container);
         if (setContainer.getChildCount() == 1) {
             Toast.makeText(getContext(),
@@ -302,8 +303,13 @@ public class ExerciseFragment extends Fragment {
                     Toast.LENGTH_SHORT).show();
             return;
         }
+
+        //remove last set
         setContainer.removeViewAt(setContainer.getChildCount() - 1);
-        DatabaseManager.removeLastSet(exercise.getExerciseID(), setContainer.getChildCount() + 1);
+
+        //update Database
+        DatabaseManager.removeSet(exercise.getExerciseID(),
+                setContainer.getChildCount() + 1);
     }
 
     private void addNote(View view, boolean giveFocus) {

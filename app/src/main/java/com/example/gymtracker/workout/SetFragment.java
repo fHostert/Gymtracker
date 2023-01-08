@@ -64,7 +64,7 @@ public class SetFragment extends Fragment {
         repsET = ((EditText)view.findViewById(R.id.reps_edit_text));
         areHintsSet = false;
 
-        ///Fill fields
+        //Fill fields
         //Set index field
         ((TextView) view.findViewById(R.id.set_index_text_view)).
                 setText(String.valueOf(set.getIndex()));

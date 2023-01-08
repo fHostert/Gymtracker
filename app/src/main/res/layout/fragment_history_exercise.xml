@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:layout_marginHorizontal="@dimen/horizontal_margin_between_boxes"
     android:layout_marginVertical="@dimen/vertical_margin_between_boxes"
-    tools:context=".history.HistoryExerciseFragment">
+    tools:context=".stats.HistoryExerciseFragment">
 
 
     <LinearLayout

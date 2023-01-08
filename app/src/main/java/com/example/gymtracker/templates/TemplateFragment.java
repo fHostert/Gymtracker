@@ -85,7 +85,7 @@ public class TemplateFragment extends Fragment {
                     setVisibility(View.INVISIBLE);
         }
 
-
+        //add exercises
         TableLayout tableLayout = view.findViewById(R.id.template_exercises_table_layout);
         for (Exercise exercise : template.getExercises()) {
             String newLineString = String.format(l,
@@ -103,6 +103,7 @@ public class TemplateFragment extends Fragment {
         //initialize buttons
         ImageButton templateMenuButton = view.findViewById(R.id.template_menu_button);
         templateMenuButton.setOnClickListener(view1 -> templateMenuClick());
+
         return view;
     }
 
@@ -161,6 +162,7 @@ public class TemplateFragment extends Fragment {
         }
         final Intent intent = new Intent(getContext(), ChooseActivity.class);
         intent.putExtra("LIST", DatabaseManager.getExercises());
+        //these exercises are already in the template, remove from list
         intent.putExtra("REMOVE_LIST", exercisesInTemplate);
         intent.putExtra("TITLE", getResources().getString(R.string.addExerciseToTemplate));
         startActivityForResult(intent, 1);
@@ -169,6 +171,7 @@ public class TemplateFragment extends Fragment {
     private void addToTemplate(String exerciseName) {
         DatabaseManager.addExerciseToTemplate(template.getName(), exerciseName);
 
+        //add new line
         TableLayout tableLayout = getView().findViewById(R.id.template_exercises_table_layout);
         String newLineString = String.format(l,
                 "%d × %s", 3, exerciseName);

@@ -11,15 +11,10 @@ import android.widget.TextView;
 
 import com.example.gymtracker.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link HistoryRowFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class HistoryRowFragment extends Fragment {
 
     private static final String ARG_EXERCISE = "param1";
-    private static final String ARG_BESTSET = "param2";
+    private static final String ARG_BEST_SET = "param2";
 
     private String exercise;
     private String bestSet;
@@ -32,7 +27,7 @@ public class HistoryRowFragment extends Fragment {
         HistoryRowFragment fragment = new HistoryRowFragment();
         Bundle args = new Bundle();
         args.putString(ARG_EXERCISE, exercise);
-        args.putString(ARG_BESTSET, bestSet);
+        args.putString(ARG_BEST_SET, bestSet);
         fragment.setArguments(args);
         return fragment;
     }
@@ -42,7 +37,7 @@ public class HistoryRowFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             exercise = getArguments().getString(ARG_EXERCISE);
-            bestSet = getArguments().getString(ARG_BESTSET);
+            bestSet = getArguments().getString(ARG_BEST_SET);
         }
     }
 

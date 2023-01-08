@@ -20,6 +20,8 @@ import com.example.gymtracker.helper.DatabaseManager;
 
 public class HistoryFragment extends Fragment {
 
+    //TODO refactor initialize and update together
+
     private boolean isInitialized = false;
     private final int howManyWorkoutsToLoad = 10;
 
@@ -27,7 +29,7 @@ public class HistoryFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static HistoryFragment newInstance(String param1, String param2) {
+    public static HistoryFragment newInstance() {
         HistoryFragment fragment = new HistoryFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -47,7 +49,10 @@ public class HistoryFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_history, container, false);
 
+        //load first 10 entries
         initialize(view);
+
+        //initialize buttons
         Button loadMoreHistoryButton = view.findViewById(R.id.load_more_history_button);
         loadMoreHistoryButton.setOnClickListener(view1 -> loadMoreHistory());
 
@@ -58,20 +63,29 @@ public class HistoryFragment extends Fragment {
         if (isInitialized) {
             return;
         }
+
+        //get data
         History history = DatabaseManager.getHistory(howManyWorkoutsToLoad, 0);
+
+        //reset view
         LinearLayout historyLinearLayout = view.findViewById(R.id.history_linear_layout);
         historyLinearLayout.removeAllViews();
+
+        //add workouts
         for (Workout workout : history.getWorkouts()) {
-            HistoryWorkoutFragment historyWorkoutFragment = HistoryWorkoutFragment.newInstance(workout);
+            HistoryWorkoutFragment historyWorkoutFragment =
+                    HistoryWorkoutFragment.newInstance(workout);
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
             newContainer.setId(View.generateViewId());
 
+            //add on click listener for the detail view to each workout
             newContainer.setOnClickListener(view1 -> {
                 final Intent intent = new Intent(getContext(), HistoryDetailActivity.class);
                 intent.putExtra("WORKOUT", workout);
                 startActivity(intent);
             });
 
+            //add with unique tag
             getParentFragmentManager().beginTransaction()
                     .add(newContainer.getId(), historyWorkoutFragment,
                     "HISTORY_WORKOUT" + workout.getID()).commit();
@@ -79,6 +93,7 @@ public class HistoryFragment extends Fragment {
         }
         isInitialized = true;
 
+        //handle load more button visibility
         if (historyLinearLayout.getChildCount() > 9) {
             view.findViewById(R.id.load_more_history_button).setVisibility(View.VISIBLE);
         }
@@ -101,7 +116,8 @@ public class HistoryFragment extends Fragment {
         History history = DatabaseManager.getHistory(1, 0);
         LinearLayout historyLinearLayout = getView().findViewById(R.id.history_linear_layout);
         for (Workout workout : history.getWorkouts()) {
-            HistoryWorkoutFragment historyWorkoutFragment = HistoryWorkoutFragment.newInstance(workout);
+            HistoryWorkoutFragment historyWorkoutFragment =
+                    HistoryWorkoutFragment.newInstance(workout);
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
 
             newContainer.setOnClickListener(view1 -> {
@@ -119,7 +135,7 @@ public class HistoryFragment extends Fragment {
     }
 
     /**
-     * Click on Button
+     * Click on load more Button loads 10 more entries
      */
     private void loadMoreHistory() {
         LinearLayout historyLinearLayout = getView().findViewById(R.id.history_linear_layout);
@@ -135,7 +151,8 @@ public class HistoryFragment extends Fragment {
         }
 
         for (Workout workout : history.getWorkouts()) {
-            HistoryWorkoutFragment historyWorkoutFragment = HistoryWorkoutFragment.newInstance(workout);
+            HistoryWorkoutFragment historyWorkoutFragment =
+                    HistoryWorkoutFragment.newInstance(workout);
             FragmentContainerView newContainer = new FragmentContainerView(getContext());
 
             newContainer.setOnClickListener(view1 -> {

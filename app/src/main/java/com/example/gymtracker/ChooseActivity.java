@@ -35,7 +35,7 @@ public class ChooseActivity extends AppCompatActivity {
             //Items that should be removed from the list before choosing
             removeList = extras.getStringArray("REMOVE_LIST");
         }
-        //Remove items form removeList
+        //Remove items from removeList
         ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(list));
         if (removeList != null) {
             arrayList.removeAll(Arrays.asList(removeList));
@@ -81,7 +81,6 @@ public class ChooseActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-
             }
 
             @Override

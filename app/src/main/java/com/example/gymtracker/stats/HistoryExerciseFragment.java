@@ -1,9 +1,8 @@
-package com.example.gymtracker.history;
+package com.example.gymtracker.stats;
 
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentContainerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,13 +12,11 @@ import android.widget.TextView;
 
 import com.example.gymtracker.R;
 import com.example.gymtracker.charts.datastructures.ExerciseEntry;
-import com.example.gymtracker.charts.datastructures.ExerciseHistory;
-import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.Set;
-import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.Formatter;
 
 import java.util.Locale;
+import java.util.Objects;
 
 
 public class HistoryExerciseFragment extends Fragment {
@@ -55,6 +52,7 @@ public class HistoryExerciseFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_history_exercise, container, false);
 
+        //set title
         TextView head = view.findViewById(R.id.exercise_history_header);
         head.setText(String.format("%s - %s %s kg",
                 Formatter.formatDate(exerciseEntry.getDate()), getResources().getString(R.string.totalWeight),
@@ -62,6 +60,15 @@ public class HistoryExerciseFragment extends Fragment {
 
         LinearLayout setContainer = view.findViewById(R.id.exercise_history_container);
 
+        //add note
+        if (!Objects.equals(exerciseEntry.getNote(), "")) {
+            TextView newSet = new TextView(getContext());
+            String note = getString(R.string.note) + " " + exerciseEntry.getNote();
+            newSet.setText(note);
+            setContainer.addView(newSet);
+        }
+
+        //add sets
         for (Set set : exerciseEntry.getSets()) {
             TextView newSet = new TextView(getContext());
             newSet.setText(String.format(l, "%d: %s kg × %d %s", set.getIndex(),

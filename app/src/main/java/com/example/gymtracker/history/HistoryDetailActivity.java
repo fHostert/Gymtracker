@@ -35,11 +35,15 @@ public class HistoryDetailActivity extends AppCompatActivity {
         if (extras != null) {
             workout = (Workout) extras.getSerializable("WORKOUT");
         }
+
+        // add title
         String title = Formatter.formatDate(workout.getDate()) + " - " + workout.getName();
         this.setTitle(title);
 
         TableLayout container = findViewById(R.id.detail_view_container);
         for (Exercise exercise : workout.getExercises()) {
+
+            //add note
             if (!Objects.equals(exercise.getNote(), "")) {
                 TextViewTableRowFragment newLine = TextViewTableRowFragment.
                         newInstance(getString(R.string.note) + " " + exercise.getNote(), true);
@@ -49,6 +53,8 @@ public class HistoryDetailActivity extends AppCompatActivity {
                         .add(newContainer.getId(), newLine).commit();
                 container.addView(newContainer);
             }
+
+            //add sets
             for (Set set : exercise.getSets()) {
                 String personalRecord = (set.isPR()) ? "\uD83C\uDFC6" : "";
                 String newLineString = String.format(l,
@@ -69,7 +75,8 @@ public class HistoryDetailActivity extends AppCompatActivity {
             int dimensionInDp =
                     (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 3, getResources().getDisplayMetrics());
-            LinearLayout.LayoutParams lp= new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dimensionInDp);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, dimensionInDp);
             separator.setLayoutParams(lp);
             separator.setBackgroundColor(getColor(R.color.boarders));
             container.addView(separator);
