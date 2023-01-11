@@ -25,4 +25,8 @@
         android:id="@+id/add_exercise_note_menu"
         android:title="@string/addNote" />
 
+    <item
+        android:id="@+id/show_stats_menu"
+        android:title="@string/showStats" />
+
 </menu>

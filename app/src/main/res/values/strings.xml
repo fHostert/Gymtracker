@@ -196,5 +196,6 @@
     <string name="noteSaved">Notiz gespeichert</string>
     <string name="note">Notiz:</string>
     <string name="noteDeleted">Notiz gelöscht</string>
+    <string name="showStats">Statistiken zeigen</string>
 
 </resources>

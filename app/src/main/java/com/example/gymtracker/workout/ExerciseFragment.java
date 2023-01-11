@@ -29,6 +29,7 @@ import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.R;
 import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.Set;
+import com.example.gymtracker.stats.StatsForExerciseActivity;
 
 import java.util.Objects;
 
@@ -173,6 +174,9 @@ public class ExerciseFragment extends Fragment {
             }
             else if (id == R.id.add_exercise_note_menu) {
                 addNote(getView(), true);
+            }
+            else if (id == R.id.show_stats_menu){
+                showStats();
             }
             return false;
         });
@@ -339,5 +343,17 @@ public class ExerciseFragment extends Fragment {
 
         ImageButton saveNoteButton = view.findViewById(R.id.delete_note_button);
         saveNoteButton.setVisibility(View.GONE);
+    }
+
+    private void showStats() {
+        if (DatabaseManager.wasExerciseNeverDone(exercise.getName())) {
+            Toast.makeText(getContext(),
+                    getResources().getString(R.string.toastNeverDoneExercise),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        final Intent intent = new Intent(getContext(), StatsForExerciseActivity.class);
+        intent.putExtra("EXERCISE", exercise.getName());
+        startActivity(intent);
     }
 }
