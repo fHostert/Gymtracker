@@ -105,6 +105,22 @@ public final class DatabaseManager {
         db.execSQL(query);
     }
 
+    public static String[] getExercisesInCurrentWorkout() {
+        String query = "SELECT DISTINCT name FROM CurrentWorkout, Exercises WHERE exerciseID = ID;";
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        String[] erg = new String[resultSet.getCount()];
+        if (resultSet.getCount() == 0) {
+            return erg;
+        }
+        for (int i = 0; i < resultSet.getCount(); i++) {
+            erg[i] = resultSet.getString(0);
+            resultSet.moveToNext();
+        }
+        resultSet.close();
+        return erg;
+    }
+
     public static void replaceExercise(int indexOfNewExercise, int indexOfOldExercise) {
         String query = String.format(l,
                 "UPDATE CurrentWorkout " +

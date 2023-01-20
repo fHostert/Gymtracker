@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="25dp"
         android:digits="abcdefghijklmnopqrstuvwxyzüöäßABCDEFGHIJKLMNOPQRSTUVWXYZÜÖÄ1234567890(),&amp; "
-        android:maxLength="25"
+        android:maxLength="30"
         android:inputType="textCapSentences"
         android:backgroundTint="@color/black"
         android:textColor="@color/black">

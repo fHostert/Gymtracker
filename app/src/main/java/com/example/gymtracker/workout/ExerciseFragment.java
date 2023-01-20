@@ -272,8 +272,9 @@ public class ExerciseFragment extends Fragment {
 
     private void replaceExerciseClick() {
         final Intent intent = new Intent(getContext(), ChooseActivity.class);
+        String[] exercisesInWorkout = DatabaseManager.getExercisesInCurrentWorkout();
         intent.putExtra("LIST", DatabaseManager.getExercises());
-        intent.putExtra("REMOVE_LIST", new String[]{exercise.getName()});
+        intent.putExtra("REMOVE_LIST", exercisesInWorkout);
         intent.putExtra("TITLE", getResources().getString(R.string.replaceExerciseThrough));
         startActivityForResult(intent, 0);
     }

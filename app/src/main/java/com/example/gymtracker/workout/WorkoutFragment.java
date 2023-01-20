@@ -22,6 +22,8 @@ import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.Set;
 import com.example.gymtracker.datastructures.Workout;
 
+import java.util.Arrays;
+
 public class WorkoutFragment extends Fragment {
 
     private static final String ARG_WORKOUT = "param1";
@@ -83,7 +85,7 @@ public class WorkoutFragment extends Fragment {
 
     private void addExerciseClick() {
         final Intent intent = new Intent(getContext(), ChooseActivity.class);
-        String[] exercisesInWorkout = workout.getExerciseNames();
+        String[] exercisesInWorkout = DatabaseManager.getExercisesInCurrentWorkout();
         intent.putExtra("LIST", DatabaseManager.getExercises());
         intent.putExtra("REMOVE_LIST", exercisesInWorkout);
         intent.putExtra("TITLE", getResources().getString(R.string.addExercise));
