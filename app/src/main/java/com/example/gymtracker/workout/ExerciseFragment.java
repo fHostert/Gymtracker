@@ -79,16 +79,16 @@ public class ExerciseFragment extends Fragment {
         }
 
         //Restore note
-        if (!Objects.equals(exercise.getNote(), "")) {
+        if (!Objects.equals(DatabaseManager.getCurrentNote(exercise.getExerciseID()), "")) {
             addNote(view, false);
             EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
             noteET.setText(exercise.getNote());
         }
-        else if (!Objects.equals(DatabaseManager.getLastNote(exercise.getExerciseID()), "")) {
+        /*else if (!Objects.equals(DatabaseManager.getLastNote(exercise.getExerciseID()), "")) {
             addNote(view, false);
             EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
             noteET.setText(DatabaseManager.getLastNote(exercise.getExerciseID()));
-        }
+        }*/
 
         //Initialize buttons
         Button addSetButton = view.findViewById(R.id.add_set_button);
@@ -282,7 +282,7 @@ public class ExerciseFragment extends Fragment {
     private void replace(String newExerciseName) {
         //Update Database
         DatabaseManager.replaceExercise(DatabaseManager.getExerciseID(newExerciseName),
-                exercise.getExerciseID());
+                exercise.getExerciseID(), positionInWorkout);
 
         //Update exercise name
         ((TextView) getView().findViewById(R.id.name_of_exercise_text_view)).

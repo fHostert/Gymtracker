@@ -51,11 +51,15 @@ public final class DatabaseManager {
     }
 
     public static void insertSetIntoCurrentWorkout(int exerciseID, int position, Set set) {
+        String note = "";
+        if (set.getIndex() == 1) {
+            note = getLastNote(exerciseID);
+        }
         String query = String.format(l,
                 "INSERT INTO CurrentWorkout VALUES " +
-                        "(%d, %d, %d, %d, '%s', '')",
+                        "(%d, %d, %d, %d, '%s', '%s')",
                         exerciseID, position, set.getIndex(), set.getReps(),
-                        Formatter.formatFloat(set.getWeight()));
+                        Formatter.formatFloat(set.getWeight()), note);
         db.execSQL(query);
     }
 
@@ -121,18 +125,17 @@ public final class DatabaseManager {
         return erg;
     }
 
-    public static void replaceExercise(int indexOfNewExercise, int indexOfOldExercise) {
-        String query = String.format(l,
-                "UPDATE CurrentWorkout " +
-                        "SET exerciseID = %d, reps = 0, weight = 0 WHERE exerciseID = %d;",
-                        indexOfNewExercise, indexOfOldExercise);
-        db.execSQL(query);
+    public static void replaceExercise(int indexOfNewExercise, int indexOfOldExercise,
+                                       int positionInWorkout) {
+        for (int i = 1; i < 4; i++) {
+            insertSetIntoCurrentWorkout(indexOfNewExercise, positionInWorkout,
+                    new Set(i, 0, 0));
+        }
 
         //Delete all but 3 sets
-        query = String.format(l,
-                "DELETE FROM CurrentWorkout " +
-                        "WHERE exerciseID = %d AND setIndex > 3;",
-                        indexOfNewExercise);
+        String query = String.format(l,
+                "DELETE FROM CurrentWorkout WHERE exerciseID = %d;",
+                        indexOfOldExercise);
         db.execSQL(query);
     }
 
@@ -364,6 +367,22 @@ public final class DatabaseManager {
                         "WHERE exerciseID = %d AND setIndex = 1;",
                         exerciseID);
         db.execSQL(query);
+    }
+
+    public static String getCurrentNote(int exerciseID){
+        String query = String.format(l,
+                "SELECT note FROM CurrentWorkout " +
+                        "WHERE exerciseID = %d AND setIndex = 1;",
+                        exerciseID);
+        Cursor resultSet = db.rawQuery(query, null);
+        if (resultSet.getCount() == 0){
+            resultSet.close();
+            return "";
+        }
+        resultSet.moveToFirst();
+        String erg = resultSet.getString(0);
+        resultSet.close();
+        return erg;
     }
 
     /*##############################################################################################
@@ -727,11 +746,16 @@ public final class DatabaseManager {
         int position = 1;
         for (Exercise exercise : getExercisesInTemplate(templateName)) {
             for (int i = 0; i < exercise.getSets().size(); i++) {
+                String note = "";
+                if (i == 0) {
+                    note = getLastNote(exercise.getExerciseID());
+                }
                 String query = String.format(l,
-                        "INSERT INTO CurrentWorkout VALUES (%d, %d, %d, %d, '%s', '');",
+                        "INSERT INTO CurrentWorkout VALUES (%d, %d, %d, %d, '%s', '%s');",
                         exercise.getExerciseID(), position, i + 1,
                         exercise.getSets().get(i).getReps(),
-                        Formatter.formatFloat(exercise.getSets().get(i).getWeight()));
+                        Formatter.formatFloat(exercise.getSets().get(i).getWeight()),
+                        note);
                 db.execSQL(query);
             }
             position++;
