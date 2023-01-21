@@ -173,11 +173,11 @@ public final class DatabaseManager {
         db.execSQL(query);
     }
 
-    public static void moveExerciseDown(int exerciseID, int oldIndex) {
+    public static void moveExerciseDown(int exerciseID, int oldPosition) {
         String query = String.format(l,
                 "UPDATE CurrentWorkout SET position = position - 1 " +
                         "WHERE position = %d;",
-                oldIndex + 1);
+                oldPosition + 1);
         db.execSQL(query);
 
         query = String.format(l,
@@ -743,7 +743,7 @@ public final class DatabaseManager {
         setCurrentWorkoutMetadata(templateName);
 
         //insert all sets from template into current workout
-        int position = 1;
+        int position = 0;
         for (Exercise exercise : getExercisesInTemplate(templateName)) {
             for (int i = 0; i < exercise.getSets().size(); i++) {
                 String note = "";

@@ -109,8 +109,8 @@ public class SetFragment extends Fragment {
         view.findViewById(R.id.set_table_row).setBackgroundColor(
                 getResources().getColor(R.color.setCompleted));
 
-        /* please ignore this
-        weightET.setTextColor(getResources().getColor(R.color.black));
+        //please ignore this
+        /*weightET.setTextColor(getResources().getColor(R.color.black));
         repsET.setTextColor(getResources().getColor(R.color.black));
         weightET.setHintTextColor(getResources().getColor(R.color.black));
         repsET.setHintTextColor(getResources().getColor(R.color.black));
