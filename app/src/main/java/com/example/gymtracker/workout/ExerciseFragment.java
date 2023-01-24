@@ -284,19 +284,12 @@ public class ExerciseFragment extends Fragment {
         DatabaseManager.replaceExercise(DatabaseManager.getExerciseID(newExerciseName),
                 exercise.getExerciseID(), positionInWorkout);
 
-        //Update exercise name
-        ((TextView) getView().findViewById(R.id.name_of_exercise_text_view)).
-                setText(newExerciseName);
+        //Update Layout
+        ((WorkoutFragment) getParentFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT"))
+                .replaceExercise(newExerciseName, positionInWorkout);
+
+        //Update exercise
         exercise = new Exercise(DatabaseManager.getExerciseID(newExerciseName));
-
-        //Remove old sets
-        LinearLayout setContainer = getView().findViewById(R.id.set_container);
-        setContainer.removeAllViews();
-
-        //Add empty Sets
-        addEmptySet(false);
-        addEmptySet(false);
-        addEmptySet(false);
     }
 
     private void deleteLastSet() {

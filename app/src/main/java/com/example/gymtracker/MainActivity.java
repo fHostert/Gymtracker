@@ -235,7 +235,8 @@ public class MainActivity extends AppCompatActivity {
         if (workout != null) {
             WorkoutFragment workoutFragment = WorkoutFragment.newInstance(workout);
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.home_container, workoutFragment).commit();
+                    .replace(R.id.home_container, workoutFragment,
+                "WORKOUT_FRAGMENT").commit();
             getSupportFragmentManager().executePendingTransactions();
             this.setTitle(DatabaseManager.getCurrentWorkoutName());
             startWorkout();
@@ -248,7 +249,8 @@ public class MainActivity extends AppCompatActivity {
     public void startEmptyWorkoutClick(View view) {
         WorkoutFragment newWorkout = new WorkoutFragment();
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.home_container, newWorkout).commit();
+                .replace(R.id.home_container, newWorkout,
+            "WORKOUT_FRAGMENT").commit();
         DatabaseManager.createCurrentWorkoutTable();
         DatabaseManager.createCurrentWorkoutMetadataTable();
         DatabaseManager.setCurrentWorkoutMetadata(

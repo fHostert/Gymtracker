@@ -121,4 +121,22 @@ public class WorkoutFragment extends Fragment {
         Exercise exercise = new Exercise(DatabaseManager.getExerciseID(exerciseName));
         addExercise(exercise, getView(), true);
     }
+
+    public void replaceExercise(String newExercise, int positionInWorkout) {
+        LinearLayout exerciseContainer = getView().findViewById(R.id.exercise_container);
+        exerciseContainer.removeViewAt(positionInWorkout);
+
+        Exercise exercise = new Exercise(DatabaseManager.getExerciseID(newExercise));
+
+        ExerciseFragment exerciseFragment = ExerciseFragment.newInstance(exercise, positionInWorkout);
+        FragmentContainerView newContainer = new FragmentContainerView(getContext());
+        newContainer.setId(View.generateViewId());
+
+        //Give the exerciseFragment an unique tag and add it
+        getParentFragmentManager().beginTransaction()
+                .add(newContainer.getId(), exerciseFragment, "EXERCISE" + exercise.getName())
+                .commit();
+        exerciseContainer.addView(newContainer, positionInWorkout);
+
+    }
 }
