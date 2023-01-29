@@ -84,15 +84,10 @@ public class ExerciseFragment extends Fragment {
             EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
             noteET.setText(exercise.getNote());
         }
-        /*else if (!Objects.equals(DatabaseManager.getLastNote(exercise.getExerciseID()), "")) {
-            addNote(view, false);
-            EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
-            noteET.setText(DatabaseManager.getLastNote(exercise.getExerciseID()));
-        }*/
 
         //Initialize buttons
         Button addSetButton = view.findViewById(R.id.add_set_button);
-        addSetButton.setOnClickListener(view1 -> addEmptySet(true));
+        addSetButton.setOnClickListener(view1 -> addEmptySet());
 
         ImageButton exerciseMenuButton = view.findViewById(R.id.exercise_menu_button);
         exerciseMenuButton.setOnClickListener(view1 -> exerciseMenuClick());
@@ -145,11 +140,11 @@ public class ExerciseFragment extends Fragment {
         }
     }
 
-    private void addEmptySet(boolean addToCurrentWorkoutTable) {
+    private void addEmptySet() {
         LinearLayout setContainer = getView().findViewById(R.id.set_container);
         int setIndex = setContainer.getChildCount() + 1;
         Set set = new Set(setIndex);
-        addSet(set, getView(), addToCurrentWorkoutTable);
+        addSet(set, getView(), true);
     }
 
     private void exerciseMenuClick() {
@@ -164,7 +159,7 @@ public class ExerciseFragment extends Fragment {
                 moveExerciseDown();
             }
             else if (id == R.id.remove_exercise_menu) {
-                removeExercise();
+                deleteExercise();
             }
             else if (id == R.id.replace_exercise_menu) {
                 replaceExerciseClick();
@@ -187,8 +182,9 @@ public class ExerciseFragment extends Fragment {
 
     private void moveExerciseUp() {
         //Get the exercise container
-        LinearLayout exerciseContainer = ((View) getView().getParent().getParent())
-                .findViewById(R.id.exercise_container);
+        LinearLayout exerciseContainer =
+                ((WorkoutFragment) getParentFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT"))
+                        .getExerciseLayout();
 
         //Exercise already up
         if (positionInWorkout == 0) {
@@ -206,22 +202,16 @@ public class ExerciseFragment extends Fragment {
         exerciseContainer.removeViewAt(positionInWorkout);
         exerciseContainer.addView(thisExercise, positionInWorkout - 1);
 
-        //Update positionInWorkout of other exercise
-        String nameOfAboveExercise = (String) ((TextView)
-                exerciseContainer.getChildAt(positionInWorkout).
-                        findViewById(R.id.name_of_exercise_text_view)).getText();
-        ((ExerciseFragment) getParentFragmentManager()
-                .findFragmentByTag("EXERCISE" + nameOfAboveExercise))
-                .addToPositionInWorkout(1);
-
-        //Update position
-        positionInWorkout--;
+        //Update Position in Workout
+        ((WorkoutFragment) getParentFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT"))
+                .refreshExercisePositions();
     }
 
     private void moveExerciseDown() {
         //Get the exercise container
-        LinearLayout exerciseContainer = ((View) getView().getParent().getParent())
-                .findViewById(R.id.exercise_container);
+        LinearLayout exerciseContainer =
+                ((WorkoutFragment) getParentFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT"))
+                .getExerciseLayout();
 
         //Exercise already down
         if (positionInWorkout == exerciseContainer.getChildCount() - 1) {
@@ -239,19 +229,12 @@ public class ExerciseFragment extends Fragment {
         exerciseContainer.removeViewAt(positionInWorkout);
         exerciseContainer.addView(thisExercise, positionInWorkout + 1);
 
-        //Update positionInWorkout of other exercise
-        String nameOfBelowExercise = (String) ((TextView)
-                exerciseContainer.getChildAt(positionInWorkout).
-                        findViewById(R.id.name_of_exercise_text_view)).getText();
-        ((ExerciseFragment) getParentFragmentManager()
-                .findFragmentByTag("EXERCISE" + nameOfBelowExercise))
-                .addToPositionInWorkout(-1);
-
-        //Update position
-        positionInWorkout++;
+        //Update Position in Workout
+        ((WorkoutFragment) getParentFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT"))
+                .refreshExercisePositions();
     }
 
-    private void removeExercise() {
+    private void deleteExercise() {
         //Update Database
         DatabaseManager.deleteExerciseFromCurrentWorkout(exercise.getExerciseID());
 
@@ -264,10 +247,10 @@ public class ExerciseFragment extends Fragment {
         Toast.makeText(getContext(),
                 getResources().getString(R.string.exerciseRemoved),
                 Toast.LENGTH_SHORT).show();
-    }
 
-    public void addToPositionInWorkout(int difference) {
-        positionInWorkout += difference;
+        //Update Position in Workout
+        ((WorkoutFragment) getParentFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT"))
+                .refreshExercisePositions();
     }
 
     private void replaceExerciseClick() {
@@ -290,6 +273,10 @@ public class ExerciseFragment extends Fragment {
 
         //Update exercise
         exercise = new Exercise(DatabaseManager.getExerciseID(newExerciseName));
+
+        //Update Position in Workout
+        ((WorkoutFragment) getParentFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT"))
+                .refreshExercisePositions();
     }
 
     private void deleteLastSet() {
@@ -349,5 +336,9 @@ public class ExerciseFragment extends Fragment {
         final Intent intent = new Intent(getContext(), StatsForExerciseActivity.class);
         intent.putExtra("EXERCISE", exercise.getName());
         startActivity(intent);
+    }
+
+    public void setPositionInWorkout(int i) {
+        positionInWorkout = i;
     }
 }

@@ -137,6 +137,19 @@ public class WorkoutFragment extends Fragment {
                 .add(newContainer.getId(), exerciseFragment, "EXERCISE" + exercise.getName())
                 .commit();
         exerciseContainer.addView(newContainer, positionInWorkout);
+    }
 
+    public void refreshExercisePositions(){
+        String[] exercises = DatabaseManager.getExercisesInCurrentWorkout();
+        int counter = 0;
+        for (String e : exercises){
+            ((ExerciseFragment) getParentFragmentManager().findFragmentByTag("EXERCISE" + e))
+                    .setPositionInWorkout(counter);
+            counter++;
+        }
+    }
+
+    public LinearLayout getExerciseLayout() {
+        return getView().findViewById(R.id.exercise_container);
     }
 }

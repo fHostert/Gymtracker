@@ -110,7 +110,8 @@ public final class DatabaseManager {
     }
 
     public static String[] getExercisesInCurrentWorkout() {
-        String query = "SELECT DISTINCT name FROM CurrentWorkout, Exercises WHERE exerciseID = ID;";
+        String query = "SELECT DISTINCT name FROM CurrentWorkout, Exercises WHERE exerciseID = ID" +
+                        " ORDER BY position ASC;";
         Cursor resultSet = db.rawQuery(query, null);
         resultSet.moveToFirst();
         String[] erg = new String[resultSet.getCount()];
