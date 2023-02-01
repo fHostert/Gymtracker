@@ -273,10 +273,6 @@ public class ExerciseFragment extends Fragment {
 
         //Update exercise
         exercise = new Exercise(DatabaseManager.getExerciseID(newExerciseName));
-
-        //Update Position in Workout
-        ((WorkoutFragment) getParentFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT"))
-                .refreshExercisePositions();
     }
 
     private void deleteLastSet() {
