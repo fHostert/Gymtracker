@@ -24,7 +24,9 @@ import com.example.gymtracker.charts.datastructures.WorkoutEntry;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.helper.Formatter;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -144,11 +146,13 @@ public class StatsFragment extends Fragment {
 
         //Add data to entries list
         List<Entry> entries = new ArrayList<>();
+        float sum = 0;
         for (WorkoutEntry workout : history) {
             long timestamp = Formatter.convertDateToUnixTimestampSeconds(workout.getDate());
             float durationInMinutes = (float) workout.getDuration() / 60;
             float average = durationInMinutes / daysToAverageOver;
             entries.add(new Entry(timestamp, average));
+            sum += average;
         }
         //this fixes a common bug in the library
         Collections.sort(entries, new EntryXComparator());
@@ -163,6 +167,14 @@ public class StatsFragment extends Fragment {
         //bind set to chart
         LineData lineData = new LineData(dataSet);
         chart.setData(lineData);
+
+        LimitLine averageLine = new LimitLine(sum / history.size());
+        averageLine.setLineColor(getResources().getColor(R.color.red));
+        averageLine.setLineWidth(3f);
+
+        YAxis leftAxis = chart.getAxisLeft();
+        leftAxis.removeAllLimitLines(); // reset all limit lines to avoid overlapping lines
+        leftAxis.addLimitLine(averageLine);
 
         //refresh
         chart.invalidate();
