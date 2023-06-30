@@ -7,34 +7,65 @@
     android:orientation="vertical"
     tools:context=".workout.ExerciseFragment">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/horizontal_margin_from_boxes_to_inside"
-            android:weightSum="100">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/horizontal_margin_from_boxes_to_inside"
+        android:weightSum="100">
 
-            <TextView
-                android:id="@+id/name_of_exercise_text_view"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="85"
-                android:text="Name der Übung"
-                android:textSize="@dimen/headline_size"
-                android:textStyle="bold" />
+        <TextView
+            android:id="@+id/name_of_exercise_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="70"
+            android:text="Name der Übung"
+            android:textSize="@dimen/headline_size"
+            android:textStyle="bold" />
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="15">
+            <ImageButton
+                android:id="@+id/exercise_up_button"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="50"
+                android:background="@drawable/ic_baseline_keyboard_arrow_up_24"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:backgroundTint="@color/buttonText">
+            </ImageButton>
 
             <ImageButton
-                android:id="@+id/exercise_menu_button"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/menu_button_height"
-                android:layout_marginEnd="@dimen/vertical_margin_from_boxes_to_inside"
-                android:layout_weight="15"
-                android:background="@drawable/ic_baseline_more_vert_24"
+                android:id="@+id/exercise_down_button"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="50"
+                android:background="@drawable/ic_baseline_keyboard_arrow_down_24"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:gravity="center"
                 android:backgroundTint="@color/buttonText">
             </ImageButton>
         </LinearLayout>
+
+
+        <ImageButton
+            android:id="@+id/exercise_menu_button"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/menu_button_height"
+            android:layout_marginEnd="@dimen/vertical_margin_from_boxes_to_inside"
+            android:layout_weight="15"
+            android:background="@drawable/ic_baseline_more_vert_24"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:backgroundTint="@color/buttonText">
+        </ImageButton>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

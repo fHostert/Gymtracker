@@ -96,6 +96,12 @@ public class ExerciseFragment extends Fragment {
         Button addSetButton = view.findViewById(R.id.add_set_button);
         addSetButton.setOnClickListener(view1 -> addEmptySet());
 
+        ImageButton moveExerciseUp = view.findViewById(R.id.exercise_up_button);
+        moveExerciseUp.setOnClickListener(view1 -> moveExerciseUp());
+
+        ImageButton moveExerciseDown = view.findViewById(R.id.exercise_down_button);
+        moveExerciseDown.setOnClickListener(view1 -> moveExerciseDown());
+
         ImageButton exerciseMenuButton = view.findViewById(R.id.exercise_menu_button);
         exerciseMenuButton.setOnClickListener(view1 -> exerciseMenuClick());
 
@@ -165,8 +171,6 @@ public class ExerciseFragment extends Fragment {
         if (addToCurrentWorkoutTable) {
             DatabaseManager.addSetToExerciseInCurrentWorkout(exercise.getExerciseID(), set);
         }
-
-        TextView textView = view.findViewById(R.id.name_of_exercise_text_view); // Ersetze "R.id.textView" durch die ID deines TextView-Elements
     }
 
     private void addEmptySet() {
@@ -181,13 +185,7 @@ public class ExerciseFragment extends Fragment {
         PopupMenu popup = new PopupMenu(getContext(), thisButton);
         popup.setOnMenuItemClickListener(menuItem -> {
             int id = menuItem.getItemId();
-            if (id == R.id.move_exercise_up_menu) {
-                moveExerciseUp();
-            }
-            else if (id == R.id.move_exercise_down_menu) {
-                moveExerciseDown();
-            }
-            else if (id == R.id.remove_exercise_menu) {
+            if (id == R.id.remove_exercise_menu) {
                 deleteExercise();
             }
             else if (id == R.id.replace_exercise_menu) {
