@@ -3,19 +3,26 @@ package com.example.gymtracker.workout;
 import static android.app.Activity.RESULT_OK;
 
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 
 
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
 import android.text.Editable;
+import android.text.TextPaint;
+import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -114,6 +121,26 @@ public class ExerciseFragment extends Fragment {
             }
         });
 
+        // Reduce text size until it fits
+        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                TextView textView = view.findViewById(R.id.name_of_exercise_text_view);
+                textView.setSingleLine(true);
+                textView.setEllipsize(TextUtils.TruncateAt.END);
+                float originalTextSize = textView.getTextSize();
+                TextPaint textPaint = textView.getPaint();
+                float textWidth = textPaint.measureText(textView.getText().toString());
+                while (textWidth > textView.getWidth()) {
+                    originalTextSize--;
+                    textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, originalTextSize);
+                    textWidth = textPaint.measureText(textView.getText().toString());
+                }
+            }
+        });
+
         return view;
     }
 
@@ -138,6 +165,8 @@ public class ExerciseFragment extends Fragment {
         if (addToCurrentWorkoutTable) {
             DatabaseManager.addSetToExerciseInCurrentWorkout(exercise.getExerciseID(), set);
         }
+
+        TextView textView = view.findViewById(R.id.name_of_exercise_text_view); // Ersetze "R.id.textView" durch die ID deines TextView-Elements
     }
 
     private void addEmptySet() {
