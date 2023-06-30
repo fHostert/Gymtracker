@@ -1193,51 +1193,6 @@ public final class DatabaseManager {
     /*##############################################################################################
     #############################################GENERAL############################################
     ##############################################################################################*/
-    public static String exportDatabase(String databasePath) {
-        try {
-            File download = Environment
-                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-
-            if (download.canWrite()) {
-                String backupDBPath = "GymtrackerExport.db";
-                File currentDB = new File(databasePath);
-                File backupDB = new File(download, backupDBPath);
-
-                FileChannel src = new FileInputStream(currentDB).getChannel();
-                FileChannel dst = new FileOutputStream(backupDB).getChannel();
-                dst.transferFrom(src, 0, src.size());
-                src.close();
-                dst.close();
-                return download.getAbsolutePath() + "/" + backupDBPath;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
-    public static boolean importDatabase(String databasePath, Uri uri) {
-        //TODO basic check if valid file was chosen
-        try {
-            File download = Environment
-                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            if (download.canWrite()) {
-                File currentDB = new File(databasePath);
-                File backupDB  = new File(uri.getPath().split(":")[1]);
-
-                FileChannel src = new FileInputStream(backupDB).getChannel();
-                FileChannel dst = new FileOutputStream(currentDB).getChannel();
-                dst.transferFrom(src, 0, src.size());
-                src.close();
-                dst.close();
-                return true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     public static void dropTable(String table) {
         if (doesTableExist(table)) {
             String query = String.format("DROP TABLE \"%s\";", table);

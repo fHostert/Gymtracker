@@ -2,11 +2,14 @@ package com.example.gymtracker;
 
 import static android.database.sqlite.SQLiteDatabase.openOrCreateDatabase;
 
+import static androidx.core.content.FileProvider.getUriForFile;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
@@ -24,6 +27,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -42,7 +46,16 @@ import com.example.gymtracker.templates.AddTemplateActivity;
 import com.example.gymtracker.workout.WorkoutFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.io.Console;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -65,16 +78,9 @@ public class MainActivity extends AppCompatActivity {
         DatabaseManager.createWorkoutsTable();
         DatabaseManager.createTemplatesTable();
 
-        //DIE NÄCHSTE ZEILE KANN EINKOMMENTIERT WERDEN, UM FÜR DIE LETZTEN 100 TAGE FAKE WORKOUTS
-        //IN DIE DATENBANK EINZUTRAGEN. DIE ÜBUNG BANKDRÜCKEN WIRD JEWEILS DURCHGEFÜHRT.
-        //SO KÖNNEN DIE STATISTIKEN GETESTET WERDEN
-
         //DatabaseManager.fillWorkoutsTable(100);
 
-        //DIE NÄCHSTE ZEILE LÖSCHT DIE FAKE WORKOUTS WIEDER AUS DER DATENBANK.
-
         //DatabaseManager.deleteFakeEntries();
-
 
         //Bottom Navigation View Setup
         BottomNavigationView navView = findViewById(R.id.nav_view);
@@ -129,6 +135,13 @@ public class MainActivity extends AppCompatActivity {
 
         //restore the last workout if it did not exit properly
         restoreWorkout();
+
+        //Check if app got opened by clicking on a .Gymtracker database
+        Intent intent = getIntent();
+        if (intent != null && Intent.ACTION_VIEW.equals(intent.getAction())) {
+            Uri fileUri = intent.getData();
+            importDatabase(fileUri);
+        }
     }
 
     @Override
@@ -192,9 +205,6 @@ public class MainActivity extends AppCompatActivity {
         }
         else if (id == R.id.create_new_template_menu) {
             createNewTemplate();
-        }
-        else if (id == R.id.import_data_menu) {
-            importDatabaseClick();
         }
         else if (id == R.id.export_data_menu) {
             exportDatabase();
@@ -383,80 +393,108 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void exportDatabase() {
-        boolean hasPermission =
-                (ContextCompat.checkSelfPermission(
-                        this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        == PackageManager.PERMISSION_GRANTED);
-
-        if (!hasPermission) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    112);
-        }
-
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setMessage(getResources().getString(R.string.exportDataText));
         alert.setTitle(getResources().getString(R.string.exportData));
 
         //If ok, continue
         alert.setPositiveButton(getResources().getString(R.string.ok), (dialogInterface, i) -> {
-            String exportPath = " " + DatabaseManager.exportDatabase(
-                    this.getDatabasePath("Gymtracker").getAbsolutePath());
-            if (!exportPath.equals(" ")) {
-                Toast.makeText(this,
-                        getResources().getString(R.string.toastExportSuccess) + exportPath,
-                        Toast.LENGTH_LONG).show();
-            }
-            else {
-                Toast.makeText(this,
-                        getResources().getString(R.string.toastExportFail),
-                        Toast.LENGTH_SHORT).show();
+            boolean hasPermission =
+                    (ContextCompat.checkSelfPermission(
+                            this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            == PackageManager.PERMISSION_GRANTED);
+
+            if (!hasPermission) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        112);
             }
 
+            //copy current database
+            String databasePath = this.getDatabasePath("Gymtracker").getAbsolutePath();
+            String exportFileName = "Gymtracker.Gymtracker";
+            File exportFile = new File(getExternalFilesDir(null), exportFileName);
+            try {
+                InputStream inputStream = new FileInputStream(databasePath);
+                OutputStream outputStream = new FileOutputStream(exportFile);
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = inputStream.read(buffer)) > 0) {
+                    outputStream.write(buffer, 0, length);
+                }
+                outputStream.flush();
+                outputStream.close();
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Uri contentUri = FileProvider.getUriForFile(
+                    this, "com.example.gymtracker.fileprovider", exportFile);
+
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("application/octet-stream");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            this.startActivity(Intent.createChooser(shareIntent, getResources().getString(R.string.exportData)));
         });
+
         //If cancel, return
         alert.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
         });
-
         alert.show();
     }
 
-    private void importDatabaseClick() {
+    private void importDatabase(Uri uri) {
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setMessage(getResources().getString(R.string.importDataText));
         alert.setTitle(getResources().getString(R.string.importData));
 
         //If ok, continue
         alert.setPositiveButton(getResources().getString(R.string.ok), (dialogInterface, i) -> {
-            Intent intent = new Intent()
-                    .setType("*/*")
-                    .setAction(Intent.ACTION_GET_CONTENT);
+            AlertDialog.Builder alertCon = new AlertDialog.Builder(this);
+            alertCon.setMessage(getResources().getString(R.string.importDataTextConfirmation));
+            alertCon.setTitle(getResources().getString(R.string.importData));
 
-            startActivityForResult(Intent.createChooser(intent, "Select a file"), 3);
+            //If ok, continue
+            alertCon.setPositiveButton(getResources().getString(R.string.ok), (dialogInterfaceCon, iCon) -> {
+
+                //Overwrite old Database
+                String oldDatabaseFilePath = this.getDatabasePath("Gymtracker").getAbsolutePath();
+                try {
+                    InputStream inputStream = getContentResolver().openInputStream(uri);
+                    FileOutputStream outputStream = new FileOutputStream(oldDatabaseFilePath);
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                    }
+                    outputStream.close();
+                    inputStream.close();
+
+                    //Reload UI
+                    reload();
+                    ((HistoryFragment) getSupportFragmentManager().
+                            findFragmentByTag("history_fragment")).reload();
+                    Toast.makeText(this,
+                            getResources().getString(R.string.toastImportSuccess),
+                            Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    Toast.makeText(this,
+                            getResources().getString(R.string.toastImportFail),
+                            Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            });
+            //If cancel, return
+            alertCon.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
+            });
+            alertCon.show();
         });
         //If cancel, return
         alert.setNegativeButton(getResources().getString(R.string.cancel), (dialog, whichButton) -> {
         });
-
         alert.show();
-    }
-
-    private void importDatabase(Uri uri) {
-        if (DatabaseManager.importDatabase(
-                this.getDatabasePath("Gymtracker").getAbsolutePath(), uri)) {
-            //TODO check if database is valid and load backup if not
-            Toast.makeText(this,
-                    getResources().getString(R.string.toastImportSuccess),
-                    Toast.LENGTH_SHORT).show();
-            reload();
-            ((HistoryFragment) getSupportFragmentManager().
-                    findFragmentByTag("history_fragment")).reload();
-        }
-        else {
-            Toast.makeText(this,
-                    getResources().getString(R.string.toastImportFail),
-                    Toast.LENGTH_SHORT).show();
-        }
     }
 
     /*##############################################################################################

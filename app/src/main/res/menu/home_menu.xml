@@ -24,11 +24,6 @@
         android:iconTint="@color/white"/>
 
     <item
-        android:id="@+id/import_data_menu"
-        android:title="@string/importData"
-        android:iconTint="@color/white"/>
-
-    <item
         android:id="@+id/export_data_menu"
         android:title="@string/exportData"
         android:iconTint="@color/white"/>
