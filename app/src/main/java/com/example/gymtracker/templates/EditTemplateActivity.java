@@ -25,7 +25,6 @@ import java.util.Objects;
 public class EditTemplateActivity extends AppCompatActivity {
 
     private String name = "";
-    private boolean editingTemplate = false;
     private ArrayList<TemplateRowFragment> fragments = new ArrayList<>();;
 
         //TODO Scrtollview
@@ -47,12 +46,14 @@ public class EditTemplateActivity extends AppCompatActivity {
         if (extras != null) {
             name = extras.getString("NAME");
             String[] exercisesInTemplate = extras.getStringArray("EXERCISES");
+            int[] numberOfSets = extras.getIntArray("NUMBEROFSETS");
 
             //editing Template
             if (exercisesInTemplate != null) {
-                editingTemplate = true;
+                int counter = 0;
                 for (String name : exercisesInTemplate) {
-                    addExerciseToTemplate(name);
+                    addExerciseToTemplate(name, numberOfSets[counter]);
+                    counter++;
                 }
             }
         }
@@ -64,7 +65,7 @@ public class EditTemplateActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         //add Exercise to Template
         if (resultCode == RESULT_OK && requestCode == 0) {
-            addExerciseToTemplate(data.getExtras().getString("ITEM"));
+            addExerciseToTemplate(data.getExtras().getString("ITEM"), 3);
         }
     }
 
@@ -137,10 +138,10 @@ public class EditTemplateActivity extends AppCompatActivity {
         startActivityForResult(intent, 0);
     }
 
-    private void addExerciseToTemplate(String exerciseName) {
+    private void addExerciseToTemplate(String exerciseName, int numberOfSets) {
         LinearLayout exerciseContainer = findViewById(R.id.new_template_exercises_layout);
         TemplateRowFragment newLine = TemplateRowFragment.
-                newInstance(exerciseName);
+                newInstance(exerciseName, numberOfSets);
         FragmentContainerView newContainer = new FragmentContainerView(this);
         newContainer.setId(View.generateViewId());
         getSupportFragmentManager().beginTransaction()
@@ -161,6 +162,18 @@ public class EditTemplateActivity extends AppCompatActivity {
         return exercises;
     }
 
+    private int[] getNumberOfSets() {
+        int[] numberOfSets = new int[getExercises().size()];
+        LinearLayout exerciseContainer = findViewById(R.id.new_template_exercises_layout);
+        for (int i = 0; i < exerciseContainer.getChildCount(); i++) {
+            View childView = exerciseContainer.getChildAt(i);
+            EditText numberOfSetsET = (EditText)childView.findViewById(R.id.number_of_sets_edit_text);
+            int sets = Integer.parseInt(numberOfSetsET.getText().toString());
+            numberOfSets[i] = sets;
+        }
+        return numberOfSets;
+    }
+
     public void saveTemplateClick(View view) {
         if (getExercises().size() == 0) {
             Toast.makeText(this,
@@ -168,7 +181,7 @@ public class EditTemplateActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT).show();
             return;
         }
-        DatabaseManager.saveTemplate(name, getExercises());
+        DatabaseManager.saveTemplate(name, getExercises(), getNumberOfSets());
         setResult(RESULT_OK, new Intent());
         finish();
     }

@@ -767,7 +767,7 @@ public final class DatabaseManager {
         }
     }
 
-    public static void saveTemplate(String name, ArrayList<String> exercises) {
+    public static void saveTemplate(String name, ArrayList<String> exercises, int[] numberOfSets) {
         int position = 0;
 
         //get distinct names
@@ -808,11 +808,13 @@ public final class DatabaseManager {
                 "DELETE FROM Templates WHERE name = '%s'", name);
         db.execSQL(query);
 
+        int counter = 0;
         for (String exerciseName : exercises) {
             query = String.format(l,
-                    "INSERT INTO Templates VALUES ('%s', %d, 3, %d);",
-                    name, getExerciseID(exerciseName), position);
+                    "INSERT INTO Templates VALUES ('%s', %d, %d, %d);",
+                    name, getExerciseID(exerciseName), numberOfSets[counter], position);
             db.execSQL(query);
+            counter++;
         }
     }
 

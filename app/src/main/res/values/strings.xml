@@ -173,7 +173,8 @@
     <string name="trainingTimeInMinutes">Trainingszeit in Minuten:</string>
     <string name="volume">Gesamtvolumen</string>
     <string name="volumeAndMaxWeight">Volumen und Maximalgewicht</string>
-    <string name="ofFirst3SetsInKG">der ersten 3 Sätze in KG:</string>
+    <string name="ofFirst">der ersten</string>
+    <string name="SetsInKG">Sätze in KG:</string>
     <string name="ofFirst3Sets">der ersten 3 Sätze</string>
     <string name="volumeOfFirst3Sets">Volumen der ersten 3 Sätze</string>
     <string name="maxWeight">Maximalgewicht</string>
@@ -203,5 +204,7 @@
     <string name="moveTemplateDown">Vorlage nach unten schieben</string>
     <string name="toastTemplateAlreadyUp">Vorlage ist bereits ganz oben</string>
     <string name="toastTemplateAlreadyDown">Vorlage ist bereits ganz unten</string>
+    <string name="volumeOfFirst">Volumen der ersten</string>
+    <string name="saetze">Sätze</string>
 
 </resources>

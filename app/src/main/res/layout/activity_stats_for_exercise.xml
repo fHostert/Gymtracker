@@ -20,14 +20,44 @@
             android:text="@string/volumeAndMaxWeight"
             android:layout_marginTop="@dimen/vertical_margin_between_boxes">
         </TextView>
-        <TextView
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/large_text"
-            android:gravity="center"
-            android:text="@string/ofFirst3SetsInKG"
-            android:layout_marginTop="@dimen/vertical_margin_between_boxes">
-        </TextView>
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/large_text"
+                android:gravity="center"
+                android:text="@string/ofFirst"
+                android:layout_gravity="center"
+                >
+            </TextView>
+            <EditText
+                android:id="@+id/days_to_calc_edit_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="3"
+                android:layout_marginHorizontal="2dp"
+                android:digits="123456789"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textColor="@color/buttonText">
+            </EditText>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/large_text"
+                android:gravity="center"
+                android:text="@string/SetsInKG"
+                android:layout_gravity="center">
+            </TextView>
+
+        </LinearLayout>
+
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/exercise_volume_chart"

@@ -197,6 +197,13 @@ public class TemplateFragment extends Fragment {
         final Intent intent = new Intent(getContext(), EditTemplateActivity.class);
         intent.putExtra("NAME", template.getName());
         intent.putExtra("EXERCISES", template.getExerciseNames());
+        int[] numberOfSets = new int[template.getExerciseNames().length];
+        int counter = 0;
+        for (Exercise exercise : template.getExercises()) {
+            numberOfSets[counter] = exercise.getSets().size();
+            counter++;
+        }
+        intent.putExtra("NUMBEROFSETS", numberOfSets);
         startActivityForResult(intent, 2);
     }
 

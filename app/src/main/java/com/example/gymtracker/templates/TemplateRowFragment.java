@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -20,17 +21,20 @@ import com.example.gymtracker.workout.WorkoutFragment;
 public class TemplateRowFragment extends Fragment {
 
     private static final String ARG_TEXT = "param1";
+    private static final String ARG_SETS = "param2";
 
     private String text;
+    private int numberOfSets;
 
     public TemplateRowFragment() {
         // Required empty public constructor
     }
 
-    public static TemplateRowFragment newInstance(String text) {
+    public static TemplateRowFragment newInstance(String text, int numberOfSets) {
         TemplateRowFragment fragment = new TemplateRowFragment();
         Bundle args = new Bundle();
         args.putString(ARG_TEXT, text);
+        args.putInt(ARG_SETS, numberOfSets);
         fragment.setArguments(args);
         return fragment;
     }
@@ -40,6 +44,7 @@ public class TemplateRowFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             text = getArguments().getString(ARG_TEXT);
+            numberOfSets = getArguments().getInt(ARG_SETS);
         }
     }
 
@@ -51,6 +56,9 @@ public class TemplateRowFragment extends Fragment {
 
         TextView textView =  view.findViewById(R.id.text_view_template_row);
         textView.setText(text);
+
+        EditText editText =  view.findViewById(R.id.number_of_sets_edit_text);
+        editText.setText(Integer.toString(numberOfSets));
 
         //Initialize buttons
         ImageButton deleteExerciseButton = view.findViewById(R.id.delete_exercise_from_template_button);

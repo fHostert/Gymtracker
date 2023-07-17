@@ -18,7 +18,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_weight="15">
+            android:layout_weight="20">
             <ImageButton
                 android:id="@+id/exercise_up_template_button"
                 android:layout_width="match_parent"
@@ -42,26 +42,60 @@
             </ImageButton>
         </LinearLayout>
 
-    <TextView
-        android:id="@+id/text_view_template_row"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:text="adsfgagfasga"
-        android:gravity="center"
-        android:layout_weight="70"
-        android:textSize="@dimen/large_text"
-        />
 
-    <ImageButton
-        android:id="@+id/delete_exercise_from_template_button"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/menu_button_height"
-        android:layout_weight="15"
-        android:background="@drawable/ic_baseline_delete_24"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:gravity="center"
-        android:backgroundTint="@color/buttonText">
-    </ImageButton>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_weight="60">
+            <EditText
+                android:id="@+id/number_of_sets_edit_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="3"
+                android:layout_marginHorizontal="2dp"
+                android:digits="123456789"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textColor="@color/buttonText">
+            </EditText>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="@dimen/horizontal_margin_between_boxes"
+                android:text="×"
+                android:gravity="center"
+                android:textSize="@dimen/large_text"
+                />
+
+            <TextView
+                android:id="@+id/text_view_template_row"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="adsfgagfasga"
+                android:gravity="center"
+
+                android:textSize="@dimen/large_text"
+                />
+
+        </LinearLayout>
+
+
+
+        <ImageButton
+            android:id="@+id/delete_exercise_from_template_button"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/menu_button_height"
+            android:layout_weight="20"
+            android:background="@drawable/ic_baseline_delete_24"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:backgroundTint="@color/buttonText">
+        </ImageButton>
 
 
 

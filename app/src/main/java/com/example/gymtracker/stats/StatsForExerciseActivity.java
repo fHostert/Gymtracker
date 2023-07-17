@@ -4,7 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentContainerView;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -45,6 +48,8 @@ public class StatsForExerciseActivity extends AppCompatActivity {
         }
         this.setTitle(exerciseName);
 
+        ExerciseHistory history = DatabaseManager.getExerciseHistory(exerciseName);
+
         //style chart
         LineChart chart = findViewById(R.id.exercise_volume_chart);
         chart.getDescription().setEnabled(false);
@@ -58,49 +63,7 @@ public class StatsForExerciseActivity extends AppCompatActivity {
         chart.getAxisLeft().setTextColor(getResources().getColor(R.color.boarders));
         chart.getAxisRight().setTextColor(getResources().getColor(R.color.red));
 
-        //Get data
-        ExerciseHistory history = DatabaseManager.getExerciseHistory(exerciseName);
-        if (history == null) {
-            return;
-        }
-
-        //set value formatter
-        chart.getXAxis().setValueFormatter(new DateFormatterXAxis());
-
-        //create lists with data entries
-        List<Entry> entriesVolume = new ArrayList<>();
-        List<Entry> entriesWeight = new ArrayList<>();
-        for (ExerciseEntry entry : history.getEntries()) {
-            long timestamp = Formatter.convertDateToUnixTimestampSeconds(entry.getDate());
-            entriesVolume.add(new Entry(timestamp, entry.getVolume(3)));
-            entriesWeight.add(new Entry(timestamp, entry.getMaxWeight()));
-        }
-
-        //this fixes a common bug in the library
-        Collections.sort(entriesVolume, new EntryXComparator());
-        Collections.sort(entriesWeight, new EntryXComparator());
-
-        //add data to set
-        LineDataSet dataSetVolume = new LineDataSet(entriesVolume, getString(R.string.volumeOfFirst3Sets));
-        dataSetVolume.setAxisDependency(YAxis.AxisDependency.LEFT);
-        dataSetVolume.setColor(getResources().getColor(R.color.boarders));
-        dataSetVolume.setDrawCircles(false);
-        dataSetVolume.setDrawValues(false);
-        dataSetVolume.setLineWidth(getResources().getDimension(R.dimen.chart_line_width));
-
-        LineDataSet dataSetWeight = new LineDataSet(entriesWeight, getString(R.string.maxWeight));
-        dataSetWeight.setAxisDependency(YAxis.AxisDependency.RIGHT);
-        dataSetWeight.setColor(getResources().getColor(R.color.red));
-        dataSetWeight.setDrawCircles(false);
-        dataSetWeight.setLineWidth(getResources().getDimension(R.dimen.chart_line_width));
-        dataSetWeight.setValueTextColor(getResources().getColor(R.color.red));
-        dataSetWeight.setValueTextSize(getResources().getDimension(R.dimen.value_chart_text));
-
-        LineData lineData = new LineData(dataSetVolume, dataSetWeight);
-        chart.setData(lineData);
-
-        //refresh
-        chart.invalidate();
+       refresh();
 
         //Set textViews
         TextView bestWeightTV = findViewById(R.id.stats_best_weight_text_view);
@@ -138,7 +101,6 @@ public class StatsForExerciseActivity extends AppCompatActivity {
         //fill exercise history
         LinearLayout historyContainer = findViewById(R.id.exercise_history_linear_layout);
         for (ExerciseEntry entry : history.getEntries()) {
-            //TODO Button to load more entries, like history
             HistoryExerciseFragment historyExerciseFragment =
                     HistoryExerciseFragment.newInstance(entry);
             FragmentContainerView newContainer = new FragmentContainerView(this);
@@ -147,5 +109,74 @@ public class StatsForExerciseActivity extends AppCompatActivity {
                     .add(newContainer.getId(), historyExerciseFragment).commit();
             historyContainer.addView(newContainer);
         }
+
+        EditText daysToCalcET = findViewById(R.id.days_to_calc_edit_text);
+        TextWatcher refreshChartTW = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                refresh();
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        };
+        daysToCalcET.addTextChangedListener(refreshChartTW);
+
+    }
+
+    public void refresh() {
+        LineChart chart = findViewById(R.id.exercise_volume_chart);
+        EditText daysToCalcET = findViewById(R.id.days_to_calc_edit_text);
+        String daysToCalString = daysToCalcET.getText().toString();
+        if (daysToCalString.equals(""))
+            return;
+
+        //Get data
+        ExerciseHistory history = DatabaseManager.getExerciseHistory(exerciseName);
+        if (history == null) {
+            return;
+        }
+
+        //set value formatter
+        chart.getXAxis().setValueFormatter(new DateFormatterXAxis());
+
+        //create lists with data entries
+        List<Entry> entriesVolume = new ArrayList<>();
+        List<Entry> entriesWeight = new ArrayList<>();
+        for (ExerciseEntry entry : history.getEntries()) {
+            long timestamp = Formatter.convertDateToUnixTimestampSeconds(entry.getDate());
+            entriesVolume.add(new Entry(timestamp, entry.getVolume(Integer.parseInt(daysToCalString))));
+            entriesWeight.add(new Entry(timestamp, entry.getMaxWeight()));
+        }
+
+        //this fixes a common bug in the library
+        Collections.sort(entriesVolume, new EntryXComparator());
+        Collections.sort(entriesWeight, new EntryXComparator());
+
+        //add data to set
+        LineDataSet dataSetVolume = new LineDataSet(entriesVolume, getString(R.string.volumeOfFirst) + " " + daysToCalString + " " + getString(R.string.saetze));
+        dataSetVolume.setAxisDependency(YAxis.AxisDependency.LEFT);
+        dataSetVolume.setColor(getResources().getColor(R.color.boarders));
+        dataSetVolume.setDrawCircles(false);
+        dataSetVolume.setDrawValues(false);
+        dataSetVolume.setLineWidth(getResources().getDimension(R.dimen.chart_line_width));
+
+        LineDataSet dataSetWeight = new LineDataSet(entriesWeight, getString(R.string.maxWeight));
+        dataSetWeight.setAxisDependency(YAxis.AxisDependency.RIGHT);
+        dataSetWeight.setColor(getResources().getColor(R.color.red));
+        dataSetWeight.setDrawCircles(false);
+        dataSetWeight.setLineWidth(getResources().getDimension(R.dimen.chart_line_width));
+        dataSetWeight.setValueTextColor(getResources().getColor(R.color.red));
+        dataSetWeight.setValueTextSize(getResources().getDimension(R.dimen.value_chart_text));
+
+        LineData lineData = new LineData(dataSetVolume, dataSetWeight);
+        chart.setData(lineData);
+
+        //refresh
+        chart.invalidate();
     }
 }
