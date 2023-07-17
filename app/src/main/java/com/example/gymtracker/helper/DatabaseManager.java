@@ -42,6 +42,18 @@ public final class DatabaseManager {
 
     public static void initialize(SQLiteDatabase dbPara) {
         db = dbPara;
+
+        //Update older versions
+        try
+        {
+            String query = "ALTER TABLE Templates ADD COLUMN position INT";
+            db.execSQL(query);
+        }
+        catch (Exception ignored)
+        {
+
+        }
+
     }
 
     /*##############################################################################################

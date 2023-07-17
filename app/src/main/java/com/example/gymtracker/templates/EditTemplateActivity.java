@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,16 +27,6 @@ public class EditTemplateActivity extends AppCompatActivity {
 
     private String name = "";
     private ArrayList<TemplateRowFragment> fragments = new ArrayList<>();;
-
-        //TODO Scrtollview
-    /*
-    * anzhal sets anpassen
-    * templates hoch runter
-    * durchschnitssgewicht textboc
-    * update table if not there try catch
-    * bessere suchew
-    *
-    * */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +147,8 @@ public class EditTemplateActivity extends AppCompatActivity {
         for (int i = 0; i < exerciseContainer.getChildCount(); i++) {
             View childView = exerciseContainer.getChildAt(i);
             TextView exerciseNameTV = (TextView)childView.findViewById(R.id.text_view_template_row);
+            if (exerciseNameTV == null)
+                continue;
             String exerciseName = exerciseNameTV.getText().toString();
             exercises.add(exerciseName);
         }
@@ -165,11 +158,17 @@ public class EditTemplateActivity extends AppCompatActivity {
     private int[] getNumberOfSets() {
         int[] numberOfSets = new int[getExercises().size()];
         LinearLayout exerciseContainer = findViewById(R.id.new_template_exercises_layout);
+        int counter = 0;
         for (int i = 0; i < exerciseContainer.getChildCount(); i++) {
             View childView = exerciseContainer.getChildAt(i);
             EditText numberOfSetsET = (EditText)childView.findViewById(R.id.number_of_sets_edit_text);
+            if (numberOfSetsET == null) {
+                counter++;
+                continue;
+            }
+
             int sets = Integer.parseInt(numberOfSetsET.getText().toString());
-            numberOfSets[i] = sets;
+            numberOfSets[i - counter] = sets;
         }
         return numberOfSets;
     }
@@ -191,6 +190,8 @@ public class EditTemplateActivity extends AppCompatActivity {
         for (int i = 0; i < exerciseContainer.getChildCount(); i++) {
             View childView = exerciseContainer.getChildAt(i);
             TextView exerciseNameTV = (TextView)childView.findViewById(R.id.text_view_template_row);
+            if (exerciseNameTV == null)
+                continue;
             String exerciseName = exerciseNameTV.getText().toString();
             if (exerciseName.equals(name)) {
                 if (i == 0) {
@@ -211,6 +212,8 @@ public class EditTemplateActivity extends AppCompatActivity {
         for (int i = 0; i < exerciseContainer.getChildCount(); i++) {
             View childView = exerciseContainer.getChildAt(i);
             TextView exerciseNameTV = (TextView)childView.findViewById(R.id.text_view_template_row);
+            if (exerciseNameTV == null)
+                continue;
             String exerciseName = exerciseNameTV.getText().toString();
             if (exerciseName.equals(name)) {
                 if (i == exerciseContainer.getChildCount() - 1) {
