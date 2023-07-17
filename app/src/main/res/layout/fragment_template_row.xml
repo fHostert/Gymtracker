@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".templates.TemplateRowFragment"
+    android:weightSum="100">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/horizontal_margin_from_boxes_to_inside"
+        android:layout_marginEnd="@dimen/horizontal_margin_from_boxes_to_inside"
+        android:weightSum="100"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="15">
+            <ImageButton
+                android:id="@+id/exercise_up_template_button"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="50"
+                android:background="@drawable/ic_baseline_keyboard_arrow_up_24"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:backgroundTint="@color/buttonText">
+            </ImageButton>
+
+            <ImageButton
+                android:id="@+id/exercise_down_template_button"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="50"
+                android:background="@drawable/ic_baseline_keyboard_arrow_down_24"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:backgroundTint="@color/buttonText">
+            </ImageButton>
+        </LinearLayout>
+
+    <TextView
+        android:id="@+id/text_view_template_row"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:text="adsfgagfasga"
+        android:gravity="center"
+        android:layout_weight="70"
+        android:textSize="@dimen/large_text"
+        />
+
+    <ImageButton
+        android:id="@+id/delete_exercise_from_template_button"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/menu_button_height"
+        android:layout_weight="15"
+        android:background="@drawable/ic_baseline_delete_24"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:gravity="center"
+        android:backgroundTint="@color/buttonText">
+    </ImageButton>
+
+
+
+    </LinearLayout>
+
+</TableRow>

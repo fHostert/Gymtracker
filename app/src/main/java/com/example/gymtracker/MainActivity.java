@@ -18,7 +18,6 @@ import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -27,36 +26,27 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.history.HistoryFragment;
-import com.example.gymtracker.stats.StatsFragment;
-import com.example.gymtracker.templates.AddTemplateActivity;
+import com.example.gymtracker.templates.EditTemplateActivity;
 import com.example.gymtracker.workout.WorkoutFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.channels.FileChannel;
-import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -377,7 +367,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            final Intent intent = new Intent(this, AddTemplateActivity.class);
+            final Intent intent = new Intent(this, EditTemplateActivity.class);
             intent.putExtra("NAME", newTemplateName);
             startActivityForResult(intent, 2);
             reload();

@@ -44,6 +44,7 @@
     <string name="replaceExerciseThrough">Übung ersetzen durch</string>
     <string name="cantRemoveLastSet">Das letzte Set kann nicht entfernt werden.</string>
     <string name="editTemplates">Vorlagen bearbeiten</string>
+    <string name="editTemplate">Vorlage bearbeiten</string>
     <string name="deleteLastSet">Letztes Set löschen</string>
     <string name="editExercises">Übungen bearbeiten</string>
     <string name="workoutChangeName">Namen des Workouts ändern</string>
@@ -198,5 +199,9 @@
     <string name="note">Notiz:</string>
     <string name="noteDeleted">Notiz gelöscht</string>
     <string name="showStats">Statistiken zeigen</string>
+    <string name="moveTemplateUp">Vorlage nach oben schieben</string>
+    <string name="moveTemplateDown">Vorlage nach unten schieben</string>
+    <string name="toastTemplateAlreadyUp">Vorlage ist bereits ganz oben</string>
+    <string name="toastTemplateAlreadyDown">Vorlage ist bereits ganz unten</string>
 
 </resources>

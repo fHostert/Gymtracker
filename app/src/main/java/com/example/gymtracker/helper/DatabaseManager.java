@@ -3,8 +3,12 @@ package com.example.gymtracker.helper;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Debug;
 import android.os.Environment;
+import android.util.Log;
+import android.widget.Toast;
 
+import com.example.gymtracker.R;
 import com.example.gymtracker.charts.datastructures.ExerciseEntry;
 import com.example.gymtracker.charts.datastructures.ExerciseHistory;
 import com.example.gymtracker.charts.datastructures.PersonalRecord;
@@ -733,7 +737,7 @@ public final class DatabaseManager {
     ##############################################################################################*/
     public static void createTemplatesTable() {
         String query = "CREATE TABLE IF NOT EXISTS Templates(" +
-                "name VARCHAR, exerciseID INT, numberOfSets INT);";
+                "name VARCHAR, exerciseID INT, numberOfSets INT, position INT);";
         db.execSQL(query);
     }
 
@@ -764,10 +768,50 @@ public final class DatabaseManager {
     }
 
     public static void saveTemplate(String name, ArrayList<String> exercises) {
+        int position = 0;
+
+        //get distinct names
+        String query = "SELECT DISTINCT name FROM Templates";
+        Cursor resultSet = db.rawQuery(query, null);
+        String[] names = new String[resultSet.getCount()];
+        resultSet.moveToFirst();
+        for (int i = 0; i < resultSet.getCount(); i++) {
+            names[i] = resultSet.getString(0);
+            resultSet.moveToNext();
+        }
+
+        //Get position if updating
+        boolean templateExists = false;
+        for(String s : names) {
+            if (s.equals(name)){
+                query = String.format(l,
+                        "SELECT position FROM Templates WHERE name = '%s'", name);
+                resultSet = db.rawQuery(query, null);
+                resultSet.moveToFirst();
+                position = resultSet.getInt(0) + 1;
+                templateExists = true;
+                break;
+            }
+        }
+
+        if (!templateExists) {
+            query = "SELECT MAX(position) FROM Templates";
+            resultSet = db.rawQuery(query, null);
+            resultSet.moveToFirst();
+            if (resultSet.getCount() > 0) {
+                position = resultSet.getInt(0) + 1;
+            }
+        }
+        resultSet.close();
+
+        query = String.format(l,
+                "DELETE FROM Templates WHERE name = '%s'", name);
+        db.execSQL(query);
+
         for (String exerciseName : exercises) {
-            String query = String.format(l,
-                    "INSERT INTO Templates VALUES ('%s', %d, 3);",
-                    name, getExerciseID(exerciseName));
+            query = String.format(l,
+                    "INSERT INTO Templates VALUES ('%s', %d, 3, %d);",
+                    name, getExerciseID(exerciseName), position);
             db.execSQL(query);
         }
     }
@@ -790,7 +834,7 @@ public final class DatabaseManager {
 
     public static ArrayList<Workout> getTemplates() {
         //get distinct names
-        String query = "SELECT DISTINCT name FROM Templates";
+        String query = "SELECT DISTINCT name FROM Templates ORDER BY position ASC";
         Cursor resultSet = db.rawQuery(query, null);
         String[] names = new String[resultSet.getCount()];
         resultSet.moveToFirst();
@@ -828,25 +872,23 @@ public final class DatabaseManager {
     }
 
     public static void deleteTemplate(String templateName) {
+        int positionOfWorkout = 0;
         String query = String.format(
+                "SELECT position FROM Templates WHERE name = '%s'", templateName);
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        if (resultSet.getCount() > 0) {
+            positionOfWorkout = resultSet.getInt(0);
+        }
+
+        query = String.format(
                 "DELETE FROM Templates WHERE name = '%s';",
                 templateName);
         db.execSQL(query);
-    }
 
-    public static void addExerciseToTemplate(String templateName, String exerciseName) {
-        int exerciseID = getExerciseID(exerciseName);
-        String query = String.format(l,
-                "INSERT INTO Templates VALUES ('%s', %d, 3);",
-                templateName, exerciseID);
-        db.execSQL(query);
-    }
-
-    public static void deleteExerciseFromTemplate(String templateName, String exerciseName) {
-        int exerciseID = getExerciseID(exerciseName);
-        String query = String.format(l,
-                "DELETE FROM Templates WHERE name = '%s' AND exerciseID = %d;",
-                templateName, exerciseID);
+        query = String.format(l,
+                "UPDATE Templates SET position = position - 1 WHERE position > %d;",
+                positionOfWorkout);
         db.execSQL(query);
     }
 
@@ -883,6 +925,80 @@ public final class DatabaseManager {
         }
         resultSet.close();
         return erg;
+    }
+
+    public static boolean moveTemplateUp(String templateName) {
+        int positionOfWorkout = 0;
+        String query = String.format(
+                "SELECT position FROM Templates WHERE name = '%s'", templateName);
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        if (resultSet.getCount() > 0) {
+            positionOfWorkout = resultSet.getInt(0);
+        }
+
+        int minPosition = 0;
+        query = "SELECT MIN(position) FROM Templates";
+        resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        if (resultSet.getCount() > 0) {
+            minPosition = resultSet.getInt(0);
+        }
+
+        if(minPosition == positionOfWorkout) {
+            return false;
+        }
+
+        query = String.format(l,
+                "UPDATE Templates SET position = position + 1 " +
+                        "WHERE position = %d;",
+                positionOfWorkout - 1);
+        db.execSQL(query);
+
+        query = String.format(l,
+                "UPDATE Templates SET position = position - 1 " +
+                        "WHERE name = '%s'", templateName);
+        db.execSQL(query);
+
+        resultSet.close();
+        return true;
+    }
+
+    public static boolean moveTemplateDown(String templateName) {
+        int positionOfWorkout = 0;
+        String query = String.format(
+                "SELECT position FROM Templates WHERE name = '%s'", templateName);
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        if (resultSet.getCount() > 0) {
+            positionOfWorkout = resultSet.getInt(0);
+        }
+
+        int maxPosition = 0;
+        query = "SELECT MAX(position) FROM Templates";
+        resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+        if (resultSet.getCount() > 0) {
+            maxPosition = resultSet.getInt(0);
+        }
+
+        if(maxPosition == positionOfWorkout) {
+            return false;
+        }
+        Log.d("TEMPLATELOG", "adfafdaffd");
+        query = String.format(l,
+                "UPDATE Templates SET position = position + 1 " +
+                        "WHERE position = %d;",
+                positionOfWorkout);
+        db.execSQL(query);
+
+        query = String.format(l,
+                "UPDATE Templates SET position = position - 1 " +
+                        "WHERE position = %d AND name <> '%s'", positionOfWorkout + 1, templateName);
+        db.execSQL(query);
+
+        resultSet.close();
+        return true;
     }
 
     /*##############################################################################################

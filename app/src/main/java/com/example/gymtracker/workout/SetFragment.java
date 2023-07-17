@@ -109,7 +109,7 @@ public class SetFragment extends Fragment {
         view.findViewById(R.id.set_table_row).setBackgroundColor(
                 getResources().getColor(R.color.setCompleted));
 
-        //please ignore this
+        //Change background color to second option
         /*weightET.setTextColor(getResources().getColor(R.color.black));
         repsET.setTextColor(getResources().getColor(R.color.black));
         weightET.setHintTextColor(getResources().getColor(R.color.black));

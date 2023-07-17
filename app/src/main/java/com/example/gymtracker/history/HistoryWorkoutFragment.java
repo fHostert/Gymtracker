@@ -6,9 +6,13 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
+import android.text.TextPaint;
+import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -104,6 +108,26 @@ public class HistoryWorkoutFragment extends Fragment {
             });
 
             alert.show();
+        });
+
+        // Reduce text size until it fits
+        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                TextView textView = view.findViewById(R.id.workout_name_text_view);
+                textView.setSingleLine(true);
+                textView.setEllipsize(TextUtils.TruncateAt.END);
+                float originalTextSize = textView.getTextSize();
+                TextPaint textPaint = textView.getPaint();
+                float textWidth = textPaint.measureText(textView.getText().toString());
+                while (textWidth > textView.getWidth()) {
+                    originalTextSize--;
+                    textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, originalTextSize);
+                    textWidth = textPaint.measureText(textView.getText().toString());
+                }
+            }
         });
 
         return view;

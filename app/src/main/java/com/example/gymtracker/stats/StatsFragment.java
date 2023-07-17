@@ -170,7 +170,7 @@ public class StatsFragment extends Fragment {
 
         LimitLine averageLine = new LimitLine(sum / history.size());
         averageLine.setLineColor(getResources().getColor(R.color.red));
-        averageLine.setLineWidth(3f);
+        averageLine.setLineWidth(getResources().getDimension(R.dimen.chart_line_width));
 
         YAxis leftAxis = chart.getAxisLeft();
         leftAxis.removeAllLimitLines(); // reset all limit lines to avoid overlapping lines

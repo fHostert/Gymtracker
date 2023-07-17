@@ -2,19 +2,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/delete_template_menu"
-        android:title="@string/deleteTemplate"/>
-
-    <item
-        android:id="@+id/add_to_template_menu"
-        android:title="@string/addExerciseToTemplate"/>
-
-    <item
-        android:id="@+id/delete_from_template_menu"
-        android:title="@string/deleteExercise"/>
+        android:id="@+id/edit_template_menu"
+        android:title="@string/editTemplate"/>
 
     <item
         android:id="@+id/rename_template_menu"
         android:title="@string/renameTemplate"/>
+
+    <item
+        android:id="@+id/move_template_up_menu"
+        android:title="@string/moveTemplateUp"/>
+
+    <item
+    android:id="@+id/move_template_down_menu"
+    android:title="@string/moveTemplateDown"/>
+
+    <item
+        android:id="@+id/delete_template_menu"
+        android:title="@string/deleteTemplate"/>
 
 </menu>

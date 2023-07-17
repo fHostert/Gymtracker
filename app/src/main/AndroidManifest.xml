@@ -40,7 +40,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".templates.AddTemplateActivity"
+            android:name=".templates.EditTemplateActivity"
             android:exported="false"
             android:screenOrientation="portrait">
             <meta-data
