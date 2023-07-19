@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import com.example.gymtracker.R;
 import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.Set;
 import com.example.gymtracker.datastructures.Workout;
+import com.example.gymtracker.helper.TimerBar;
 
 import java.util.Arrays;
 
@@ -29,6 +31,8 @@ public class WorkoutFragment extends Fragment {
     private static final String ARG_WORKOUT = "param1";
 
     private Workout workout;
+
+    private float progress = 1.0f;
 
     public WorkoutFragment() {
         // Required empty public constructor
@@ -54,6 +58,9 @@ public class WorkoutFragment extends Fragment {
         else {
             workout = new Workout(getResources().getString(R.string.defaultWorkoutName));
         }
+
+
+
     }
 
     @Override
@@ -70,6 +77,21 @@ public class WorkoutFragment extends Fragment {
         //Initialize buttons
         Button addExerciseButton = view.findViewById(R.id.add_exercise_button);
         addExerciseButton.setOnClickListener(view1 -> addExerciseClick());
+
+        TimerBar timer = view.findViewById(R.id.timer);
+        // Starten Sie eine Animation, um den Fortschritt zu erhöhen
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                progress -= 0.01f; // Ändern Sie diesen Wert, um die Geschwindigkeit der Animation anzupassen
+                timer.setProgress(progress);
+
+                if (progress < 1.0f) {
+                    handler.postDelayed(this, 50); // 50 Millisekunden Verzögerung für die Animation (kann angepasst werden)
+                }
+            }
+        }, 50); // Starten Sie die Animation nach 50 Millisekunden (kann angepasst werden)
 
         return view;
     }
