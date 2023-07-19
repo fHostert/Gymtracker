@@ -3,18 +3,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/timer_start_add10_menu"
+        android:icon="@drawable/ic_baseline_play_arrow_24"
+        android:title="@string/startTimer"
+        android:iconTint="@color/white"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/timer_activate_deactivate_menu"
+        android:icon="@drawable/ic_baseline_timer_24"
+        android:title="@string/activateTimer"
+        android:iconTint="@color/white"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/save_workout_menu"
         android:icon="@drawable/ic_baseline_save_alt_24"
         android:title="@string/saveWorkout"
         android:iconTint="@color/white"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="always"/>
 
     <item
         android:id="@+id/quit_workout_menu"
         android:icon="@drawable/ic_baseline_delete_24"
         android:title="@string/quitWorkout"
         android:iconTint="@color/white"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="always"/>
 
     <item
         android:id="@+id/change_workout_name"

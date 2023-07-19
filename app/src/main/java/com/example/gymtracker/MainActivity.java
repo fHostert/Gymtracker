@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -37,11 +38,13 @@ import android.widget.Toast;
 
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
+import com.example.gymtracker.helper.TimerBar;
 import com.example.gymtracker.history.HistoryFragment;
 import com.example.gymtracker.templates.EditTemplateActivity;
 import com.example.gymtracker.workout.WorkoutFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -55,6 +58,12 @@ public class MainActivity extends AppCompatActivity {
 
     private final int notificationId = 69;
     boolean doubleBackToExitPressedOnce = false;
+
+    private MenuItem startTimerMenuItem;
+    boolean timerIsActive = false;
+    boolean timerIsRunning = false;
+    private float progress = 1.0f;
+    private float secondsRemaining;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +148,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         if (DatabaseManager.doesTableExist("CurrentWorkout")){
             getMenuInflater().inflate(R.menu.workout_menu, menu);
+            startTimerMenuItem = menu.findItem(R.id.timer_start_add10_menu);
+            startTimerMenuItem.setVisible(false);
         }
         else {
             getMenuInflater().inflate(R.menu.home_menu, menu);
@@ -170,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
                 -> doubleBackToExitPressedOnce=false, 2000);
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -186,6 +198,39 @@ public class MainActivity extends AppCompatActivity {
         }
         else if (id == R.id.quit_workout_menu) {
             quitWorkout();
+        }
+        else if (id == R.id.timer_activate_deactivate_menu) {
+            if(timerIsActive) {
+                timerIsActive = false;
+                timerIsRunning = false;
+                item.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_24));
+                item.setTitle(R.string.activateTimer);
+                deactivateTimer();
+                startTimerMenuItem.setVisible(false);
+                startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_play_arrow_24));
+                startTimerMenuItem.setTitle(R.string.startTimer);
+                startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
+            }
+            else {
+                timerIsActive = true;
+                item.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_off_24));
+                item.setTitle(R.string.deactivateTimer);
+                activateTimer();
+                startTimerMenuItem.setVisible(true);
+            }
+            item.getIcon().setTint(getColor(R.color.white));
+        }
+        else if (id == R.id.timer_start_add10_menu) {
+            if(timerIsRunning) {
+                addToTimer(10);
+            }
+            else {
+                timerIsRunning = true;
+                item.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_10_24));
+                item.setTitle(R.string.add10Timer);
+                startTimer(10);
+            }
+            item.getIcon().setTint(getColor(R.color.white));
         }
         //home buttons
         else if (id == R.id.delete_exercise_menu) {
@@ -637,6 +682,55 @@ public class MainActivity extends AppCompatActivity {
         });
 
         alert.show();
+    }
+
+    /*##############################################################################################
+    #############################################TIMER##############################################
+    ##############################################################################################*/
+    private void activateTimer() {
+        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
+                .getView().findViewById(R.id.timer);
+        timer.setVisibility(View.VISIBLE);
+        timer.setProgress(progress);
+    }
+
+    private void deactivateTimer() {
+        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
+                .getView().findViewById(R.id.timer);
+        timer.setVisibility(View.GONE);
+    }
+
+    private void startTimer(int duration) {
+        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
+                .getView().findViewById(R.id.timer);
+        timer.setVisibility(View.VISIBLE);
+
+        secondsRemaining = duration;
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (progress < 0f) {
+                    timerExpired();
+                    return;
+                }
+                progress -= 1.0f / (duration * 10);
+                secondsRemaining -= 0.1;
+                timer.setProgress(progress);
+                handler.postDelayed(this, 100);
+            }
+        }, 0);
+    }
+
+    private void addToTimer(float seconds) {
+        float deltaProgress = 1.0f / (secondsRemaining + seconds);
+        progress += deltaProgress * seconds;
+        secondsRemaining += seconds;
+    }
+
+    private void timerExpired() {
+
     }
 
     /*##############################################################################################

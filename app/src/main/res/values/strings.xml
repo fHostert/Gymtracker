@@ -206,5 +206,10 @@
     <string name="toastTemplateAlreadyDown">Vorlage ist bereits ganz unten</string>
     <string name="volumeOfFirst">Volumen der ersten</string>
     <string name="saetze">Sätze</string>
+    <string name="activateTimer">Timer aktivieren</string>
+    <string name="startTimer">Timer starten</string>
+    <string name="deactivateTimer">Timer deaktivieren</string>
+    <string name="pauseTimer">Timer pausieren</string>
+    <string name="add10Timer">10sec hinzufügen</string>
 
 </resources>
