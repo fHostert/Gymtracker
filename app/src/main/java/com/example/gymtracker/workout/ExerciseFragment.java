@@ -93,8 +93,8 @@ public class ExerciseFragment extends Fragment {
         }
 
         //Initialize buttons
-        Button addSetButton = view.findViewById(R.id.add_set_button);
-        addSetButton.setOnClickListener(view1 -> addEmptySet());
+        //Button addSetButton = view.findViewById(R.id.add_set_button);
+        //addSetButton.setOnClickListener(view1 -> addEmptySet());
 
         ImageButton moveExerciseUp = view.findViewById(R.id.exercise_up_button);
         moveExerciseUp.setOnClickListener(view1 -> moveExerciseUp());
@@ -190,6 +190,9 @@ public class ExerciseFragment extends Fragment {
             }
             else if (id == R.id.replace_exercise_menu) {
                 replaceExerciseClick();
+            }
+            else if (id == R.id.add_set_menu) {
+                addEmptySet();
             }
             else if (id == R.id.delete_last_set_menu) {
                 deleteLastSet();

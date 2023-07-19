@@ -145,14 +145,14 @@
 
     </TableLayout>
 
-    <Button
+    <!--<Button
         android:id="@+id/add_set_button"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:text="@string/addSet"
         android:textSize="@dimen/medium_text"
         style="@style/largeButton">
-    </Button>
+    </Button>-->
 
     <View
         android:layout_width="match_parent"
