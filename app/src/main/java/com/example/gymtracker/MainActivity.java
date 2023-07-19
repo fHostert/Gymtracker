@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -452,8 +453,9 @@ public class MainActivity extends AppCompatActivity {
                 //Overwrite old Database
                 String oldDatabaseFilePath = this.getDatabasePath("Gymtracker").getAbsolutePath();
                 try {
-                    InputStream inputStream = getContentResolver().openInputStream(uri);
-                    FileOutputStream outputStream = new FileOutputStream(oldDatabaseFilePath);
+                    //Save old db
+                    InputStream inputStream = new FileInputStream(oldDatabaseFilePath);
+                    FileOutputStream outputStream = new FileOutputStream(oldDatabaseFilePath + "TEMP");
                     byte[] buffer = new byte[4096];
                     int bytesRead;
                     while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -461,6 +463,38 @@ public class MainActivity extends AppCompatActivity {
                     }
                     outputStream.close();
                     inputStream.close();
+
+                    //Copy new db
+                    inputStream = getContentResolver().openInputStream(uri);
+                    outputStream = new FileOutputStream(oldDatabaseFilePath);
+                    buffer = new byte[4096];
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                    }
+                    outputStream.close();
+                    inputStream.close();
+
+                    try {
+                        if(DatabaseManager.doesTableExist("Exercises")) {
+                            Toast.makeText(this,
+                                    getResources().getString(R.string.toastImportSuccess),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    catch (Exception e) {
+                        //Import failed, restore
+                        inputStream = new FileInputStream(oldDatabaseFilePath + "TEMP");
+                        outputStream = new FileOutputStream(oldDatabaseFilePath);
+                        buffer = new byte[4096];
+                        while ((bytesRead = inputStream.read(buffer)) != -1) {
+                            outputStream.write(buffer, 0, bytesRead);
+                        }
+                        outputStream.close();
+                        inputStream.close();
+                        Toast.makeText(this,
+                                getResources().getString(R.string.toastImportFail),
+                                Toast.LENGTH_SHORT).show();
+                    }
 
                     //Reload UI
                     reload();
