@@ -28,4 +28,9 @@
         android:title="@string/exportData"
         android:iconTint="@color/white"/>
 
+    <item
+        android:id="@+id/settings_menu_home"
+        android:title="@string/settings"
+        android:iconTint="@color/white"/>
+
 </menu>

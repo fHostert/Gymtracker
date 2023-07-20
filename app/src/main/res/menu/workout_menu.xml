@@ -40,4 +40,9 @@
         android:title="@string/createNewExercise"
         app:showAsAction="never"/>
 
+    <item
+        android:id="@+id/settings_menu_workout"
+        android:title="@string/settings"
+        app:showAsAction="never"/>
+
 </menu>

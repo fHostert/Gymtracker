@@ -211,5 +211,17 @@
     <string name="deactivateTimer">Timer deaktivieren</string>
     <string name="pauseTimer">Timer pausieren</string>
     <string name="add10Timer">10sec hinzufügen</string>
+    <string name="added10SecondsToTimer">+10 Sekunden</string>
+    <string name="timerSettings">Timer Einstellungen</string>
+    <string name="timerSettingsText">Hier können verschiedene Einstellung für den Timer festgelegt werden.</string>
+    <string name="autoStartTimer">Timer nach Speichern eines Sets starten:</string>
+    <string name="timerDuration">Dauer des Timers (Sekunden):</string>
+    <string name="settings">Einstellungen</string>
+    <string name="playSound10">Sound bei 10 Sekunden spielen:</string>
+    <string name="playSound3">Sound bei 3 Sekunden spielen:</string>
+    <string name="save">Speichern</string>
+    <string name="vibrateAtSounds">Vibration bei Sounds:</string>
+    <string name="timer">Timer:</string>
+    <string name="seconds">Sekunden.</string>
 
 </resources>

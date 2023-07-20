@@ -13,6 +13,7 @@ import com.example.gymtracker.R;
 
 public class TimerBar extends View {
     private Paint backgroundPaint;
+    private Paint red;
     private Paint progressPaint;
     private float progress;
 
@@ -35,6 +36,9 @@ public class TimerBar extends View {
         backgroundPaint = new Paint();
         backgroundPaint.setColor(getResources().getColor(R.color.background));
 
+        red = new Paint();
+        red.setColor(getResources().getColor(R.color.red));
+
         progressPaint = new Paint();
     }
 
@@ -49,7 +53,11 @@ public class TimerBar extends View {
         float progressWidth = width * progress;
 
         // Zeichne den Hintergrund
-        canvas.drawRect(0, 0, width, height, backgroundPaint);
+        if (this.progress > 0)
+            canvas.drawRect(0, 0, width, height, backgroundPaint);
+        else
+            canvas.drawRect(0, 0, width, height, red);
+
 
         // Aktualisiere den Farbverlauf des Fortschrittsbalkens
         int[] colors = {Color.RED, Color.GREEN};

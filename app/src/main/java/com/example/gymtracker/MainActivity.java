@@ -19,6 +19,7 @@ import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -31,6 +32,8 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +41,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.gymtracker.datastructures.Settings;
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.helper.TimerBar;
@@ -46,7 +50,6 @@ import com.example.gymtracker.templates.EditTemplateActivity;
 import com.example.gymtracker.workout.WorkoutFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -64,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem startTimerMenuItem;
     boolean timerIsActive = false;
     boolean timerIsRunning = false;
+    boolean timer10SecondsSoundPlayed = false;
+    boolean timer3SecondsSoundPlayed = false;
     private float progress = 1.0f;
     private float secondsRemaining;
     private CountDownTimer countDownTimer;
@@ -80,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
         DatabaseManager.createHistoryTable();
         DatabaseManager.createWorkoutsTable();
         DatabaseManager.createTemplatesTable();
+        DatabaseManager.createSettingsTable();
 
         //DatabaseManager.fillWorkoutsTable(100);
 
@@ -187,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         int id = item.getItemId();
         //workout buttons
         if (id == R.id.change_workout_name) {
@@ -204,33 +211,29 @@ public class MainActivity extends AppCompatActivity {
         }
         else if (id == R.id.timer_activate_deactivate_menu) {
             if(timerIsActive) {
-                timerIsActive = false;
-                timerIsRunning = false;
                 item.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_24));
                 item.setTitle(R.string.activateTimer);
                 deactivateTimer();
-
             }
             else {
-                timerIsActive = true;
                 item.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_off_24));
                 item.setTitle(R.string.deactivateTimer);
                 activateTimer();
-                startTimerMenuItem.setVisible(true);
             }
             item.getIcon().setTint(getColor(R.color.white));
         }
         else if (id == R.id.timer_start_add10_menu) {
             if(timerIsRunning) {
-                addToTimer(10, 20);
+                addToTimer(10, DatabaseManager.getSettings().timerDuration);
             }
             else {
-                timerIsRunning = true;
-                item.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_10_24));
-                item.setTitle(R.string.add10Timer);
-                startTimer(20);
+                startTimer(DatabaseManager.getSettings().timerDuration);
             }
             item.getIcon().setTint(getColor(R.color.white));
+        }
+        else if (id == R.id.settings_menu_workout ||
+                id == R.id.settings_menu_home) {
+            openSettings();
         }
         //home buttons
         else if (id == R.id.delete_exercise_menu) {
@@ -267,6 +270,7 @@ public class MainActivity extends AppCompatActivity {
         else if (resultCode == RESULT_OK && requestCode == 3) {
             importDatabase(data.getData());
         }
+
     }
 
     public void reload() {
@@ -692,6 +696,9 @@ public class MainActivity extends AppCompatActivity {
                 .getView().findViewById(R.id.timer);
         timer.setVisibility(View.VISIBLE);
         timer.setProgress(progress);
+
+        timerIsActive = true;
+        startTimerMenuItem.setVisible(true);
     }
 
     private void deactivateTimer() {
@@ -705,37 +712,57 @@ public class MainActivity extends AppCompatActivity {
         startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_play_arrow_24));
         startTimerMenuItem.setTitle(R.string.startTimer);
         startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
+        progress = 1.0f;
+        countDownTimer.cancel();
     }
 
-    private void startTimer(int duration) {
+    public void startTimer(int duration) {
+        if (timerIsRunning || !timerIsActive)
+            return;
+
         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
                 .getView().findViewById(R.id.timer);
         secondsRemaining = duration;
+        timerIsRunning = true;
+        startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_10_24));
+        startTimerMenuItem.setTitle(R.string.add10Timer);
+        startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
+        timer.setProgress(1.0f);
 
-        countDownTimer = new CountDownTimer(duration * 1000L, 100) {
-            public void onTick(long millisUntilFinished) {
-                secondsRemaining -= 0.1;
-                progress = secondsRemaining / duration;
-                timer.setProgress(progress);
-            }
-
-            public void onFinish() {
-                timerExpired();
-            }
-        }.start();
+        setCountDownTimer(duration, duration);
     }
 
     private void addToTimer(int seconds, int duration) {
+        secondsRemaining += seconds;
+        timer3SecondsSoundPlayed = false;
+        timer10SecondsSoundPlayed = false;
+
+        setCountDownTimer(secondsRemaining, duration);
+
+        Toast.makeText(this,
+                getResources().getString(R.string.added10SecondsToTimer),
+                Toast.LENGTH_SHORT).show();
+    }
+
+    private void setCountDownTimer(float seconds, int duration) {
         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
                 .getView().findViewById(R.id.timer);
-        countDownTimer.cancel();
-        secondsRemaining += seconds;
-
-        countDownTimer = new CountDownTimer((long) (secondsRemaining * 1000L), 100) {
+        if (countDownTimer != null)
+            countDownTimer.cancel();
+        countDownTimer = new CountDownTimer((long) (seconds * 1000L), 100) {
             public void onTick(long millisUntilFinished) {
                 secondsRemaining -= 0.1;
                 progress = secondsRemaining / duration;
                 timer.setProgress(progress);
+                updateOngoingNotification(getResources().getString(R.string.timer) + " " + (int) secondsRemaining + " " + getResources().getString(R.string.seconds));
+                if (secondsRemaining < 10 && !timer10SecondsSoundPlayed) {
+                    timer10SecondsSoundPlayed = true;
+                    timerUnder10Seconds();
+                }
+                if (secondsRemaining < 4 && !timer3SecondsSoundPlayed) {
+                    timer3SecondsSoundPlayed = true;
+                    timerUnder3Seconds();
+                }
             }
 
             public void onFinish() {
@@ -744,12 +771,53 @@ public class MainActivity extends AppCompatActivity {
         }.start();
     }
 
+    private void timerUnder10Seconds() {
+        Settings settings = DatabaseManager.getSettings();
+        if (settings.timerVibrate)
+        {
+            Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            v.vibrate(VibrationEffect.createOneShot(750, VibrationEffect.DEFAULT_AMPLITUDE));
+        }
+        if (!settings.timerPlay10Seconds)
+            return;
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.sound_10_seconds);
+        mediaPlayer.start();
+    }
+
+    private void timerUnder3Seconds() {
+        Settings settings = DatabaseManager.getSettings();
+
+        if (settings.timerVibrate)
+        {
+            Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            v.vibrate(VibrationEffect.createOneShot(750, VibrationEffect.DEFAULT_AMPLITUDE));
+        }
+
+        if (!settings.timerPlay3Seconds)
+            return;
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.sound_3_seconds);
+        mediaPlayer.start();
+    }
+
     private void timerExpired() {
-        //MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.test);
-        //mediaPlayer.start(); // no need to call prepare(); create() does that for you
+        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
+                .getView().findViewById(R.id.timer);
+
+        updateOngoingNotification(getResources().getString(R.string.notificationText));
+        timer3SecondsSoundPlayed = false;
+        timer10SecondsSoundPlayed = false;
         secondsRemaining = 0;
         progress = 0f;
-        Log.d("TIMER", "FINISH");
+        timerIsRunning = false;
+        timer.setProgress(progress);
+        startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_play_arrow_24));
+        startTimerMenuItem.setTitle(R.string.startTimer);
+        startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
+    }
+
+    private void openSettings() {
+        final Intent intent = new Intent(this, SettingsActivity.class);
+        startActivityForResult(intent, 4);
     }
 
     /*##############################################################################################
@@ -779,6 +847,22 @@ public class MainActivity extends AppCompatActivity {
                         .setContentIntent(contentIntent);
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
+
+        notificationManagerCompat.notify(notificationId, builder.build());
+    }
+
+    public void updateOngoingNotification(String text) {
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, MainActivity.class), PendingIntent.FLAG_IMMUTABLE);
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this, "69")
+                        .setSmallIcon(R.drawable.ic_fitness_center_24)
+                        .setContentTitle(getResources().getString(R.string.notificationTitle))
+                        .setContentText(text)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setOngoing(true)
+                        .setContentIntent(contentIntent);
 
         notificationManagerCompat.notify(notificationId, builder.build());
     }

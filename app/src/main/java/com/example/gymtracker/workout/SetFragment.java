@@ -12,6 +12,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.gymtracker.MainActivity;
+import com.example.gymtracker.datastructures.Settings;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.helper.Formatter;
 import com.example.gymtracker.R;
@@ -153,5 +155,10 @@ public class SetFragment extends Fragment {
         set.setWeight(weight);
         DatabaseManager.updateSet(exerciseID, set);
         colorSet(getView());
+
+        //start Timer
+        Settings settings = DatabaseManager.getSettings();
+        if (settings.timerAutoPlay)
+            ((MainActivity) getActivity()).startTimer(settings.timerDuration);
     }
 }

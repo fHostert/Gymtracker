@@ -16,6 +16,7 @@ import com.example.gymtracker.charts.datastructures.WorkoutEntry;
 import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.History;
 import com.example.gymtracker.datastructures.Set;
+import com.example.gymtracker.datastructures.Settings;
 import com.example.gymtracker.datastructures.Workout;
 
 import java.io.File;
@@ -1318,6 +1319,66 @@ public final class DatabaseManager {
         float erg = resultSet.getFloat(0);
         resultSet.close();
         return erg;
+    }
+
+    /*##############################################################################################
+    ############################################SETTINGS###########################################
+    ##############################################################################################*/
+    public static void createSettingsTable() {
+        boolean tableExists = doesTableExist("Settings");
+        String query = "CREATE TABLE IF NOT EXISTS Settings(" +
+                "timerDuration INT, timerAutoPlay INT, timerPlay3Seconds INT, timerPlay10Seconds INT, " +
+                "timerVibrate INT, progress REAL);";
+        db.execSQL(query);
+
+        if (!tableExists) {
+            query = String.format(
+                    "INSERT INTO SETTINGS VALUES(" +
+                    "120, 1, 1, 1, 1, '%s');", Formatter.formatFloat(0.0f));
+            db.execSQL(query);
+        }
+    }
+
+    public static Settings getSettings() {
+        String query = "SELECT * FROM Settings";
+        Cursor resultSet = db.rawQuery(query, null);
+        resultSet.moveToFirst();
+
+        Settings settings = new Settings();
+        settings.timerDuration = resultSet.getInt(0);
+        settings.timerAutoPlay = resultSet.getInt(1) == 1;
+        settings.timerPlay3Seconds = resultSet.getInt(2) == 1;
+        settings.timerPlay10Seconds = resultSet.getInt(3) == 1;
+        settings.timerVibrate = resultSet.getInt(4) == 1;
+
+        resultSet.close();
+        return settings;
+    }
+
+    public static void setSettings(Settings settings) {
+        String query = String.format(l,
+                "UPDATE Settings SET timerDuration = %d;", settings.timerDuration);
+        db.execSQL(query);
+
+        query = String.format(l,
+                "UPDATE Settings SET timerAutoPlay = %d;", settings.timerAutoPlay ? 1 : 0);
+        db.execSQL(query);
+
+        query = String.format(l,
+                "UPDATE Settings SET timerPlay3Seconds = %d;", settings.timerPlay3Seconds ? 1 : 0);
+        db.execSQL(query);
+
+        query = String.format(l,
+                "UPDATE Settings SET timerPlay10Seconds = %d;", settings.timerPlay10Seconds ? 1 : 0);
+        db.execSQL(query);
+
+        query = String.format(l,
+                "UPDATE Settings SET timerVibrate = %d;", settings.timerVibrate ? 1 : 0);
+        db.execSQL(query);
+
+        //query = String.format(l,
+        //        "UPDATE Settings SET progress = '%s';", Formatter.formatFloat(settings.progress));
+        //db.execSQL(query);
     }
 
     /*##############################################################################################
