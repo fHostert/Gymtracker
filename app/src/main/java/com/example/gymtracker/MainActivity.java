@@ -28,6 +28,7 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     boolean timerIsRunning = false;
     private float progress = 1.0f;
     private float secondsRemaining;
+    private CountDownTimer countDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -220,13 +222,13 @@ public class MainActivity extends AppCompatActivity {
         }
         else if (id == R.id.timer_start_add10_menu) {
             if(timerIsRunning) {
-                addToTimer(10);
+                addToTimer(10, 20);
             }
             else {
                 timerIsRunning = true;
                 item.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_10_24));
                 item.setTitle(R.string.add10Timer);
-                startTimer(60);
+                startTimer(20);
             }
             item.getIcon().setTint(getColor(R.color.white));
         }
@@ -708,35 +710,46 @@ public class MainActivity extends AppCompatActivity {
     private void startTimer(int duration) {
         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
                 .getView().findViewById(R.id.timer);
-        timer.setVisibility(View.VISIBLE);
-
         secondsRemaining = duration;
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (progress < 0f) {
-                    timerExpired();
-                    handler.removeCallbacks(this);
-                }
-                progress -= 1.0f / (duration * 10);
+        countDownTimer = new CountDownTimer(duration * 1000L, 100) {
+            public void onTick(long millisUntilFinished) {
                 secondsRemaining -= 0.1;
+                progress = secondsRemaining / duration;
                 timer.setProgress(progress);
-                handler.postDelayed(this, 100);
             }
-        }, 0);
+
+            public void onFinish() {
+                timerExpired();
+            }
+        }.start();
     }
 
-    private void addToTimer(float seconds) {
-        float deltaProgress = 1.0f / (secondsRemaining + seconds);
-        progress += deltaProgress * seconds;
+    private void addToTimer(int seconds, int duration) {
+        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
+                .getView().findViewById(R.id.timer);
+        countDownTimer.cancel();
         secondsRemaining += seconds;
+
+        countDownTimer = new CountDownTimer((long) (secondsRemaining * 1000L), 100) {
+            public void onTick(long millisUntilFinished) {
+                secondsRemaining -= 0.1;
+                progress = secondsRemaining / duration;
+                timer.setProgress(progress);
+            }
+
+            public void onFinish() {
+                timerExpired();
+            }
+        }.start();
     }
 
     private void timerExpired() {
         //MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.test);
         //mediaPlayer.start(); // no need to call prepare(); create() does that for you
+        secondsRemaining = 0;
+        progress = 0f;
+        Log.d("TIMER", "FINISH");
     }
 
     /*##############################################################################################
