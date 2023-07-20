@@ -25,6 +25,7 @@ import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -206,10 +207,7 @@ public class MainActivity extends AppCompatActivity {
                 item.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_24));
                 item.setTitle(R.string.activateTimer);
                 deactivateTimer();
-                startTimerMenuItem.setVisible(false);
-                startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_play_arrow_24));
-                startTimerMenuItem.setTitle(R.string.startTimer);
-                startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
+
             }
             else {
                 timerIsActive = true;
@@ -228,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
                 timerIsRunning = true;
                 item.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_10_24));
                 item.setTitle(R.string.add10Timer);
-                startTimer(10);
+                startTimer(60);
             }
             item.getIcon().setTint(getColor(R.color.white));
         }
@@ -698,6 +696,13 @@ public class MainActivity extends AppCompatActivity {
         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
                 .getView().findViewById(R.id.timer);
         timer.setVisibility(View.GONE);
+
+        timerIsActive = false;
+        timerIsRunning = false;
+        startTimerMenuItem.setVisible(false);
+        startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_play_arrow_24));
+        startTimerMenuItem.setTitle(R.string.startTimer);
+        startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
     }
 
     private void startTimer(int duration) {
@@ -713,7 +718,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 if (progress < 0f) {
                     timerExpired();
-                    return;
+                    handler.removeCallbacks(this);
                 }
                 progress -= 1.0f / (duration * 10);
                 secondsRemaining -= 0.1;
@@ -730,7 +735,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void timerExpired() {
-
+        //MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.test);
+        //mediaPlayer.start(); // no need to call prepare(); create() does that for you
     }
 
     /*##############################################################################################
