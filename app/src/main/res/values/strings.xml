@@ -223,5 +223,8 @@
     <string name="vibrateAtSounds">Vibration bei Sounds:</string>
     <string name="timer">Timer:</string>
     <string name="seconds">Sekunden.</string>
+    <string name="timerActivated">Timer aktiviert</string>
+    <string name="timerDeactivated">Timer deaktiviert</string>
+    <string name="timerStarted">Timer gestartet</string>
 
 </resources>

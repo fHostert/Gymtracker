@@ -699,6 +699,10 @@ public class MainActivity extends AppCompatActivity {
 
         timerIsActive = true;
         startTimerMenuItem.setVisible(true);
+
+        Toast.makeText(this,
+                getResources().getString(R.string.timerActivated),
+                Toast.LENGTH_SHORT).show();
     }
 
     private void deactivateTimer() {
@@ -713,7 +717,12 @@ public class MainActivity extends AppCompatActivity {
         startTimerMenuItem.setTitle(R.string.startTimer);
         startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
         progress = 1.0f;
-        countDownTimer.cancel();
+        if (countDownTimer != null)
+            countDownTimer.cancel();
+
+        Toast.makeText(this,
+                getResources().getString(R.string.timerDeactivated),
+                Toast.LENGTH_SHORT).show();
     }
 
     public void startTimer(int duration) {
@@ -730,6 +739,9 @@ public class MainActivity extends AppCompatActivity {
         timer.setProgress(1.0f);
 
         setCountDownTimer(duration, duration);
+        Toast.makeText(this,
+                getResources().getString(R.string.timerStarted),
+                Toast.LENGTH_SHORT).show();
     }
 
     private void addToTimer(int seconds, int duration) {
