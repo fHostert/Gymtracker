@@ -226,5 +226,7 @@
     <string name="timerActivated">Timer aktiviert</string>
     <string name="timerDeactivated">Timer deaktiviert</string>
     <string name="timerStarted">Timer gestartet</string>
+    <string name="timerExpired">Timer abgelaufen.</string>
+    <string name="second">Sekunde.</string>
 
 </resources>

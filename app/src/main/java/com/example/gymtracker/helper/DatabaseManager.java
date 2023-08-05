@@ -1328,13 +1328,11 @@ public final class DatabaseManager {
         boolean tableExists = doesTableExist("Settings");
         String query = "CREATE TABLE IF NOT EXISTS Settings(" +
                 "timerDuration INT, timerAutoPlay INT, timerPlay3Seconds INT, timerPlay10Seconds INT, " +
-                "timerVibrate INT, progress REAL);";
+                "timerVibrate INT);";
         db.execSQL(query);
 
         if (!tableExists) {
-            query = String.format(
-                    "INSERT INTO SETTINGS VALUES(" +
-                    "120, 1, 1, 1, 1, '%s');", Formatter.formatFloat(0.0f));
+            query = "INSERT INTO SETTINGS VALUES(120, 0, 1, 1, 0);";
             db.execSQL(query);
         }
     }
@@ -1375,10 +1373,6 @@ public final class DatabaseManager {
         query = String.format(l,
                 "UPDATE Settings SET timerVibrate = %d;", settings.timerVibrate ? 1 : 0);
         db.execSQL(query);
-
-        //query = String.format(l,
-        //        "UPDATE Settings SET progress = '%s';", Formatter.formatFloat(settings.progress));
-        //db.execSQL(query);
     }
 
     /*##############################################################################################

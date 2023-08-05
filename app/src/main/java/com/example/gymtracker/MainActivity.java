@@ -19,8 +19,12 @@ import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteDatabase;
@@ -31,6 +35,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -45,6 +50,7 @@ import com.example.gymtracker.datastructures.Settings;
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.helper.TimerBar;
+import com.example.gymtracker.helper.TimerService;
 import com.example.gymtracker.history.HistoryFragment;
 import com.example.gymtracker.templates.EditTemplateActivity;
 import com.example.gymtracker.workout.WorkoutFragment;
@@ -57,6 +63,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
+import java.util.Timer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -69,9 +76,24 @@ public class MainActivity extends AppCompatActivity {
     boolean timerIsRunning = false;
     boolean timer10SecondsSoundPlayed = false;
     boolean timer3SecondsSoundPlayed = false;
-    private float progress = 1.0f;
-    private float secondsRemaining;
-    private CountDownTimer countDownTimer;
+
+    private BroadcastReceiver receiver;
+    boolean mBounded;
+    TimerService timerService;
+    ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mBounded = false;
+            timerService = null;
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mBounded = true;
+            TimerService.LocalBinder mLocalBinder = (TimerService.LocalBinder)service;
+            timerService = mLocalBinder.getTimerServiceInstance();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,7 +173,21 @@ public class MainActivity extends AppCompatActivity {
             Uri fileUri = intent.getData();
             importDatabase(fileUri);
         }
+
+        //receiver for countdown
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                updateCountdown(intent); // or whatever method used to update your GUI fields
+            }
+        };
+        registerReceiver(receiver, new IntentFilter("COUNTDOWN"));
+
+        Intent mIntent = new Intent(this, TimerService.class);
+        bindService(mIntent, mConnection, BIND_AUTO_CREATE);
+
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -271,6 +307,39 @@ public class MainActivity extends AppCompatActivity {
             importDatabase(data.getData());
         }
 
+    }
+
+    @Override
+    public void onDestroy() {
+        //stopService(new Intent(this, TimerService.class));
+        //Log.d("TIMER", "Intent zerstört");
+        super.onDestroy();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerReceiver(receiver, new IntentFilter("COUNTDOWN"));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
+    @Override
+    public void onStop() {
+        try {
+            unregisterReceiver(receiver);
+        } catch (Exception e) {
+            // Receiver was probably already stopped in onPause()
+        }
+        if(mBounded) {
+            unbindService(mConnection);
+            mBounded = false;
+        }
+        super.onStop();
     }
 
     public void reload() {
@@ -695,7 +764,8 @@ public class MainActivity extends AppCompatActivity {
         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
                 .getView().findViewById(R.id.timer);
         timer.setVisibility(View.VISIBLE);
-        timer.setProgress(progress);
+        timer.setProgress(1.0f);
+
 
         timerIsActive = true;
         startTimerMenuItem.setVisible(true);
@@ -709,6 +779,7 @@ public class MainActivity extends AppCompatActivity {
         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
                 .getView().findViewById(R.id.timer);
         timer.setVisibility(View.GONE);
+        timer.setProgress(1.0f);
 
         timerIsActive = false;
         timerIsRunning = false;
@@ -716,9 +787,10 @@ public class MainActivity extends AppCompatActivity {
         startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_play_arrow_24));
         startTimerMenuItem.setTitle(R.string.startTimer);
         startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
-        progress = 1.0f;
-        if (countDownTimer != null)
-            countDownTimer.cancel();
+
+        timerService.stopTimer();
+        updateOngoingNotification(getResources().getString(R.string.notificationText));
+
 
         Toast.makeText(this,
                 getResources().getString(R.string.timerDeactivated),
@@ -729,61 +801,39 @@ public class MainActivity extends AppCompatActivity {
         if (timerIsRunning || !timerIsActive)
             return;
 
-        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
-                .getView().findViewById(R.id.timer);
-        secondsRemaining = duration;
         timerIsRunning = true;
+        timer3SecondsSoundPlayed = false;
+        timer10SecondsSoundPlayed = false;
         startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_10_24));
         startTimerMenuItem.setTitle(R.string.add10Timer);
         startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
+
+        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
+                .getView().findViewById(R.id.timer);
         timer.setProgress(1.0f);
 
-        setCountDownTimer(duration, duration);
+        Intent serviceIntent = new Intent(this, TimerService.class);
+        serviceIntent.putExtra("DURATION", (float)duration);
+        startService(serviceIntent);
+
         Toast.makeText(this,
                 getResources().getString(R.string.timerStarted),
                 Toast.LENGTH_SHORT).show();
     }
 
     private void addToTimer(int seconds, int duration) {
-        secondsRemaining += seconds;
         timer3SecondsSoundPlayed = false;
         timer10SecondsSoundPlayed = false;
-
-        setCountDownTimer(secondsRemaining, duration);
-
+        timerService.add10Seconds();
         Toast.makeText(this,
                 getResources().getString(R.string.added10SecondsToTimer),
                 Toast.LENGTH_SHORT).show();
     }
 
-    private void setCountDownTimer(float seconds, int duration) {
-        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
-                .getView().findViewById(R.id.timer);
-        if (countDownTimer != null)
-            countDownTimer.cancel();
-        countDownTimer = new CountDownTimer((long) (seconds * 1000L), 100) {
-            public void onTick(long millisUntilFinished) {
-                secondsRemaining -= 0.1;
-                progress = secondsRemaining / duration;
-                timer.setProgress(progress);
-                updateOngoingNotification(getResources().getString(R.string.timer) + " " + (int) secondsRemaining + " " + getResources().getString(R.string.seconds));
-                if (secondsRemaining < 10 && !timer10SecondsSoundPlayed) {
-                    timer10SecondsSoundPlayed = true;
-                    timerUnder10Seconds();
-                }
-                if (secondsRemaining < 4 && !timer3SecondsSoundPlayed) {
-                    timer3SecondsSoundPlayed = true;
-                    timerUnder3Seconds();
-                }
-            }
-
-            public void onFinish() {
-                timerExpired();
-            }
-        }.start();
-    }
 
     private void timerUnder10Seconds() {
+        if (timer10SecondsSoundPlayed)
+            return;
         Settings settings = DatabaseManager.getSettings();
         if (settings.timerVibrate)
         {
@@ -797,8 +847,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void timerUnder3Seconds() {
+        if (timer3SecondsSoundPlayed)
+            return;
         Settings settings = DatabaseManager.getSettings();
-
         if (settings.timerVibrate)
         {
             Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -812,16 +863,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void timerExpired() {
-        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
-                .getView().findViewById(R.id.timer);
-
-        updateOngoingNotification(getResources().getString(R.string.notificationText));
-        timer3SecondsSoundPlayed = false;
-        timer10SecondsSoundPlayed = false;
-        secondsRemaining = 0;
-        progress = 0f;
         timerIsRunning = false;
-        timer.setProgress(progress);
         startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_play_arrow_24));
         startTimerMenuItem.setTitle(R.string.startTimer);
         startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
@@ -830,6 +872,27 @@ public class MainActivity extends AppCompatActivity {
     private void openSettings() {
         final Intent intent = new Intent(this, SettingsActivity.class);
         startActivityForResult(intent, 4);
+    }
+
+    private void updateCountdown(Intent intent) {
+        float progress = intent.getFloatExtra("PROGRESS", 0);
+        float remainingSeconds = intent.getFloatExtra("REMAINING", 0);
+
+        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
+                .getView().findViewById(R.id.timer);
+        timer.setProgress(progress);
+
+        if (remainingSeconds == 0) {
+            timerExpired();
+        }
+        if(remainingSeconds < 10) {
+            timerUnder10Seconds();
+            timer10SecondsSoundPlayed = true;
+        }
+        if(remainingSeconds < 3.5f) {
+            timerUnder3Seconds();
+            timer3SecondsSoundPlayed = true;
+        }
     }
 
     /*##############################################################################################
