@@ -145,6 +145,7 @@ public class TimerService extends Service {
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
             notificationManager.notify(69, notificationBuilder.build());
         }
+        this.onDestroy();
     }
 
     private void timerUnder10Seconds() {
