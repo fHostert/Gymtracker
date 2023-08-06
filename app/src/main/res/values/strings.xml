@@ -75,7 +75,7 @@
     <string name="mergeExercises">Übungen zusmamenführen</string>
     <string name="mergeExercisesText">Die neu eingegebene Übung exisitiert bereits. Sollen beide Übungen unter dem neuen Namen zusammengefasst werden? Diese Aktion kann NICHT rückgängig gemacht werden.</string>
     <string name="defaultWorkoutName">Standard Workout</string>
-    <string name="toastCannotSaveEmptyWorkout">Schließe ein Set ab, um das Workout zu speichern.</string>
+    <string name="toastCannotSaveEmptyWorkout">Schließe ein Set ab, bevor du das Workout speicherst.</string>
     <string name="toastDoubleExercise">Diese Übung existiert bereits.</string>
     <string name="toastDoubleTemplate">Diese Vorlage exisitert bereits.</string>
     <string name="toastNeverDoneExercise">Keine Details - diese Übung wurde noch nie durchgeführt.</string>

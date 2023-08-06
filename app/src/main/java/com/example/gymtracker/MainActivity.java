@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver receiver;
     boolean mBounded;
     TimerService timerService;
-    Intent serviceIntent;
     ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceDisconnected(ComponentName name) {
@@ -687,6 +686,10 @@ public class MainActivity extends AppCompatActivity {
         reload();
         stopOngoingNotification();
         invalidateOptionsMenu();
+        DatabaseManager.setTimerActive(0);
+        timerService.stopTimer();
+        timerIsActive = false;
+        timerIsRunning = false;
         this.setTitle(getResources().getString(R.string.app_name));
     }
 
@@ -793,8 +796,10 @@ public class MainActivity extends AppCompatActivity {
         startTimerMenuItem.setTitle(R.string.startTimer);
         startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
 
-        timerService.stopTimer();
         timerService.resetAudio();
+        timerService.stopAudio();
+        timerService.stopTimer();
+
 
         DatabaseManager.setTimerActive(0);
         Toast.makeText(this,
@@ -816,7 +821,7 @@ public class MainActivity extends AppCompatActivity {
                 .getView().findViewById(R.id.timer);
         timer.setProgress(1.0f);
 
-        serviceIntent = new Intent(this, TimerService.class);
+        Intent serviceIntent = new Intent(this, TimerService.class);
         serviceIntent.putExtra("DURATION", (float)duration);
         startService(serviceIntent);
 
@@ -856,10 +861,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (remainingSeconds == 0) {
             timerExpired();
-        }
-        else
-        {
-            timerIsRunning = true;
         }
     }
 

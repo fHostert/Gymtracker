@@ -145,8 +145,12 @@ public class TimerService extends Service {
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
             notificationManager.notify(69, notificationBuilder.build());
         }
+        stopForeground(true);
+        stopSelf();
         this.onDestroy();
     }
+
+
 
     private void timerUnder10Seconds() {
         if (timer10SecondsSoundPlayed)
@@ -182,6 +186,14 @@ public class TimerService extends Service {
     public void resetAudio() {
         timer3SecondsSoundPlayed = false;
         timer10SecondsSoundPlayed = false;
+
+
+    }
+
+    public void stopAudio() {
+        if(mediaPlayer != null) {
+            mediaPlayer.stop();
+        }
     }
 
     private void updateNotification(String text) {
