@@ -120,6 +120,11 @@ public class TimerService extends Service {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
+        if (notificationBuilder != null) {
+            notificationBuilder.setContentText(getResources().getString(R.string.notificationText));
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+            notificationManager.notify(69, notificationBuilder.build());
+        }
     }
 
     private void timerUnder10Seconds() {

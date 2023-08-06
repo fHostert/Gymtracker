@@ -766,6 +766,7 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this,
                 getResources().getString(R.string.timerActivated),
                 Toast.LENGTH_SHORT).show();
+        updateOngoingNotification(getResources().getString(R.string.notificationText));
     }
 
     private void deactivateTimer(MenuItem item) {
@@ -785,12 +786,12 @@ public class MainActivity extends AppCompatActivity {
 
         timerService.stopTimer();
         timerService.resetAudio();
-        updateOngoingNotification(getResources().getString(R.string.notificationText));
 
         DatabaseManager.setTimerActive(0);
         Toast.makeText(this,
                 getResources().getString(R.string.timerDeactivated),
                 Toast.LENGTH_SHORT).show();
+        updateOngoingNotification(getResources().getString(R.string.notificationText));
     }
 
     public void startTimer(int duration) {
