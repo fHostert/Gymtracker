@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
                 drawable.setTint(getColor(R.color.white));
             }
             if (DatabaseManager.getSettings().timerIsActive && menu.getItem(i).getItemId() == R.id.timer_activate_deactivate_menu) {
-                activateTimer(menu.getItem(i));
+                activateTimer(menu.getItem(i), true);
             }
         }
         return true;
@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
                 deactivateTimer(item);
             }
             else {
-                activateTimer(item);
+                activateTimer(item, false);
             }
             item.getIcon().setTint(getColor(R.color.white));
         }
@@ -749,29 +749,31 @@ public class MainActivity extends AppCompatActivity {
     /*##############################################################################################
     #############################################TIMER##############################################
     ##############################################################################################*/
-    private void activateTimer(MenuItem item) {
+    private void activateTimer(MenuItem item, boolean afterRestart) {
         item.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_off_24));
         item.setTitle(R.string.deactivateTimer);
+        item.getIcon().setTint(getColor(R.color.white));
         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
                 .getView().findViewById(R.id.timer);
         timer.setVisibility(View.VISIBLE);
-        timer.setProgress(1.0f);
-        timerService.resetAudio();
 
-
+        if (!afterRestart) {
+            timer.setProgress(1.0f);
+            timerService.resetAudio();
+            updateOngoingNotification(getResources().getString(R.string.notificationText));
+            Toast.makeText(this,
+                    getResources().getString(R.string.timerActivated),
+                    Toast.LENGTH_SHORT).show();
+        }
         timerIsActive = true;
         startTimerMenuItem.setVisible(true);
-
         DatabaseManager.setTimerActive(1);
-        Toast.makeText(this,
-                getResources().getString(R.string.timerActivated),
-                Toast.LENGTH_SHORT).show();
-        updateOngoingNotification(getResources().getString(R.string.notificationText));
     }
 
     private void deactivateTimer(MenuItem item) {
-         item.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_24));
+        item.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_24));
         item.setTitle(R.string.activateTimer);
+        item.getIcon().setTint(getColor(R.color.white));
         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
                 .getView().findViewById(R.id.timer);
         timer.setVisibility(View.GONE);
@@ -829,6 +831,7 @@ public class MainActivity extends AppCompatActivity {
         startTimerMenuItem.setTitle(R.string.startTimer);
         startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
         timerService.resetAudio();
+        updateOngoingNotification(getResources().getString(R.string.timerExpired));
     }
 
     private void openSettings() {
@@ -871,7 +874,7 @@ public class MainActivity extends AppCompatActivity {
                         .setSmallIcon(R.drawable.ic_fitness_center_24)
                         .setContentTitle(getResources().getString(R.string.notificationTitle))
                         .setContentText(getResources().getString(R.string.notificationText))
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setPriority(NotificationCompat.PRIORITY_MAX)
                         .setOngoing(true)
                         .setContentIntent(contentIntent);
 
