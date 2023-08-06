@@ -5,11 +5,14 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -17,6 +20,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.example.gymtracker.MainActivity;
 import com.example.gymtracker.R;
+import com.example.gymtracker.datastructures.Settings;
 
 public class TimerService extends Service {
     Intent broadcast = new Intent("COUNTDOWN");
@@ -27,6 +31,9 @@ public class TimerService extends Service {
     private float secondsRemaining;
     private float progress;
     private NotificationCompat.Builder notificationBuilder;
+
+    boolean timer10SecondsSoundPlayed = false;
+    boolean timer3SecondsSoundPlayed = false;
 
     @Override
     public void onStart(Intent intent, int startId) {
@@ -60,6 +67,8 @@ public class TimerService extends Service {
     }
 
     public void add10Seconds() {
+        timer3SecondsSoundPlayed = false;
+        timer10SecondsSoundPlayed = false;
         countDownTimer.cancel();
         secondsRemaining += 10;
         setCountDownTimer(secondsRemaining, duration);
@@ -86,12 +95,22 @@ public class TimerService extends Service {
                     updateNotification(getResources().getString(R.string.timer) + " " + fullSeconds + " " + getResources().getString(R.string.seconds));
                 }
 
+                if (fullSeconds == 10) {
+                    timerUnder10Seconds();
+                    timer10SecondsSoundPlayed = true;
+                }
+                if (fullSeconds == 3) {
+                    timerUnder3Seconds();
+                    timer3SecondsSoundPlayed = true;
+                }
             }
 
             public void onFinish() {
                 broadcast.putExtra("PROGRESS", 0.0f);
                 broadcast.putExtra("REMAINING", 0.0f);
                 sendBroadcast(broadcast);
+                timer3SecondsSoundPlayed = false;
+                timer10SecondsSoundPlayed = false;
                 onDestroy();
             }
         }.start();
@@ -101,6 +120,42 @@ public class TimerService extends Service {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
+    }
+
+    private void timerUnder10Seconds() {
+        if (timer10SecondsSoundPlayed)
+            return;
+        Settings settings = DatabaseManager.getSettings();
+        if (settings.timerVibrateAt10Seconds)
+        {
+            Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            v.vibrate(VibrationEffect.createOneShot(750, VibrationEffect.DEFAULT_AMPLITUDE));
+        }
+        if (!settings.timerPlay10Seconds)
+            return;
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.sound_10_seconds);
+        mediaPlayer.start();
+    }
+
+    private void timerUnder3Seconds() {
+        if (timer3SecondsSoundPlayed)
+            return;
+        Settings settings = DatabaseManager.getSettings();
+        if (settings.timerVibrateAt3Seconds)
+        {
+            Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            v.vibrate(VibrationEffect.createOneShot(750, VibrationEffect.DEFAULT_AMPLITUDE));
+        }
+
+        if (!settings.timerPlay3Seconds)
+            return;
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.sound_3_seconds);
+        mediaPlayer.start();
+    }
+
+    public void resetAudio() {
+        timer3SecondsSoundPlayed = false;
+        timer10SecondsSoundPlayed = false;
     }
 
     private void updateNotification(String text) {

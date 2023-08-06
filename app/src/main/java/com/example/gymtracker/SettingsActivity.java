@@ -23,7 +23,8 @@ public class SettingsActivity extends AppCompatActivity {
     CheckBox timerAutoStart;
     CheckBox timerPlay3Seconds;
     CheckBox timerPlay10Seconds;
-    CheckBox timerVibrate;
+    CheckBox timerVibrateAt3;
+    CheckBox timerVibrateAt10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +50,11 @@ public class SettingsActivity extends AppCompatActivity {
         timerPlay10Seconds = findViewById(R.id.timer_10_box);
         timerPlay10Seconds.setChecked(settings.timerPlay10Seconds);
 
-        timerVibrate = findViewById(R.id.timer_vibrate_box);
-        timerVibrate.setChecked(settings.timerVibrate);
+        timerVibrateAt3 = findViewById(R.id.timer_vibrate_at_10_box);
+        timerVibrateAt3.setChecked(settings.timerVibrateAt10Seconds);
+
+        timerVibrateAt10 = findViewById(R.id.timer_vibrate_at_3_box);
+        timerVibrateAt10.setChecked(settings.timerVibrateAt3Seconds);
     }
 
     private void saveSettings() {
@@ -58,7 +62,8 @@ public class SettingsActivity extends AppCompatActivity {
         settings.timerAutoPlay = timerAutoStart.isChecked();
         settings.timerPlay3Seconds = timerPlay3Seconds.isChecked();
         settings.timerPlay10Seconds = timerPlay10Seconds.isChecked();
-        settings.timerVibrate = timerVibrate.isChecked();
+        settings.timerVibrateAt3Seconds = timerVibrateAt3.isChecked();
+        settings.timerVibrateAt10Seconds = timerVibrateAt10.isChecked();
 
         DatabaseManager.setSettings(settings);
         setResult(RESULT_OK);

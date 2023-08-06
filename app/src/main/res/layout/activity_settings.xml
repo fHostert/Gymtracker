@@ -100,11 +100,31 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/vibrateAtSounds"
+                android:text="@string/vibrateAt10"
                 android:layout_gravity="center">
             </TextView>
             <CheckBox
-                android:id="@+id/timer_vibrate_box"
+                android:id="@+id/timer_vibrate_at_3_box"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layoutDirection="rtl">
+            </CheckBox>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/vibrateAt3"
+                android:layout_gravity="center">
+            </TextView>
+            <CheckBox
+                android:id="@+id/timer_vibrate_at_10_box"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

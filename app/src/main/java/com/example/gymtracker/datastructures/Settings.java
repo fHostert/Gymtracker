@@ -5,5 +5,7 @@ public class Settings {
     public boolean timerAutoPlay;
     public boolean timerPlay3Seconds;
     public boolean timerPlay10Seconds;
-    public boolean timerVibrate;
+    public boolean timerVibrateAt3Seconds;
+    public boolean timerVibrateAt10Seconds;
+    public boolean timerIsActive;
 }

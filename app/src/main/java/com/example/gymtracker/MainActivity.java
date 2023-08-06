@@ -30,23 +30,18 @@ import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
-import android.util.Log;
+import android.provider.ContactsContract;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.gymtracker.datastructures.Settings;
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.helper.TimerBar;
@@ -63,7 +58,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
-import java.util.Timer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -71,12 +65,10 @@ public class MainActivity extends AppCompatActivity {
     private final int notificationId = 69;
     boolean doubleBackToExitPressedOnce = false;
 
+    //timer stuff
     private MenuItem startTimerMenuItem;
     boolean timerIsActive = false;
     boolean timerIsRunning = false;
-    boolean timer10SecondsSoundPlayed = false;
-    boolean timer3SecondsSoundPlayed = false;
-
     private BroadcastReceiver receiver;
     boolean mBounded;
     TimerService timerService;
@@ -174,18 +166,16 @@ public class MainActivity extends AppCompatActivity {
             importDatabase(fileUri);
         }
 
-        //receiver for countdown
+        //countdown
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                updateCountdown(intent); // or whatever method used to update your GUI fields
+                updateCountdown(intent);
             }
         };
         registerReceiver(receiver, new IntentFilter("COUNTDOWN"));
-
         Intent mIntent = new Intent(this, TimerService.class);
         bindService(mIntent, mConnection, BIND_AUTO_CREATE);
-
     }
 
 
@@ -205,6 +195,9 @@ public class MainActivity extends AppCompatActivity {
             Drawable drawable = menu.getItem(i).getIcon();
             if(drawable != null) {
                 drawable.setTint(getColor(R.color.white));
+            }
+            if (DatabaseManager.getSettings().timerIsActive && menu.getItem(i).getItemId() == R.id.timer_activate_deactivate_menu) {
+                activateTimer(menu.getItem(i));
             }
         }
         return true;
@@ -247,14 +240,10 @@ public class MainActivity extends AppCompatActivity {
         }
         else if (id == R.id.timer_activate_deactivate_menu) {
             if(timerIsActive) {
-                item.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_24));
-                item.setTitle(R.string.activateTimer);
-                deactivateTimer();
+                deactivateTimer(item);
             }
             else {
-                item.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_off_24));
-                item.setTitle(R.string.deactivateTimer);
-                activateTimer();
+                activateTimer(item);
             }
             item.getIcon().setTint(getColor(R.color.white));
         }
@@ -760,22 +749,28 @@ public class MainActivity extends AppCompatActivity {
     /*##############################################################################################
     #############################################TIMER##############################################
     ##############################################################################################*/
-    private void activateTimer() {
+    private void activateTimer(MenuItem item) {
+        item.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_off_24));
+        item.setTitle(R.string.deactivateTimer);
         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
                 .getView().findViewById(R.id.timer);
         timer.setVisibility(View.VISIBLE);
         timer.setProgress(1.0f);
+        timerService.resetAudio();
 
 
         timerIsActive = true;
         startTimerMenuItem.setVisible(true);
 
+        DatabaseManager.setTimerActive(1);
         Toast.makeText(this,
                 getResources().getString(R.string.timerActivated),
                 Toast.LENGTH_SHORT).show();
     }
 
-    private void deactivateTimer() {
+    private void deactivateTimer(MenuItem item) {
+         item.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_24));
+        item.setTitle(R.string.activateTimer);
         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
                 .getView().findViewById(R.id.timer);
         timer.setVisibility(View.GONE);
@@ -789,9 +784,10 @@ public class MainActivity extends AppCompatActivity {
         startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
 
         timerService.stopTimer();
+        timerService.resetAudio();
         updateOngoingNotification(getResources().getString(R.string.notificationText));
 
-
+        DatabaseManager.setTimerActive(0);
         Toast.makeText(this,
                 getResources().getString(R.string.timerDeactivated),
                 Toast.LENGTH_SHORT).show();
@@ -802,8 +798,6 @@ public class MainActivity extends AppCompatActivity {
             return;
 
         timerIsRunning = true;
-        timer3SecondsSoundPlayed = false;
-        timer10SecondsSoundPlayed = false;
         startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_10_24));
         startTimerMenuItem.setTitle(R.string.add10Timer);
         startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
@@ -822,44 +816,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addToTimer(int seconds, int duration) {
-        timer3SecondsSoundPlayed = false;
-        timer10SecondsSoundPlayed = false;
         timerService.add10Seconds();
         Toast.makeText(this,
                 getResources().getString(R.string.added10SecondsToTimer),
                 Toast.LENGTH_SHORT).show();
-    }
-
-
-    private void timerUnder10Seconds() {
-        if (timer10SecondsSoundPlayed)
-            return;
-        Settings settings = DatabaseManager.getSettings();
-        if (settings.timerVibrate)
-        {
-            Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-            v.vibrate(VibrationEffect.createOneShot(750, VibrationEffect.DEFAULT_AMPLITUDE));
-        }
-        if (!settings.timerPlay10Seconds)
-            return;
-        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.sound_10_seconds);
-        mediaPlayer.start();
-    }
-
-    private void timerUnder3Seconds() {
-        if (timer3SecondsSoundPlayed)
-            return;
-        Settings settings = DatabaseManager.getSettings();
-        if (settings.timerVibrate)
-        {
-            Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-            v.vibrate(VibrationEffect.createOneShot(750, VibrationEffect.DEFAULT_AMPLITUDE));
-        }
-
-        if (!settings.timerPlay3Seconds)
-            return;
-        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.sound_3_seconds);
-        mediaPlayer.start();
     }
 
     private void timerExpired() {
@@ -867,6 +827,7 @@ public class MainActivity extends AppCompatActivity {
         startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_play_arrow_24));
         startTimerMenuItem.setTitle(R.string.startTimer);
         startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
+        timerService.resetAudio();
     }
 
     private void openSettings() {
@@ -884,14 +845,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (remainingSeconds == 0) {
             timerExpired();
-        }
-        if(remainingSeconds < 10) {
-            timerUnder10Seconds();
-            timer10SecondsSoundPlayed = true;
-        }
-        if(remainingSeconds < 3.5f) {
-            timerUnder3Seconds();
-            timer3SecondsSoundPlayed = true;
         }
     }
 

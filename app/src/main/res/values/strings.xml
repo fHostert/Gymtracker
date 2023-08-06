@@ -217,10 +217,11 @@
     <string name="autoStartTimer">Timer nach Speichern eines Sets starten:</string>
     <string name="timerDuration">Dauer des Timers (Sekunden):</string>
     <string name="settings">Einstellungen</string>
-    <string name="playSound10">Sound bei 10 Sekunden spielen:</string>
-    <string name="playSound3">Sound bei 3 Sekunden spielen:</string>
+    <string name="playSound10">Sound bei 10 Sekunden:</string>
+    <string name="playSound3">Sound bei 3 Sekunden:</string>
     <string name="save">Speichern</string>
-    <string name="vibrateAtSounds">Vibration bei Sounds:</string>
+    <string name="vibrateAt3">Vibration bei 3 Sekunden:</string>
+    <string name="vibrateAt10">Vibration bei 10 Sekunden:</string>
     <string name="timer">Timer:</string>
     <string name="seconds">Sekunden.</string>
     <string name="timerActivated">Timer aktiviert</string>
