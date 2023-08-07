@@ -308,7 +308,7 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         registerReceiver(receiver, new IntentFilter("COUNTDOWN"));
-        if(timerService != null && timerService.getProgress() == 0.0f) {
+        if(timerService != null && timerService.getProgress() == 0.0f && timerIsActive) {
             timerExpired();
         }
 
