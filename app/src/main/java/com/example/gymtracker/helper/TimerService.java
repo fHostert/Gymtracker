@@ -30,10 +30,10 @@ public class TimerService extends Service {
     Intent broadcast = new Intent("COUNTDOWN");
     IBinder mBinder = new LocalBinder();
 
-    CountDownTimer countDownTimer = null;
     private int duration;
     long startTime;
     long endTime;
+    float progress;
     Handler countDownHandler;
     Runnable countDownRunnable;
     MediaPlayer mediaPlayer;
@@ -65,9 +65,6 @@ public class TimerService extends Service {
 
     @Override
     public void onDestroy() {
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-        }
         super.onDestroy();
     }
 
@@ -90,7 +87,7 @@ public class TimerService extends Service {
             @Override
             public void run() {
                 if (System.currentTimeMillis() < endTime) {
-                    float progress = (float)(endTime - System.currentTimeMillis()) / (duration * 1000L);
+                    progress = (float)(endTime - System.currentTimeMillis()) / (duration * 1000L);
                     long millisRemaining = (endTime - System.currentTimeMillis());
 
                     int fullSeconds = (int) Math.round(millisRemaining / 1000.0);
@@ -121,6 +118,7 @@ public class TimerService extends Service {
                     timer3SecondsSoundPlayed = false;
                     timer10SecondsSoundPlayed = false;
                     updateNotification(getResources().getString(R.string.timerExpired));
+                    progress = 0.0f;
 
                     broadcast.putExtra("PROGRESS", 0.0f);
                     broadcast.putExtra("REMAINING", 0.0f);
@@ -134,16 +132,8 @@ public class TimerService extends Service {
     }
 
     public void stopTimer() {
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-        }
         if (countDownHandler != null) {
             countDownHandler.removeCallbacks(countDownRunnable);
-        }
-        if (notificationBuilder != null) {
-            notificationBuilder.setContentText(getResources().getString(R.string.notificationText));
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-            notificationManager.notify(69, notificationBuilder.build());
         }
         stopForeground(true);
         stopSelf();
@@ -194,6 +184,10 @@ public class TimerService extends Service {
         if(mediaPlayer != null) {
             mediaPlayer.stop();
         }
+    }
+
+    public float getProgress() {
+        return progress;
     }
 
     private void updateNotification(String text) {

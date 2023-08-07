@@ -36,6 +36,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -300,8 +301,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        //stopService(new Intent(this, TimerService.class));
-        //Log.d("TIMER", "Intent zerstört");
         super.onDestroy();
     }
 
@@ -309,6 +308,10 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         registerReceiver(receiver, new IntentFilter("COUNTDOWN"));
+        if(timerService != null && timerService.getProgress() == 0.0f) {
+            timerExpired();
+        }
+
     }
 
     @Override
@@ -844,6 +847,9 @@ public class MainActivity extends AppCompatActivity {
         startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
         timerService.resetAudio();
         updateOngoingNotification(getResources().getString(R.string.timerExpired));
+        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
+                .getView().findViewById(R.id.timer);
+        timer.setProgress(0.0f);
     }
 
     private void openSettings() {
@@ -855,9 +861,15 @@ public class MainActivity extends AppCompatActivity {
         float progress = intent.getFloatExtra("PROGRESS", 0);
         float remainingSeconds = intent.getFloatExtra("REMAINING", 0);
 
-        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
-                .getView().findViewById(R.id.timer);
-        timer.setProgress(progress);
+        try {
+            TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
+                    .getView().findViewById(R.id.timer);
+            timer.setProgress(progress);
+        }
+        catch (Exception ignored){
+
+        }
+
 
         if (remainingSeconds == 0) {
             timerExpired();
