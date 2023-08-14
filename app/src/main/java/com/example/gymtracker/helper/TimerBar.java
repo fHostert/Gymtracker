@@ -15,7 +15,7 @@ public class TimerBar extends View {
     private Paint backgroundPaint;
     private Paint red;
     private Paint progressPaint;
-    private float progress;
+    private float progress = 1.0f;
 
     public TimerBar(Context context) {
         super(context);

@@ -159,6 +159,6 @@ public class SetFragment extends Fragment {
         //start Timer
         Settings settings = DatabaseManager.getSettings();
         if (settings.timerAutoPlay)
-            ((MainActivity) getActivity()).startTimer(settings.timerDuration);
+            ((MainActivity) getActivity()).startTimer();
     }
 }

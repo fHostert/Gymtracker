@@ -1,5 +1,6 @@
 package com.example.gymtracker.helper;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -30,7 +31,6 @@ public class TimerService extends Service {
     Intent broadcast = new Intent("COUNTDOWN");
     IBinder mBinder = new LocalBinder();
 
-    private int duration;
     long startTime;
     long endTime;
     float progress;
@@ -40,46 +40,59 @@ public class TimerService extends Service {
     int lastFullSeconds;
     private NotificationCompat.Builder notificationBuilder;
 
+    boolean timerIsActive;
+    boolean timerIsRunning;
+    boolean timerIsExpired;
+
     boolean timer10SecondsSoundPlayed = false;
     boolean timer3SecondsSoundPlayed = false;
 
     @Override
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
+        float progress = 1.0f;
         Bundle extras = intent.getExtras();
-
         if(extras != null) {
-            duration = (int) extras.getFloat("DURATION");
+            progress = extras.getFloat("PROGRESS");
         }
 
-        startCountdown();
         createNotification();
         startForeground(69, notificationBuilder.build());
-
-
-        int importance = NotificationManager.IMPORTANCE_DEFAULT;
-        NotificationChannel channel = new NotificationChannel("69", "Timer Notification", importance);
-        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-        notificationManager.createNotificationChannel(channel);
+        timerIsActive = true;
+        if (progress == 0.0f) {
+            updateNotification(getString(R.string.timerExpired));
+        }
+        else
+        {
+            updateNotification(getString(R.string.notificationText));
+        }
+        Log.d("TIMER", "TimerService onStart()");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-    }
-
-    public void add10Seconds() {
-        timer3SecondsSoundPlayed = false;
-        timer10SecondsSoundPlayed = false;
-        endTime += 10000;
-        if (mediaPlayer != null) {
+        if (countDownHandler != null) {
+            countDownHandler.removeCallbacks(countDownRunnable);
+        }
+        if(mediaPlayer != null) {
             mediaPlayer.stop();
         }
+        timerIsActive = false;
+        timerIsRunning = false;
+        timerIsExpired = false;
+        stopForeground(true);
+        Log.d("TIMER", "TimerService onDestroy()");
     }
 
-    private void startCountdown() {
+    public void startCountdown() {
+        Log.d("TIMER", "TimerService startCountdown()");
+        int duration = DatabaseManager.getSettings().timerDuration;
+        timerIsActive = true;
+        timerIsRunning = true;
+        timerIsExpired = false;
         startTime = System.currentTimeMillis();
-        endTime = (long) (startTime + (duration * 1000L));
+        endTime = startTime + (duration * 1000L);
         lastFullSeconds = duration;
 
         countDownHandler = new Handler();
@@ -110,37 +123,38 @@ public class TimerService extends Service {
                     }
 
                     broadcast.putExtra("PROGRESS", progress);
-                    broadcast.putExtra("REMAINING", (float)millisRemaining / 1000);
                     sendBroadcast(broadcast);
 
                     countDownHandler.postDelayed(this, 10);
                 } else {
                     timer3SecondsSoundPlayed = false;
                     timer10SecondsSoundPlayed = false;
+                    timerIsRunning = false;
+                    timerIsExpired = true;
                     updateNotification(getResources().getString(R.string.timerExpired));
                     progress = 0.0f;
 
-                    broadcast.putExtra("PROGRESS", 0.0f);
-                    broadcast.putExtra("REMAINING", 0.0f);
+                    broadcast.putExtra("PROGRESS", progress);
                     sendBroadcast(broadcast);
-
-                    onDestroy();
                 }
             }
         };
         countDownHandler.postDelayed(countDownRunnable, 0);
     }
 
-    public void stopTimer() {
-        if (countDownHandler != null) {
-            countDownHandler.removeCallbacks(countDownRunnable);
+    public void add10Seconds() {
+        timer3SecondsSoundPlayed = false;
+        timer10SecondsSoundPlayed = false;
+        endTime += 10000;
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
         }
-        stopForeground(true);
-        stopSelf();
-        this.onDestroy();
+        Log.d("TIMER", "TimerService add10Seconds()");
     }
 
-
+    public void deactivate() {
+        onDestroy();
+    }
 
     private void timerUnder10Seconds() {
         if (timer10SecondsSoundPlayed)
@@ -173,21 +187,16 @@ public class TimerService extends Service {
         mediaPlayer.start();
     }
 
-    public void resetAudio() {
-        timer3SecondsSoundPlayed = false;
-        timer10SecondsSoundPlayed = false;
-
-
+    public boolean getTimerIsActive() {
+        return timerIsActive;
     }
 
-    public void stopAudio() {
-        if(mediaPlayer != null) {
-            mediaPlayer.stop();
-        }
+    public boolean getTimerIsRunning() {
+        return timerIsRunning;
     }
 
-    public float getProgress() {
-        return progress;
+    public boolean getTimerIsExpired() {
+        return timerIsExpired;
     }
 
     private void updateNotification(String text) {
@@ -201,13 +210,12 @@ public class TimerService extends Service {
     private void createNotification() {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
-
         notificationBuilder = new NotificationCompat.Builder(this, "69")
                 .setContentTitle(getResources().getString(R.string.notificationTitle))
                 .setSmallIcon(R.drawable.ic_fitness_center_24)
                 .setContentIntent(pendingIntent)
-                .setPriority(NotificationCompat.PRIORITY_MAX);
-
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setOngoing(true);
     }
 
     @Override
