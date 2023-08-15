@@ -50,23 +50,7 @@ public class TimerService extends Service {
     @Override
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
-        float progress = 1.0f;
-        Bundle extras = intent.getExtras();
-        if(extras != null) {
-            progress = extras.getFloat("PROGRESS");
-        }
-
-        createNotification();
-        startForeground(69, notificationBuilder.build());
         timerIsActive = true;
-        if (progress == 0.0f) {
-            updateNotification(getString(R.string.timerExpired));
-        }
-        else
-        {
-            updateNotification(getString(R.string.notificationText));
-        }
-        Log.d("TIMER", "TimerService onStart()");
     }
 
     @Override
@@ -81,12 +65,16 @@ public class TimerService extends Service {
         timerIsActive = false;
         timerIsRunning = false;
         timerIsExpired = false;
+        progress = 1.0f;
+        broadcast.putExtra("PROGRESS", progress);
+        sendBroadcast(broadcast);
+
         stopForeground(true);
-        Log.d("TIMER", "TimerService onDestroy()");
     }
 
     public void startCountdown() {
-        Log.d("TIMER", "TimerService startCountdown()");
+        createNotification();
+        startForeground(69, notificationBuilder.build());
         int duration = DatabaseManager.getSettings().timerDuration;
         timerIsActive = true;
         timerIsRunning = true;
@@ -149,7 +137,6 @@ public class TimerService extends Service {
         if (mediaPlayer != null) {
             mediaPlayer.stop();
         }
-        Log.d("TIMER", "TimerService add10Seconds()");
     }
 
     public void deactivate() {

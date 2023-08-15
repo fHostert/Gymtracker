@@ -57,8 +57,6 @@ public final class DatabaseManager {
 
     }
 
-    //TODO remove timeractive setting
-
     /*##############################################################################################
     #########################################CURRENTWORKOUT#########################################
     ##############################################################################################*/
@@ -1330,11 +1328,11 @@ public final class DatabaseManager {
         boolean tableExists = doesTableExist("Settings");
         String query = "CREATE TABLE IF NOT EXISTS Settings(" +
                 "timerDuration INT, timerAutoPlay INT, timerPlay3Seconds INT, timerPlay10Seconds INT, " +
-                "timerVibrateAt3 INT, timerVibrateAt10 INT, timerIsActive INT);";
+                "timerVibrateAt3 INT, timerVibrateAt10 INT);";
         db.execSQL(query);
 
         if (!tableExists) {
-            query = "INSERT INTO SETTINGS VALUES(120, 0, 1, 1, 1, 1, 0);";
+            query = "INSERT INTO SETTINGS VALUES(120, 0, 1, 1, 1, 1);";
             db.execSQL(query);
         }
     }
@@ -1351,7 +1349,6 @@ public final class DatabaseManager {
         settings.timerPlay10Seconds = resultSet.getInt(3) == 1;
         settings.timerVibrateAt10Seconds = resultSet.getInt(4) == 1;
         settings.timerVibrateAt3Seconds = resultSet.getInt(5) == 1;
-        settings.timerIsActive = resultSet.getInt(6) == 1;
 
         resultSet.close();
         return settings;
@@ -1380,20 +1377,6 @@ public final class DatabaseManager {
 
         query = String.format(l,
                 "UPDATE Settings SET timerVibrateAt10 = %d;", settings.timerVibrateAt10Seconds ? 1 : 0);
-        db.execSQL(query);
-    }
-
-    public static boolean wasTimerActive() {
-        String query = "SELECT timerIsActive FROM Settings;";
-        Cursor rs = db.rawQuery(query, null);
-        boolean erg = rs.getInt(0) == 1;
-        rs.close();
-        return erg;
-    }
-
-    public static void setTimerActive(int active) {
-        String query = String.format(l,
-                "UPDATE Settings SET timerIsActive = %d;", active);
         db.execSQL(query);
     }
 

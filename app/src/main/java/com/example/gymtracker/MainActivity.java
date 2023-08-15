@@ -746,11 +746,9 @@ public class MainActivity extends AppCompatActivity {
     #############################################TIMER##############################################
     ##############################################################################################*/
     private void activateTimer() {
-        Log.d("TIMER", "Main activateTimer()");
         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
                 .getView().findViewById(R.id.timer);
         timer.setVisibility(View.VISIBLE);
-        float progress = 1.0f;
 
         activateTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_off_24));
         activateTimerMenuItem.setTitle(R.string.deactivateTimer);
@@ -765,14 +763,15 @@ public class MainActivity extends AppCompatActivity {
         //app resumed to expired timer
         else if (timerService.getTimerIsExpired())
         {
-            Log.d("TIMER", "Main resumed to expired");
-            progress = 0.0f;
-            timer.setProgress(progress);
+            timer.setProgress(0.0f);
             updateNotification(getString(R.string.timerExpired));
+        }
+        else
+        {
+            updateNotification(getString(R.string.notificationText));
         }
 
         Intent serviceIntent = new Intent(this, TimerService.class);
-        serviceIntent.putExtra("PROGRESS", progress);
         startService(serviceIntent);
     }
 
@@ -797,7 +796,6 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this,
                 getResources().getString(R.string.timerDeactivated),
                 Toast.LENGTH_SHORT).show();
-        Log.d("TIMER", "Main deactivateTimer()");
     }
 
     public void startTimer() {
@@ -810,7 +808,6 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this,
                 getResources().getString(R.string.timerStarted),
                 Toast.LENGTH_SHORT).show();
-        Log.d("TIMER", "Main startTimer()");
     }
 
     private void addToTimer() {
@@ -822,7 +819,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateCountdown(Intent intent) {
         float progress = intent.getFloatExtra("PROGRESS", 0);
-        //Log.d("TIMER", "Broadcast " + progress);
 
         if (getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT") != null) {
             TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
