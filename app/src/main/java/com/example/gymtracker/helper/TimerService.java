@@ -56,20 +56,6 @@ public class TimerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (countDownHandler != null) {
-            countDownHandler.removeCallbacks(countDownRunnable);
-        }
-        if(mediaPlayer != null) {
-            mediaPlayer.stop();
-        }
-        timerIsActive = false;
-        timerIsRunning = false;
-        timerIsExpired = false;
-        progress = 1.0f;
-        broadcast.putExtra("PROGRESS", progress);
-        sendBroadcast(broadcast);
-
-        stopForeground(true);
     }
 
     public void startCountdown() {
@@ -140,7 +126,20 @@ public class TimerService extends Service {
     }
 
     public void deactivate() {
-        onDestroy();
+        if (countDownHandler != null) {
+            countDownHandler.removeCallbacks(countDownRunnable);
+        }
+        if(mediaPlayer != null) {
+            mediaPlayer.stop();
+        }
+        timerIsActive = false;
+        timerIsRunning = false;
+        timerIsExpired = false;
+        progress = 1.0f;
+        broadcast.putExtra("PROGRESS", progress);
+        sendBroadcast(broadcast);
+
+        stopForeground(true);
     }
 
     private void timerUnder10Seconds() {

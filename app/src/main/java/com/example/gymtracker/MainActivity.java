@@ -289,7 +289,6 @@ public class MainActivity extends AppCompatActivity {
         else if (resultCode == RESULT_OK && requestCode == 3) {
             importDatabase(data.getData());
         }
-
     }
 
     @Override
@@ -677,9 +676,7 @@ public class MainActivity extends AppCompatActivity {
     private void stopWorkout() {
         reload();
         invalidateOptionsMenu();
-        Intent serviceIntent = new Intent(this, TimerService.class);
         timerService.deactivate();
-        stopService(serviceIntent);
         deactivateTimer();
         deleteNotification();
         this.setTitle(getResources().getString(R.string.app_name));
@@ -784,9 +781,7 @@ public class MainActivity extends AppCompatActivity {
         startTimerMenuItem.setTitle(R.string.startTimer);
         startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
 
-        Intent serviceIntent = new Intent(this, TimerService.class);
         timerService.deactivate();
-        stopService(serviceIntent);
         updateNotification(getString(R.string.notificationText));
 
         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
@@ -799,11 +794,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startTimer() {
+        if (!timerService.getTimerIsActive()) {
+            return;
+        }
         startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_10_24));
         startTimerMenuItem.setTitle(R.string.add10Timer);
         startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
 
         timerService.startCountdown();
+        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
+                .getView().findViewById(R.id.timer);
+        timer.setVisibility(View.VISIBLE);
 
         Toast.makeText(this,
                 getResources().getString(R.string.timerStarted),

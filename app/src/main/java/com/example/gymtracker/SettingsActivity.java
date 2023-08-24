@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.gymtracker.datastructures.Settings;
 import com.example.gymtracker.helper.DatabaseManager;
@@ -67,6 +68,9 @@ public class SettingsActivity extends AppCompatActivity {
 
         DatabaseManager.setSettings(settings);
         setResult(RESULT_OK);
+        Toast.makeText(this,
+                getResources().getString(R.string.settingsSaved),
+                Toast.LENGTH_SHORT).show();
         finish();
     }
 }

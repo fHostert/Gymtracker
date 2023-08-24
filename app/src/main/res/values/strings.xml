@@ -229,5 +229,6 @@
     <string name="timerStarted">Timer gestartet</string>
     <string name="timerExpired">Timer abgelaufen.</string>
     <string name="second">Sekunde.</string>
+    <string name="settingsSaved">Einstellungen gespeichert</string>
 
 </resources>
