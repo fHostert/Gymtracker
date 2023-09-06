@@ -51,14 +51,24 @@ public class TimerService extends Service {
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
         timerIsActive = true;
+        Log.d("TIMER", "Service onStart");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d("TIMER", "Service onDestroy");
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        timerIsActive = true;
+        Log.d("TIMER", "Service onStartCommand");
+        return START_STICKY;
     }
 
     public void startCountdown() {
+        Log.d("TIMER", "Service startCountdown");
         createNotification();
         startForeground(69, notificationBuilder.build());
         int duration = DatabaseManager.getSettings().timerDuration;
@@ -126,6 +136,7 @@ public class TimerService extends Service {
     }
 
     public void deactivate() {
+        Log.d("TIMER", "Service deactivate");
         if (countDownHandler != null) {
             countDownHandler.removeCallbacks(countDownRunnable);
         }

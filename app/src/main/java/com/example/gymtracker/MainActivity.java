@@ -72,12 +72,14 @@ public class MainActivity extends AppCompatActivity {
     ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            Log.d("TIMER", "ServiceDisconnected");
             mBounded = false;
             timerService = null;
         }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d("TIMER", "ServiceConnected");
             mBounded = true;
             TimerService.LocalBinder mLocalBinder = (TimerService.LocalBinder)service;
             timerService = mLocalBinder.getTimerServiceInstance();
@@ -300,6 +302,12 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         registerReceiver(receiver, new IntentFilter("COUNTDOWN"));
+        Log.d("TIMER", "Main onResume");
+        if (timerService != null && timerService.getTimerIsExpired()) {
+            TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
+                    .getView().findViewById(R.id.timer);
+            timer.setProgress(0.0f);
+        }
     }
 
     @Override
@@ -743,6 +751,7 @@ public class MainActivity extends AppCompatActivity {
     #############################################TIMER##############################################
     ##############################################################################################*/
     private void activateTimer() {
+        Log.d("TIMER", "MainService activateTimer");
         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
                 .getView().findViewById(R.id.timer);
         timer.setVisibility(View.VISIBLE);
@@ -773,6 +782,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void deactivateTimer() {
+        Log.d("TIMER", "MainService deactivateTimer");
         activateTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_24));
         activateTimerMenuItem.setTitle(R.string.activateTimer);
         activateTimerMenuItem.getIcon().setTint(getColor(R.color.white));
@@ -788,12 +798,16 @@ public class MainActivity extends AppCompatActivity {
                 .getView().findViewById(R.id.timer);
         timer.setVisibility(View.GONE);
 
-        Toast.makeText(this,
-                getResources().getString(R.string.timerDeactivated),
-                Toast.LENGTH_SHORT).show();
+        if (DatabaseManager.doesTableExist("CurrentWorkout")) {
+            Toast.makeText(this,
+                    getResources().getString(R.string.timerDeactivated),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void startTimer() {
+        Log.d("TIMER", "MainService startTimer");
+        //Log.d("TIMER", String.valueOf("service==null: " + (timerService == null)));
         if (!timerService.getTimerIsActive()) {
             return;
         }
@@ -812,6 +826,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addToTimer() {
+        Log.d("TIMER", "MainService addToTimer");
         timerService.add10Seconds();
         Toast.makeText(this,
                 getResources().getString(R.string.added10SecondsToTimer),
