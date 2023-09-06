@@ -482,7 +482,6 @@ public final class DatabaseManager {
     public static void setCurrentWorkoutTimerStart(long value) {
         String query = String.format(l,
                 "UPDATE CurrentWorkoutMetadata SET timerStart = %d;", value);
-        Log.d("TIMER", "QUERY: " + query);
         db.execSQL(query);
     }
 

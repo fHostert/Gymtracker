@@ -55,6 +55,7 @@ import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.helper.TimerBar;
 
+import com.example.gymtracker.helper.TimerNotificationService;
 import com.example.gymtracker.history.HistoryFragment;
 import com.example.gymtracker.templates.EditTemplateActivity;
 import com.example.gymtracker.workout.WorkoutFragment;
@@ -75,10 +76,6 @@ public class MainActivity extends AppCompatActivity {
     //timer
     private MenuItem startTimerMenuItem;
     private MenuItem activateTimerMenuItem;
-    int lastFullSeconds;
-    boolean timer10SecondsSoundPlayed = false;
-    boolean timer3SecondsSoundPlayed = false;
-    MediaPlayer mediaPlayer;
     Handler handler;
     Runnable runnable;
 
@@ -178,7 +175,10 @@ public class MainActivity extends AppCompatActivity {
             startTimerMenuItem = menu.findItem(R.id.timer_start_add10_menu);
             activateTimerMenuItem = menu.findItem(R.id.timer_activate_deactivate_menu);
             startTimerMenuItem.setVisible(false);
-            activateTimer();
+            if (DatabaseManager.getCurrentWorkoutTimerIsActive()) {
+                activateTimer();
+            }
+
         }
         else {
             getMenuInflater().inflate(R.menu.home_menu, menu);
@@ -667,7 +667,7 @@ public class MainActivity extends AppCompatActivity {
     private void stopWorkout() {
         reload();
         invalidateOptionsMenu();
-        deactivateTimer();
+        stopService(new Intent(this, TimerNotificationService.class));
         deleteNotification();
         this.setTitle(getResources().getString(R.string.app_name));
     }
@@ -772,8 +772,6 @@ public class MainActivity extends AppCompatActivity {
         startTimerMenuItem.setTitle(R.string.startTimer);
         startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
 
-        updateNotification(getString(R.string.notificationText));
-
         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
                 .getView().findViewById(R.id.timer);
         timer.setVisibility(View.GONE);
@@ -784,6 +782,8 @@ public class MainActivity extends AppCompatActivity {
                     getResources().getString(R.string.timerDeactivated),
                     Toast.LENGTH_SHORT).show();
         }
+        stopService(new Intent(this, TimerNotificationService.class));
+        updateNotification(getString(R.string.notificationText));
     }
 
     public void startTimer() {
@@ -806,14 +806,17 @@ public class MainActivity extends AppCompatActivity {
         DatabaseManager.setCurrentWorkoutTimerStart(start);
         DatabaseManager.setCurrentWorkoutTimerEnd(end);
         handleTimer();
+        startService(new Intent(this, TimerNotificationService.class));
     }
 
     private void addToTimer() {
         Log.d("TIMER", "MainService addToTimer");
-        DatabaseManager.setCurrentWorkoutTimerEnd((int) (DatabaseManager.getCurrentWorkoutTimerEnd() + 10000));
+        DatabaseManager.setCurrentWorkoutTimerEnd((DatabaseManager.getCurrentWorkoutTimerEnd() + 10000L));
         Toast.makeText(this,
                 getResources().getString(R.string.added10SecondsToTimer),
                 Toast.LENGTH_SHORT).show();
+        //stopService(new Intent(this, TimerNotificationService.class));
+        //startService(new Intent(this, TimerNotificationService.class));
     }
 
     private void handleTimer() {
@@ -833,40 +836,15 @@ public class MainActivity extends AppCompatActivity {
         runnable = new Runnable() {
             @Override
             public void run() {
-                Log.d("TIMER", "endTime: " + endTime);
-                Log.d("TIMER", "NOW: " + System.currentTimeMillis());
                 if (System.currentTimeMillis() < endTime) {
-                    Log.d("TIMER", "updating");
                     float progress = (float)(endTime - System.currentTimeMillis()) / (durationInSeconds * 1000L);
 
-                    long millisRemaining = (endTime - System.currentTimeMillis());
-
-                    int fullSeconds = (int) Math.round(millisRemaining / 1000.0);
-                    if (fullSeconds == 1 && lastFullSeconds != fullSeconds) {
-                        updateNotification(getResources().getString(R.string.timer) + " " + fullSeconds + " " + getResources().getString(R.string.second));
-                    }
-                    else if (lastFullSeconds != fullSeconds) {
-                        updateNotification(getResources().getString(R.string.timer) + " " + fullSeconds + " " + getResources().getString(R.string.seconds));
-                    }
-                    lastFullSeconds = fullSeconds;
-
-                    //audio logic
-                    if (millisRemaining < 10500) {
-                        timerUnder10Seconds();
-                        timer10SecondsSoundPlayed = true;
-                    }
-                    if (millisRemaining < 3500) {
-                        timerUnder3Seconds();
-                        timer3SecondsSoundPlayed = true;
-                    }
                     if (getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT") != null) {
                         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
                                 .getView().findViewById(R.id.timer);
                         timer.setProgress(progress);
                         timer.setVisibility(View.VISIBLE);
                     }
-
-
 
                     handler.postDelayed(this, 10);
                 } else {
@@ -878,47 +856,23 @@ public class MainActivity extends AppCompatActivity {
         handler.post(runnable);
     }
 
-    private void timerUnder10Seconds() {
-        if (timer10SecondsSoundPlayed)
-            return;
-        Settings settings = DatabaseManager.getSettings();
-        if (settings.timerVibrateAt10Seconds)
-        {
-            Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-            v.vibrate(VibrationEffect.createOneShot(750, VibrationEffect.DEFAULT_AMPLITUDE));
-        }
-        if (!settings.timerPlay10Seconds)
-            return;
-        mediaPlayer = MediaPlayer.create(this, R.raw.sound_10_seconds);
-        mediaPlayer.start();
-    }
 
-    private void timerUnder3Seconds() {
-        if (timer3SecondsSoundPlayed)
-            return;
-        Settings settings = DatabaseManager.getSettings();
-        if (settings.timerVibrateAt3Seconds)
-        {
-            Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-            v.vibrate(VibrationEffect.createOneShot(750, VibrationEffect.DEFAULT_AMPLITUDE));
-        }
-
-        if (!settings.timerPlay3Seconds)
-            return;
-        mediaPlayer = MediaPlayer.create(this, R.raw.sound_3_seconds);
-        mediaPlayer.start();
-    }
 
     private void timerExpired() {
         Log.d("TIMER", "Main timerExpired");
-        timer3SecondsSoundPlayed = false;
-        timer10SecondsSoundPlayed = false;
-        updateNotification(getResources().getString(R.string.timerExpired));
-        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
-                .getView().findViewById(R.id.timer);
-        timer.setProgress(0.0f);
+
+        if (getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT") != null) {
+            TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
+                    .getView().findViewById(R.id.timer);
+            timer.setProgress(0.0f);
+        }
         DatabaseManager.setCurrentWorkoutTimerStart(-1);
         DatabaseManager.setCurrentWorkoutTimerEnd(-1);
+        if (startTimerMenuItem != null) {
+            startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_play_arrow_24));
+            startTimerMenuItem.setTitle(R.string.startTimer);
+            startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
+        }
     }
 
     private void openSettings() {
