@@ -49,6 +49,10 @@ public final class DatabaseManager {
         {
             String query = "ALTER TABLE Templates ADD COLUMN position INT";
             db.execSQL(query);
+            //query = "DROP TABLE CurrentWorkout";
+            //db.execSQL(query);
+            //query = "DROP TABLE CurrentWorkoutMetadata";
+            //db.execSQL(query);
         }
         catch (Exception ignored)
         {
@@ -408,7 +412,9 @@ public final class DatabaseManager {
     ##############################################################################################*/
     public static void createCurrentWorkoutMetadataTable() {
         String query = "CREATE TABLE IF NOT EXISTS CurrentWorkoutMetadata" +
-                "(workoutName VARCHAR, startTime INT, date VARCHAR);";
+                "(workoutName VARCHAR, startTime INT, date VARCHAR, " +
+                "timerStart BIGINT, timerEnd BIGINT," +
+                "timerIsActive INT);";
         db.execSQL(query);
     }
 
@@ -417,7 +423,7 @@ public final class DatabaseManager {
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
                 Locale.getDefault()).format(new Date());
         String query = String.format(l,
-                "INSERT INTO CurrentWorkoutMetadata VALUES ('%s', %d, '%s');",
+                "INSERT INTO CurrentWorkoutMetadata VALUES ('%s', %d, '%s', -1, -1, 0);",
                 workoutName, startTime, date);
         db.execSQL(query);
     }
@@ -454,6 +460,59 @@ public final class DatabaseManager {
         rs.close();
         return workoutDate;
     }
+
+    public static long getCurrentWorkoutTimerStart() {
+        String query = "SELECT timerStart FROM CurrentWorkoutMetadata;";
+        Cursor rs = db.rawQuery(query, null);
+        rs.moveToFirst();
+        long value = rs.getLong(0);
+        rs.close();
+        return value;
+    }
+
+    public static long getCurrentWorkoutTimerEnd() {
+        String query = "SELECT timerEnd FROM CurrentWorkoutMetadata;";
+        Cursor rs = db.rawQuery(query, null);
+        rs.moveToFirst();
+        long value = rs.getLong(0);
+        rs.close();
+        return value;
+    }
+
+    public static void setCurrentWorkoutTimerStart(long value) {
+        String query = String.format(l,
+                "UPDATE CurrentWorkoutMetadata SET timerStart = %d;", value);
+        Log.d("TIMER", "QUERY: " + query);
+        db.execSQL(query);
+    }
+
+    public static void setCurrentWorkoutTimerEnd(long value) {
+        String query = String.format(l,
+                "UPDATE CurrentWorkoutMetadata SET timerEnd = %d;", value);
+        db.execSQL(query);
+    }
+
+    public static boolean getCurrentWorkoutTimerIsActive() {
+        String query = "SELECT timerIsActive FROM CurrentWorkoutMetadata;";
+        Cursor rs = db.rawQuery(query, null);
+        rs.moveToFirst();
+        int value = rs.getInt(0);
+        rs.close();
+        return value != 0;
+    }
+
+    public static void setCurrentWorkoutTimerIsActive(boolean value) {
+        if (!doesTableExist("CurrentWorkoutMetadata")){
+            return;
+        }
+        int i = 0;
+        if (value)
+            i = 1;
+        String query = String.format(l,
+                "UPDATE CurrentWorkoutMetadata SET timerIsActive = %d;", i);
+        db.execSQL(query);
+    }
+
 
     /*##############################################################################################
     ############################################WORKOUTS############################################

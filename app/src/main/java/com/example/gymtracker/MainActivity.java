@@ -30,22 +30,31 @@ import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.text.TextPaint;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.gymtracker.datastructures.Settings;
 import com.example.gymtracker.datastructures.Workout;
 import com.example.gymtracker.helper.DatabaseManager;
 import com.example.gymtracker.helper.TimerBar;
-import com.example.gymtracker.helper.TimerService;
+
 import com.example.gymtracker.history.HistoryFragment;
 import com.example.gymtracker.templates.EditTemplateActivity;
 import com.example.gymtracker.workout.WorkoutFragment;
@@ -66,25 +75,12 @@ public class MainActivity extends AppCompatActivity {
     //timer
     private MenuItem startTimerMenuItem;
     private MenuItem activateTimerMenuItem;
-    private BroadcastReceiver receiver;
-    boolean mBounded;
-    TimerService timerService;
-    ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Log.d("TIMER", "ServiceDisconnected");
-            mBounded = false;
-            timerService = null;
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d("TIMER", "ServiceConnected");
-            mBounded = true;
-            TimerService.LocalBinder mLocalBinder = (TimerService.LocalBinder)service;
-            timerService = mLocalBinder.getTimerServiceInstance();
-        }
-    };
+    int lastFullSeconds;
+    boolean timer10SecondsSoundPlayed = false;
+    boolean timer3SecondsSoundPlayed = false;
+    MediaPlayer mediaPlayer;
+    Handler handler;
+    Runnable runnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,16 +157,17 @@ public class MainActivity extends AppCompatActivity {
             importDatabase(fileUri);
         }
 
-        //countdown bind broadcast
-        receiver = new BroadcastReceiver() {
+
+        handleTimer();
+
+
+        /*findViewById(R.id.main_constraint_layout).getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
-            public void onReceive(Context context, Intent intent) {
-                updateCountdown(intent);
+            public void onGlobalLayout() {
+                findViewById(R.id.main_constraint_layout).getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                handleTimer();
             }
-        };
-        registerReceiver(receiver, new IntentFilter("COUNTDOWN"));
-        Intent mIntent = new Intent(this, TimerService.class);
-        bindService(mIntent, mConnection, BIND_AUTO_CREATE);
+        });*/
     }
 
 
@@ -181,9 +178,11 @@ public class MainActivity extends AppCompatActivity {
             startTimerMenuItem = menu.findItem(R.id.timer_start_add10_menu);
             activateTimerMenuItem = menu.findItem(R.id.timer_activate_deactivate_menu);
             startTimerMenuItem.setVisible(false);
+            activateTimer();
         }
         else {
             getMenuInflater().inflate(R.menu.home_menu, menu);
+            invalidateOptionsMenu();
         }
 
         //Color icons
@@ -191,9 +190,6 @@ public class MainActivity extends AppCompatActivity {
             Drawable drawable = menu.getItem(i).getIcon();
             if(drawable != null) {
                 drawable.setTint(getColor(R.color.white));
-            }
-            if (timerService.getTimerIsActive() && menu.getItem(i).getItemId() == R.id.timer_activate_deactivate_menu) {
-                activateTimer();
             }
         }
         return true;
@@ -235,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
             quitWorkout();
         }
         else if (id == R.id.timer_activate_deactivate_menu) {
-            if(timerService.getTimerIsActive()) {
+            if(DatabaseManager.getCurrentWorkoutTimerIsActive()) {
                 deactivateTimer();
             }
             else {
@@ -244,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
             item.getIcon().setTint(getColor(R.color.white));
         }
         else if (id == R.id.timer_start_add10_menu) {
-            if(timerService.getTimerIsRunning()) {
+            if(System.currentTimeMillis() < DatabaseManager.getCurrentWorkoutTimerEnd()) {
                 addToTimer();
             }
             else {
@@ -301,32 +297,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        registerReceiver(receiver, new IntentFilter("COUNTDOWN"));
         Log.d("TIMER", "Main onResume");
-        if (timerService != null && timerService.getTimerIsExpired()) {
-            TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
-                    .getView().findViewById(R.id.timer);
-            timer.setProgress(0.0f);
-        }
+
+
+
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        unregisterReceiver(receiver);
     }
 
     @Override
     public void onStop() {
-        try {
-            unregisterReceiver(receiver);
-        } catch (Exception e) {
-            // Receiver was probably already stopped in onPause()
-        }
-        if(mBounded) {
-            unbindService(mConnection);
-            mBounded = false;
-        }
         super.onStop();
     }
 
@@ -684,7 +667,6 @@ public class MainActivity extends AppCompatActivity {
     private void stopWorkout() {
         reload();
         invalidateOptionsMenu();
-        timerService.deactivate();
         deactivateTimer();
         deleteNotification();
         this.setTitle(getResources().getString(R.string.app_name));
@@ -752,37 +734,36 @@ public class MainActivity extends AppCompatActivity {
     ##############################################################################################*/
     private void activateTimer() {
         Log.d("TIMER", "MainService activateTimer");
-        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
-                .getView().findViewById(R.id.timer);
-        timer.setVisibility(View.VISIBLE);
+        DatabaseManager.setCurrentWorkoutTimerIsActive(true);
+
+        if (getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT") != null) {
+            TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
+                    .getView().findViewById(R.id.timer);
+            timer.setVisibility(View.VISIBLE);
+        }
+
 
         activateTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_off_24));
         activateTimerMenuItem.setTitle(R.string.deactivateTimer);
         activateTimerMenuItem.getIcon().setTint(getColor(R.color.white));
         startTimerMenuItem.setVisible(true);
-        if (timerService.getTimerIsRunning())
+        if (System.currentTimeMillis() < DatabaseManager.getCurrentWorkoutTimerEnd())
         {
             startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_10_24));
             startTimerMenuItem.setTitle(R.string.add10Timer);
             startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
         }
-        //app resumed to expired timer
-        else if (timerService.getTimerIsExpired())
-        {
-            timer.setProgress(0.0f);
-            updateNotification(getString(R.string.timerExpired));
-        }
-        else
-        {
-            updateNotification(getString(R.string.notificationText));
-        }
-
-        Intent serviceIntent = new Intent(this, TimerService.class);
-        startService(serviceIntent);
     }
 
     private void deactivateTimer() {
         Log.d("TIMER", "MainService deactivateTimer");
+        DatabaseManager.setCurrentWorkoutTimerIsActive(false);
+        DatabaseManager.setCurrentWorkoutTimerStart(-1);
+        DatabaseManager.setCurrentWorkoutTimerEnd(-1);
+        if (handler != null) {
+            handler.removeCallbacks(runnable);
+        }
+
         activateTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_24));
         activateTimerMenuItem.setTitle(R.string.activateTimer);
         activateTimerMenuItem.getIcon().setTint(getColor(R.color.white));
@@ -791,12 +772,12 @@ public class MainActivity extends AppCompatActivity {
         startTimerMenuItem.setTitle(R.string.startTimer);
         startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
 
-        timerService.deactivate();
         updateNotification(getString(R.string.notificationText));
 
         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
                 .getView().findViewById(R.id.timer);
         timer.setVisibility(View.GONE);
+        timer.setProgress(1.0f);
 
         if (DatabaseManager.doesTableExist("CurrentWorkout")) {
             Toast.makeText(this,
@@ -808,14 +789,11 @@ public class MainActivity extends AppCompatActivity {
     public void startTimer() {
         Log.d("TIMER", "MainService startTimer");
         //Log.d("TIMER", String.valueOf("service==null: " + (timerService == null)));
-        if (!timerService.getTimerIsActive()) {
-            return;
-        }
+
         startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_10_24));
         startTimerMenuItem.setTitle(R.string.add10Timer);
         startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
 
-        timerService.startCountdown();
         TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
                 .getView().findViewById(R.id.timer);
         timer.setVisibility(View.VISIBLE);
@@ -823,30 +801,124 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this,
                 getResources().getString(R.string.timerStarted),
                 Toast.LENGTH_SHORT).show();
+        long start = System.currentTimeMillis();
+        long end = start + DatabaseManager.getSettings().timerDuration * 1000L;
+        DatabaseManager.setCurrentWorkoutTimerStart(start);
+        DatabaseManager.setCurrentWorkoutTimerEnd(end);
+        handleTimer();
     }
 
     private void addToTimer() {
         Log.d("TIMER", "MainService addToTimer");
-        timerService.add10Seconds();
+        DatabaseManager.setCurrentWorkoutTimerEnd((int) (DatabaseManager.getCurrentWorkoutTimerEnd() + 10000));
         Toast.makeText(this,
                 getResources().getString(R.string.added10SecondsToTimer),
                 Toast.LENGTH_SHORT).show();
     }
 
-    private void updateCountdown(Intent intent) {
-        float progress = intent.getFloatExtra("PROGRESS", 0);
+    private void handleTimer() {
+        if (!DatabaseManager.doesTableExist("CurrentWorkout") ||
+                !DatabaseManager.getCurrentWorkoutTimerIsActive())
+            return;
 
-        if (getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT") != null) {
-            TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
-                    .getView().findViewById(R.id.timer);
-            timer.setProgress(progress);
+        invalidateOptionsMenu();
+
+        Settings settings = DatabaseManager.getSettings();
+        int durationInSeconds = settings.timerDuration;
+        long endTime = DatabaseManager.getCurrentWorkoutTimerEnd();
+
+
+        handler = new Handler();
+
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                Log.d("TIMER", "endTime: " + endTime);
+                Log.d("TIMER", "NOW: " + System.currentTimeMillis());
+                if (System.currentTimeMillis() < endTime) {
+                    Log.d("TIMER", "updating");
+                    float progress = (float)(endTime - System.currentTimeMillis()) / (durationInSeconds * 1000L);
+
+                    long millisRemaining = (endTime - System.currentTimeMillis());
+
+                    int fullSeconds = (int) Math.round(millisRemaining / 1000.0);
+                    if (fullSeconds == 1 && lastFullSeconds != fullSeconds) {
+                        updateNotification(getResources().getString(R.string.timer) + " " + fullSeconds + " " + getResources().getString(R.string.second));
+                    }
+                    else if (lastFullSeconds != fullSeconds) {
+                        updateNotification(getResources().getString(R.string.timer) + " " + fullSeconds + " " + getResources().getString(R.string.seconds));
+                    }
+                    lastFullSeconds = fullSeconds;
+
+                    //audio logic
+                    if (millisRemaining < 10500) {
+                        timerUnder10Seconds();
+                        timer10SecondsSoundPlayed = true;
+                    }
+                    if (millisRemaining < 3500) {
+                        timerUnder3Seconds();
+                        timer3SecondsSoundPlayed = true;
+                    }
+                    if (getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT") != null) {
+                        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
+                                .getView().findViewById(R.id.timer);
+                        timer.setProgress(progress);
+                        timer.setVisibility(View.VISIBLE);
+                    }
+
+
+
+                    handler.postDelayed(this, 10);
+                } else {
+                   timerExpired();
+                   handler.removeCallbacks(this);
+                }
+            }
+        };
+        handler.post(runnable);
+    }
+
+    private void timerUnder10Seconds() {
+        if (timer10SecondsSoundPlayed)
+            return;
+        Settings settings = DatabaseManager.getSettings();
+        if (settings.timerVibrateAt10Seconds)
+        {
+            Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            v.vibrate(VibrationEffect.createOneShot(750, VibrationEffect.DEFAULT_AMPLITUDE));
+        }
+        if (!settings.timerPlay10Seconds)
+            return;
+        mediaPlayer = MediaPlayer.create(this, R.raw.sound_10_seconds);
+        mediaPlayer.start();
+    }
+
+    private void timerUnder3Seconds() {
+        if (timer3SecondsSoundPlayed)
+            return;
+        Settings settings = DatabaseManager.getSettings();
+        if (settings.timerVibrateAt3Seconds)
+        {
+            Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            v.vibrate(VibrationEffect.createOneShot(750, VibrationEffect.DEFAULT_AMPLITUDE));
         }
 
-        if (progress == 0.0f) {
-            startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_play_arrow_24));
-            startTimerMenuItem.setTitle(R.string.startTimer);
-            startTimerMenuItem.getIcon().setTint(getColor(R.color.white));
-        }
+        if (!settings.timerPlay3Seconds)
+            return;
+        mediaPlayer = MediaPlayer.create(this, R.raw.sound_3_seconds);
+        mediaPlayer.start();
+    }
+
+    private void timerExpired() {
+        Log.d("TIMER", "Main timerExpired");
+        timer3SecondsSoundPlayed = false;
+        timer10SecondsSoundPlayed = false;
+        updateNotification(getResources().getString(R.string.timerExpired));
+        TimerBar timer = getSupportFragmentManager().findFragmentByTag("WORKOUT_FRAGMENT")
+                .getView().findViewById(R.id.timer);
+        timer.setProgress(0.0f);
+        DatabaseManager.setCurrentWorkoutTimerStart(-1);
+        DatabaseManager.setCurrentWorkoutTimerEnd(-1);
     }
 
     private void openSettings() {
