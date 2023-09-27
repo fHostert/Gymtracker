@@ -16,6 +16,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.example.gymtracker.MainActivity;
 import com.example.gymtracker.R;
+import com.example.gymtracker.datastructures.Exercise;
 import com.example.gymtracker.datastructures.Settings;
 
 public class TimerNotificationService extends Service {
@@ -56,7 +57,15 @@ public class TimerNotificationService extends Service {
         runnable = new Runnable() {
             @Override
             public void run() {
-                endTime = DatabaseManager.getCurrentWorkoutTimerEnd();
+                try {
+                    endTime = DatabaseManager.getCurrentWorkoutTimerEnd();
+                }
+                catch (Exception e)
+                {
+                    handler.removeCallbacks(runnable);
+                    stopSelf();
+                }
+
                 if (System.currentTimeMillis() < endTime) {
                     long millisRemaining = (endTime - System.currentTimeMillis());
 

@@ -158,7 +158,7 @@ public class SetFragment extends Fragment {
 
         //start Timer
         Settings settings = DatabaseManager.getSettings();
-        if (settings.timerAutoPlay)
+        if (settings.timerAutoPlay && DatabaseManager.getCurrentWorkoutTimerIsActive())
             ((MainActivity) getActivity()).startTimer();
     }
 }

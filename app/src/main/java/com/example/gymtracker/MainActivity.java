@@ -175,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
             startTimerMenuItem = menu.findItem(R.id.timer_start_add10_menu);
             activateTimerMenuItem = menu.findItem(R.id.timer_activate_deactivate_menu);
             startTimerMenuItem.setVisible(false);
+            Log.d("TIMER", "onCreateOptionsMenus " + DatabaseManager.getCurrentWorkoutTimerIsActive());
             if (DatabaseManager.getCurrentWorkoutTimerIsActive()) {
                 activateTimer();
             }
@@ -231,6 +232,7 @@ public class MainActivity extends AppCompatActivity {
             quitWorkout();
         }
         else if (id == R.id.timer_activate_deactivate_menu) {
+            Log.d("TIMER", "menuklick vorher " + DatabaseManager.getCurrentWorkoutTimerIsActive());
             if(DatabaseManager.getCurrentWorkoutTimerIsActive()) {
                 deactivateTimer();
             }
@@ -238,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
                 activateTimer();
             }
             item.getIcon().setTint(getColor(R.color.white));
+            Log.d("TIMER", "menuklick anchher " + DatabaseManager.getCurrentWorkoutTimerIsActive());
         }
         else if (id == R.id.timer_start_add10_menu) {
             if(System.currentTimeMillis() < DatabaseManager.getCurrentWorkoutTimerEnd()) {
@@ -783,12 +786,18 @@ public class MainActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT).show();
         }
         stopService(new Intent(this, TimerNotificationService.class));
-        updateNotification(getString(R.string.notificationText));
+
+
+        Handler h = new Handler(Looper.getMainLooper());
+        Runnable myRunnable = () -> updateNotification(getString(R.string.notificationText));
+        h.postDelayed(myRunnable, 10);
     }
 
     public void startTimer() {
         Log.d("TIMER", "MainService startTimer");
-        //Log.d("TIMER", String.valueOf("service==null: " + (timerService == null)));
+        if (DatabaseManager.getCurrentWorkoutTimerStart() != -1) {
+            return;
+        }
 
         startTimerMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_baseline_timer_10_24));
         startTimerMenuItem.setTitle(R.string.add10Timer);
@@ -815,8 +824,6 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this,
                 getResources().getString(R.string.added10SecondsToTimer),
                 Toast.LENGTH_SHORT).show();
-        //stopService(new Intent(this, TimerNotificationService.class));
-        //startService(new Intent(this, TimerNotificationService.class));
     }
 
     private void handleTimer() {
