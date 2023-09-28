@@ -835,7 +835,6 @@ public class MainActivity extends AppCompatActivity {
 
         Settings settings = DatabaseManager.getSettings();
         int durationInSeconds = settings.timerDuration;
-        long endTime = DatabaseManager.getCurrentWorkoutTimerEnd();
 
 
         handler = new Handler();
@@ -843,6 +842,7 @@ public class MainActivity extends AppCompatActivity {
         runnable = new Runnable() {
             @Override
             public void run() {
+                long endTime = DatabaseManager.getCurrentWorkoutTimerEnd();
                 if (System.currentTimeMillis() < endTime) {
                     float progress = (float)(endTime - System.currentTimeMillis()) / (durationInSeconds * 1000L);
 
