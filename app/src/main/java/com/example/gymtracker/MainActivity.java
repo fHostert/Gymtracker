@@ -68,6 +68,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     private final int notificationId = 69;
@@ -156,15 +157,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         handleTimer();
-
-
-        /*findViewById(R.id.main_constraint_layout).getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                findViewById(R.id.main_constraint_layout).getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                handleTimer();
-            }
-        });*/
     }
 
 
@@ -301,9 +293,6 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         Log.d("TIMER", "Main onResume");
-
-
-
     }
 
     @Override

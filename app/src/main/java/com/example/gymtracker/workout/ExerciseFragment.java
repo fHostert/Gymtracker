@@ -86,10 +86,11 @@ public class ExerciseFragment extends Fragment {
         }
 
         //Restore note
-        if (!Objects.equals(DatabaseManager.getCurrentNote(exercise.getExerciseID()), "")) {
+        String note = DatabaseManager.getCurrentNote(exercise.getExerciseID());
+        if (!Objects.equals(note, "")) {
             addNote(view, false);
             EditText noteET = view.findViewById(R.id.exercise_note_edit_text);
-            noteET.setText(exercise.getNote());
+            noteET.setText(note);
         }
 
         //Initialize buttons
