@@ -52,6 +52,8 @@ public class TimerNotificationService extends Service {
         Log.d("TIMER", "Service startCountdown");
         createNotification();
         startForeground(69, notificationBuilder.build());
+        timer10SecondsSoundPlayed = false;
+        timer3SecondsSoundPlayed = false;
 
         handler = new Handler();
         runnable = new Runnable() {
