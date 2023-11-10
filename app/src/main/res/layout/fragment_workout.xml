@@ -7,7 +7,7 @@
     tools:context=".workout.WorkoutFragment"
     android:orientation="vertical">
 
-    <com.example.gymtracker.helper.TimerBar
+    <com.fhostert.gymtracker.helper.TimerBar
         android:id="@+id/timer"
         android:layout_width="match_parent"
         android:layout_height="12dp"

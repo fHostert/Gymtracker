@@ -22,7 +22,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/home_container"
-        android:name="com.example.gymtracker.HomeFragment"
+        android:name="com.fhostert.gymtracker.HomeFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_home"
@@ -36,7 +36,7 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/history_container"
         android:tag="history_fragment"
-        android:name="com.example.gymtracker.history.HistoryFragment"
+        android:name="com.fhostert.gymtracker.history.HistoryFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_history"
@@ -50,7 +50,7 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/stats_container"
         android:tag="stats_fragment"
-        android:name="com.example.gymtracker.stats.StatsFragment"
+        android:name="com.fhostert.gymtracker.stats.StatsFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_stats"

@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.gymtracker'
+    namespace 'com.fhostert.gymtracker'
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.example.gymtracker"
+        applicationId "com.fhostert.gymtracker"
         minSdk 28
         targetSdk 32
         versionCode 1
