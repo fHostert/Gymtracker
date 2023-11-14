@@ -50,7 +50,7 @@ public class TimerNotificationService extends Service {
     public void startCountdown() {
         Log.d("TIMER", "Service startCountdown");
         createNotification();
-        startForeground(69, notificationBuilder.build());
+        startForeground(420, notificationBuilder.build());
         timer10SecondsSoundPlayed = false;
         timer3SecondsSoundPlayed = false;
 
@@ -134,14 +134,14 @@ public class TimerNotificationService extends Service {
         if (notificationBuilder != null) {
             notificationBuilder.setContentText(text);
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-            notificationManager.notify(69, notificationBuilder.build());
+            notificationManager.notify(420, notificationBuilder.build());
         }
     }
 
     private void createNotification() {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
-        notificationBuilder = new NotificationCompat.Builder(this, "69")
+        notificationBuilder = new NotificationCompat.Builder(this, "420")
                 .setContentTitle(getResources().getString(R.string.notificationTitle))
                 .setSmallIcon(R.drawable.ic_fitness_center_24)
                 .setContentIntent(pendingIntent)

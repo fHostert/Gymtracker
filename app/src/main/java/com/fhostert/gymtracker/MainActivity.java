@@ -19,6 +19,7 @@ import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -26,6 +27,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -56,7 +58,7 @@ import java.io.OutputStream;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
-    private final int notificationId = 69;
+    private final int notificationId = 420;
     boolean doubleBackToExitPressedOnce = false;
 
     //timer
@@ -140,11 +142,8 @@ public class MainActivity extends AppCompatActivity {
             importDatabase(fileUri);
         }
 
-
         handleTimer();
     }
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (DatabaseManager.doesTableExist("CurrentWorkout")){
@@ -486,7 +485,7 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             Uri contentUri = FileProvider.getUriForFile(
-                    this, "com.example.gymtracker.fileprovider", exportFile);
+                    this, "com.fhostert.gymtracker.fileprovider", exportFile);
 
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("application/octet-stream");
@@ -865,8 +864,14 @@ public class MainActivity extends AppCompatActivity {
     #########################################NOTIFICATIONS##########################################
     ##############################################################################################*/
     public void startNotification(){
+        if (ContextCompat.checkSelfPermission(
+    this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.POST_NOTIFICATIONS}, 0);
+        }
+
         NotificationChannel channel =
-                new NotificationChannel("69", "General", NotificationManager.IMPORTANCE_LOW);
+                new NotificationChannel("420", "General", NotificationManager.IMPORTANCE_LOW);
         channel.enableVibration(false);
 
         // Register the channel with the system; you can't change the importance
@@ -878,7 +883,7 @@ public class MainActivity extends AppCompatActivity {
                 new Intent(this, MainActivity.class), PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this, "69")
+                new NotificationCompat.Builder(this, "420")
                         .setSmallIcon(R.drawable.ic_fitness_center_24)
                         .setContentTitle(getResources().getString(R.string.notificationTitle))
                         .setContentText(getResources().getString(R.string.notificationText))
@@ -896,7 +901,7 @@ public class MainActivity extends AppCompatActivity {
                 new Intent(this, MainActivity.class), PendingIntent.FLAG_IMMUTABLE);
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
         NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this, "69")
+                new NotificationCompat.Builder(this, "420")
                         .setSmallIcon(R.drawable.ic_fitness_center_24)
                         .setContentTitle(getResources().getString(R.string.notificationTitle))
                         .setContentText(text)
